@@ -15,6 +15,7 @@ var group__group__hal__impl__dma =
     [ "_CYHAL_DMAC_CONTROL_LINE_M2M", "group__group__hal__impl__dma.html#ga8d4c224d3be053b286fb580f3c6f2fe9", null ],
     [ "_CYHAL_DMAC_CONTROL_LINE_NONE", "group__group__hal__impl__dma.html#ga3b706e85f2a38facaf36c6ce52a64d19", null ],
     [ "_CYHAL_DMA_TDM_STRUCT_SIZE", "group__group__hal__impl__dma.html#ga6a00b2ec0dae76ae6e87630861c5d30d", null ],
+    [ "_CYHAL_DMA_TDM_STRUCT_RESERVED_SIZE", "group__group__hal__impl__dma.html#gaaba338fa27a991e42d7c5a57aec6f5c0", null ],
     [ "_CYHAL_DMA_ADDR_SRAM_START", "group__group__hal__impl__dma.html#ga7d9c2ad35beafbb2b97e37e4bb48ba27", null ],
     [ "_CYHAL_DMA_ADDR_SRAM_END", "group__group__hal__impl__dma.html#ga936c407052372a72e3ce375fa87e4df3", null ],
     [ "_CYHAL_DMA_ADDR_SCB0_START", "group__group__hal__impl__dma.html#ga663e2f3012611a6fb8c74d0e5ffa7fbf", null ],

@@ -141,7 +141,7 @@ extern "C" {
 /** Invalid src or dst addr alignment error */
 #define CYHAL_DMA_RSLT_ERR_INVALID_ALIGNMENT            \
     (CY_RSLT_CREATE_EX(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_ABSTRACTION_HAL, CYHAL_RSLT_MODULE_DMA, 3))
-/** Invalid burst_size paramenter error */
+/** Invalid burst_size parameter error */
 #define CYHAL_DMA_RSLT_ERR_INVALID_BURST_SIZE           \
     (CY_RSLT_CREATE_EX(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_ABSTRACTION_HAL, CYHAL_RSLT_MODULE_DMA, 4))
 /** Channel busy error */
@@ -186,6 +186,8 @@ typedef enum
     CYHAL_DMA_CURR_PTR_NULL       = 1 << 6, //!< Indicates that the current descriptor pointer is null
     CYHAL_DMA_ACTIVE_CH_DISABLED  = 1 << 7, //!< Indicates that the active channel is disabled
     CYHAL_DMA_DESCR_BUS_ERROR     = 1 << 8, //!< Indicates that there has been a descriptor bus error
+    CYHAL_DMA_GENERIC_ERROR       = 1 << 9, /**< Indicates that there has been a generic error during
+                                                the DMA transfer */
 } cyhal_dma_event_t;
 
 /** Specifies the transfer type to trigger when an input signal is received. */
@@ -249,7 +251,7 @@ typedef struct
     int16_t  dst_increment;             //!< Destination address auto increment amount in multiples of transfer_width
     uint8_t  transfer_width;            //!< Transfer width in bits. Valid values are: 8, 16, or 32
     uint32_t length;                    //!< Number of elements to be transferred in total
-    uint32_t burst_size;                //!< Number of elements to be transferred per trigger. If set to 0 every element is transferred, otherwise burst_size must evenly divide length.
+    uint32_t burst_size;                //!< Number of elements to be transferred per trigger. If set to 0 every element is transferred, otherwise burst_size must evenly divide length. \ref cyhal_dma_get_max_elements_per_burst can be used to determine max supported count of elements per one burst.
     cyhal_dma_transfer_action_t action; //!< Sets the behavior of the channel when triggered (using start_transfer). Ignored if burst_size is not configured.
 } cyhal_dma_cfg_t;
 
@@ -447,6 +449,16 @@ cy_rslt_t cyhal_dma_disconnect_digital(cyhal_dma_t *obj, cyhal_source_t source, 
  * @return The status of the disablement
  * */
 cy_rslt_t cyhal_dma_disable_output(cyhal_dma_t *obj, cyhal_dma_output_t output);
+
+/** Indicates, that \ref cyhal_dma_get_max_elements_per_burst function is available in this version of HAL. */
+#define CYHAL_API_AVAILABLE_DMA_GET_MAX_ELEMENTS_PER_BURST
+
+/** Max number of elements, that can be transferred by one burst
+ *
+ * @param[in]  obj         The DMA object
+ * @return Max number of elements, that can be transferred by one burst
+ * */
+uint32_t cyhal_dma_get_max_elements_per_burst(cyhal_dma_t *obj);
 
 #if defined(__cplusplus)
 }

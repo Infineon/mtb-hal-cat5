@@ -377,6 +377,10 @@ bool cyhal_i2s_is_rx_busy(cyhal_i2s_t *obj);
  * @note Each word will be aligned to the next largest power of 2. For example, if the word length is 16 bits,
  * each word will consume two bytes. But if the word length is 20, each word will consume 32 bytes.
  *
+ * @note CAT5- FIFO is 32 bit wide. When using the DMA mode of transfer, specify 32 bit buffers
+ * for the receive data. When the word length is 8 bit or 16 bit, depending on the data alignment
+ * format, fill the data in the buffer with the required zero padding bits
+ *
  * @param[in]     obj       The I2S object
  * @param[out]    rx        The receive buffer.
  * @param[in]     rx_length Number of words (as configured in cyhal_i2s_config_t.word_length) to read.
@@ -394,6 +398,10 @@ cy_rslt_t cyhal_i2s_read_async(cyhal_i2s_t *obj, void *rx, size_t rx_length);
  *
  * @note Each word will be aligned to the next largest power of 2. For example, if the word length is 16 bits,
  * each word will consume two bytes. But if the word length is 20, each word will consume 32 bytes.
+ *
+ * @note CAT5- FIFO is 32 bit wide.When using the DMA mode of transfer, specify the transmit
+ * data in 32bit buffers. When the word length is 8 bit or 16 bit, depending on the data alignment
+ * format, fill the data in the buffer with the required zero padding bits
  *
  * @param[in]     obj       The I2S object
  * @param[in]     tx        The transmit buffer.

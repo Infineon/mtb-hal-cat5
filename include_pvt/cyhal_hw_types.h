@@ -58,7 +58,7 @@
 * | TDM                | I2S                              |
 * | Timer              | TCPWM                            |
 * | UART               | SCB                              |
-* | WDT                | WDT                              |
+* | SDIO               | SDIOD                            |
 *
 */
 
@@ -109,27 +109,14 @@ extern "C" {
 /** \endcond */
 
 /************************************************************/
-/* TODO: These are placeholders for a clean build.          */
-/*       They should mostly come from the (ROM) PDL         */
+/*       The following type is not available in ROM         */
 /************************************************************/
 
 /**
 * \cond INTERNAL
 */
 
-typedef uint32_t MXS40ADCMIC_Type;
-typedef uint32_t LPCOMP_Type;
-typedef uint32_t PDM_Type;
 typedef uint32_t GPIO_PRT_Type;
-
-typedef uint32_t cy_stc_adcmic_config_t;
-typedef uint32_t cy_stc_lpcomp_config_t;
-typedef uint32_t cy_stc_pdm_pcm_config_v2_t;
-
-typedef uint32_t cy_en_adcmic_dc_channel_t;
-typedef uint32_t cy_stc_pdm_pcm_channel_config_t;
-
-extern const uint32_t cyhal_pin_map_adcmic_gpio_adc_in[1];
 
 /** \endcond */
 
@@ -168,6 +155,20 @@ typedef struct {
     uint32_t size;
     uint32_t index;
 } _cyhal_buffer_info_t;
+
+#if (CYHAL_DRIVER_AVAILABLE_SDIO_DEV)
+/**
+ * @brief SDIO Buffer info for device mode
+ *
+ * Application code relies on the specific content of this struct for data.
+ * Header information and payload are stored in this buffer.
+ */
+typedef struct
+{
+    uint8_t *rx_header;            //!< Represents the header of a received data packet
+    uint8_t *payload;               //!< Represents the payload of a received data packet
+} cyhal_sdio_buffer_t;
+#endif
 
 /**
  * @brief Shared data between timer/counter and PWM
@@ -269,8 +270,10 @@ typedef struct
   */
 typedef struct _cyhal_audioss_s { /* Explicit name to enable forward declaration */
     bool                            owned_by_configurator;
+#if (CYHAL_DRIVER_AVAILABLE_TDM)
     /* None of the PDL APIs actually want a bare TDM_Type */
     TDM_STRUCT_Type                 *base;
+#endif
     cyhal_resource_inst_t           resource;
     cyhal_gpio_t                    pin_tx_sck;
     cyhal_gpio_t                    pin_tx_ws;
@@ -317,7 +320,9 @@ typedef struct _cyhal_audioss_s { /* Explicit name to enable forward declaration
 typedef struct
 {
     const cyhal_resource_inst_t*            resource;
+#if (CYHAL_DRIVER_AVAILABLE_TDM)
     const cy_stc_tdm_config_t*              config;
+#endif
     const cyhal_clock_t *                   clock;
     uint32_t                                mclk_hz_rx; /* Must be 0 is mclk is not in use for this direction */
     uint32_t                                mclk_hz_tx; /* Must be 0 is mclk is not in use for this direction */
@@ -334,15 +339,21 @@ struct _cyhal_adc_channel_s;
   */
 typedef struct {
     bool                                owned_by_configurator;
-    MXS40ADCMIC_Type*                   base;
+#if (CYHAL_DRIVER_AVAILABLE_ADC)
+    CyADCCOMP_Type*                     base;
+    cy_stc_adccomp_adc_context_t        pdl_context;
+#endif
     /* When doing a full scan, which channel are we on */
     uint8_t                             current_channel_index;
     /* We implement multi-channel sequencing in firmware; there's no fixed channel count specified
-     * in hardware. So size the array based on the number of input pins that are connected */
+    * in hardware. So size the array based on the number of input pins that are connected */
     struct _cyhal_adc_channel_s*        channel_config[sizeof(cyhal_pin_map_adcmic_gpio_adc_in) / sizeof(cyhal_pin_map_adcmic_gpio_adc_in[0])];
     cyhal_resource_inst_t               resource;
     cyhal_clock_t                       clock;
-    bool                                dedicated_clock;
+    bool                                using_audio;
+    bool                                dc_calibrated;
+    bool                                dc_calibration_started;
+    int16_t                             calibOffset;
     /* Has at least one conversion completed since the last configuration change */
     volatile bool                       conversion_complete;
     bool                                stop_after_scan;
@@ -366,14 +377,16 @@ typedef struct {
 typedef struct
 {
     const cyhal_resource_inst_t*        resource;
-    cy_stc_adcmic_config_t const*       config;
+#if (CYHAL_DRIVER_AVAILABLE_ADC)
+    cy_stc_adccomp_adc_config_t const*  config;
+#endif
     const cyhal_clock_t *               clock;
     uint8_t                             num_channels;
-    const uint32_t*                     achieved_acquisition_time; /* length num_channels */
+    const uint32_t*                     achieved_acquisition_time;
     /* Pins are deliberately omitted from this struct. The configurator supports routing
-     * from arbitrary sources that aren't necessarily pins. The HAL only needs to know what
-     * the pins are for the purposes of reservation, freeing, and routing - all of which the
-     * configurators take care of in this flow */
+    * from arbitrary sources that aren't necessarily pins. The HAL only needs to know what
+    * the pins are for the purposes of reservation, freeing, and routing - all of which the
+    * configurators take care of in this flow */
 } cyhal_adc_configurator_t;
 
 /**
@@ -387,7 +400,9 @@ typedef struct _cyhal_adc_channel_s { /* Struct given an explicit name to make t
     cyhal_adc_t*                        adc;
     cyhal_gpio_t                        vplus;
     uint8_t                             channel_idx;
-    cy_en_adcmic_dc_channel_t           channel_sel;
+#if (CYHAL_DRIVER_AVAILABLE_ADC)
+    cy_en_adccomp_adc_dc_channel_t      channel_sel;
+#endif
     bool                                enabled;
 } cyhal_adc_channel_t;
 
@@ -395,12 +410,16 @@ typedef struct _cyhal_adc_channel_s { /* Struct given an explicit name to make t
 typedef struct {
     bool                                owned_by_configurator;
     cyhal_resource_inst_t               resource;
-    LPCOMP_Type                         *base_lpcomp;
+#if (CYHAL_DRIVER_AVAILABLE_COMP)
+    CyADCCOMP_Type*                     base;
+#endif
     cyhal_gpio_t                        pin_vin_p;
     cyhal_gpio_t                        pin_vin_m;
-    cyhal_gpio_t                        pin_out;
+    int16_t                             inP;
+    int16_t                             inN;
+    int16_t                             mode;
     cyhal_event_callback_data_t         callback_data;
-    uint32_t                            irq_cause;
+    uint32_t                            user_enabled_events;
 } cyhal_comp_t;
 
 /**
@@ -414,9 +433,11 @@ typedef struct {
 typedef struct
 {
     const cyhal_resource_inst_t*        resource;
-    const cy_stc_lpcomp_config_t *lpcomp;
+#if (CYHAL_DRIVER_AVAILABLE_COMP)
+    const cy_stc_adccomp_lpcomp_config_t *lpcomp;
+#endif
     /* No GPIOs specified. The configurator could have routed from a non-preferred
-     * GPIO, or from another non-GPIO on-chip source. */
+    * GPIO, or from another non-GPIO on-chip source. */
 } cyhal_comp_configurator_t;
 
 /**
@@ -534,26 +555,27 @@ typedef struct {
   * between platforms and/or HAL releases.
   */
 typedef struct {
-    bool                                owned_by_configurator;
-    PDM_Type                            *base;
+#if (CYHAL_DRIVER_AVAILABLE_PDMPCM)
+    CyPdmPcm_Type*                      base;
     cyhal_resource_inst_t               resource;
     cyhal_gpio_t                        pin_data;
     cyhal_gpio_t                        pin_clk;
-    cyhal_clock_t                       clock;
-    bool                                is_clock_owned;
-    /* Number of entries in the fifo when the trigger fires - i.e. one greater than the value in the register */
-    uint8_t                             user_trigger_level;
-    /** User requested irq, see cyhal_pdm_pcm_event_t */
-    uint32_t                            irq_cause;
+    cy_en_pdm_pcm_mic_source_t          source;
+    cyhal_comp_t                        comp_obj;
+    cyhal_adc_t                         adc_obj;
+    uint32_t                            stabilization_cycles;
+    bool                                is_enabled;
+    bool                                is_mic_ready;
+    bool                                is_ntd_ready;
+    int32_t                             events;
+    void*                               async_data;  
+    uint8_t*                            fifo_context;
     cyhal_event_callback_data_t         callback_data;
-    uint8_t                             word_size;
-    cyhal_dma_t                         dma;
-    cyhal_dma_t                         dma_paired;
-    volatile bool                       stabilized;
-    volatile bool                       pm_transition_ready;
-    cyhal_syspm_callback_data_t         pm_callback;
-    void                                *async_buffer;
-    size_t                              async_read_remaining;
+    bool                                pm_transition_pending;
+    cyhal_syspm_callback_data_t         pm_callback_data;
+#else
+    void                                *empty;
+#endif /* (CYHAL_DRIVER_AVAILABLE_PDMPCM) */
 } cyhal_pdm_pcm_t;
 
 /**
@@ -565,10 +587,7 @@ typedef struct {
   * and/or HAL releases.
   */
 typedef struct {
-    const cyhal_resource_inst_t*            resource;
-    const cy_stc_pdm_pcm_config_v2_t*       config;
-    const cy_stc_pdm_pcm_channel_config_t*  chan_config;
-    const cyhal_clock_t*                    clock;
+    void *empty;
 } cyhal_pdm_pcm_configurator_t;
 
 /**
@@ -610,7 +629,7 @@ typedef struct
   */
 typedef struct {
 #ifdef CY_IP_MXSMIF
-   #define SMIF_CHIP_TOP_SPI_SEL_NR    1
+  #define SMIF_CHIP_TOP_SPI_SEL_NR    1
 
     SMIF_Type*                          base;
     cyhal_resource_inst_t               resource;
@@ -739,6 +758,46 @@ typedef struct
 } cyhal_rtc_configurator_t;
 
 /**
+  * @brief SDIO object
+  *
+  * Application code should not rely on the specific contents of this struct.
+  * They are considered an implementation detail which is subject to change
+  * between platforms and/or HAL releases.
+  */
+typedef struct {
+#if (CYHAL_DRIVER_AVAILABLE_SDIO_DEV)
+    cyhal_resource_inst_t               resource;
+    cyhal_gpio_t                        pin_clk;
+    cyhal_gpio_t                        pin_cmd;
+    cyhal_gpio_t                        pin_data_0;
+    cyhal_gpio_t                        pin_data_1;
+    cyhal_gpio_t                        pin_data_2;
+    cyhal_gpio_t                        pin_data_3;
+    bool                                hw_inited;
+    bool                                is_ready;
+    int32_t                             events;
+    cyhal_event_callback_data_t         callback_data;
+    bool                                pm_transition_pending;
+    cyhal_syspm_callback_data_t         pm_callback_data;
+    cyhal_sdio_buffer_t                 buffer;
+#else
+    void                                *empty;
+#endif /* (CYHAL_DRIVER_AVAILABLE_SDIO_DEV) */
+} cyhal_sdio_t;
+
+/**
+  * @brief SDIO configurator struct
+  *
+  * This struct allows a configurator to provide block configuration information
+  * to the HAL. Because configurator-generated configurations are platform
+  * specific, the contents of this struct is subject to change between platforms
+  * and/or HAL releases.
+  */
+typedef struct {
+    void *empty;
+} cyhal_sdio_configurator_t;
+
+/**
   * @brief SPI object
   *
   * Application code should not rely on the specific contents of this struct.
@@ -753,6 +812,7 @@ typedef struct {
     cyhal_gpio_t                        pin_sclk;
     cyhal_gpio_t                        pin_ssel[4];
     cy_en_scb_spi_polarity_t            ssel_pol[4];
+    cyhal_pinmux_t                      ssel_func[4];
     uint8_t                             active_ssel;
     cyhal_clock_t                       clock;
     cy_en_scb_spi_sclk_mode_t           clk_mode;
@@ -897,6 +957,7 @@ typedef struct {
     en_hsiom_sel_t                      saved_rts_hsiom;
     cyhal_event_callback_data_t         callback_data;
     bool                                dc_configured;
+    uint32_t                            baud_rate;
 #if (CYHAL_DRIVER_AVAILABLE_DMA)
     cyhal_async_mode_t                  async_mode;
     cyhal_dma_t                         dma_tx;

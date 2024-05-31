@@ -75,7 +75,7 @@ static void _cyhal_t2timer_default_callback(void *arg)
 void _cyhal_t2timer_register_callback(cyhal_t2timer_t *obj, cy_israddress callback, void *callback_arg)
 {
     obj->int_enable = T2_ARM_TIMER_INT_EN_ENABLE;
-    obj->callback_func = callback;
+    obj->callback_func = (void*)callback;
     obj->callback_arg = (int32_t) callback_arg;
 }
 
@@ -109,7 +109,7 @@ cy_rslt_t _cyhal_t2timer_init(cyhal_t2timer_t *obj, cyhal_t2timer_t* config)
             obj->size           = _cyhal_t2timer_timer_default_config.size;
             obj->counter_mode   = _cyhal_t2timer_timer_default_config.counter_mode;
             obj->timer_duration = _cyhal_t2timer_timer_default_config.timer_duration;
-            obj->callback_func  = &_cyhal_t2timer_default_callback;
+            obj->callback_func  = (void*)&_cyhal_t2timer_default_callback;
         }
         else if (_cyhal_t2timer_in_use[T2_ARM_TIMER_AUX_2] == _CYHAL_T2TIMER_FREE)
         {
@@ -122,7 +122,7 @@ cy_rslt_t _cyhal_t2timer_init(cyhal_t2timer_t *obj, cyhal_t2timer_t* config)
             obj->size           = _cyhal_t2timer_timer_default_config.size;
             obj->counter_mode   = _cyhal_t2timer_timer_default_config.counter_mode;
             obj->timer_duration = _cyhal_t2timer_timer_default_config.timer_duration;
-            obj->callback_func  = &_cyhal_t2timer_default_callback;
+            obj->callback_func  = (void*)&_cyhal_t2timer_default_callback;
         }
         else
         {
@@ -195,26 +195,23 @@ cy_rslt_t _cyhal_t2timer_set_frequency(cyhal_t2timer_t *obj, uint32_t hz)
         return CYHAL_T2TIMER_RSLT_ERR_BAD_ARGUMENT;
     }
     
-    cy_rslt_t result;
+    cy_rslt_t result = CY_RSLT_SUCCESS;
     uint32_t base_freq = 1000000; // 1 MHz
     uint32_t base_freq_16_divided = 62500; // 62.5 kHz
     uint32_t base_freq_256_divided = 3906; // 3.91 kHz
  
     // Check if within +/- 2% of each valid frequency.
-    if(hz >= (base_freq * 0.98) || hz <= (base_freq * 1.02))
+    if(hz >= (base_freq * 0.98) && hz <= (base_freq * 1.02))
     {
         obj->divisor = T2_ARM_TIMER_DIVISOR_1;
-        result = CY_RSLT_SUCCESS;
     }
-    else if (hz >= (base_freq_16_divided * 0.98) || hz <= (base_freq_16_divided * 1.02))
+    else if ((hz >= (base_freq_16_divided * 0.98)) && (hz <= (base_freq_16_divided * 1.02)))
     {
         obj->divisor = T2_ARM_TIMER_DIVISOR_16;
-        result = CY_RSLT_SUCCESS;
     }
-    else if (hz >= (base_freq_256_divided * 0.98) || hz <= (base_freq_256_divided * 1.02))
+    else if ((hz >= (base_freq_256_divided * 0.98)) && (hz <= (base_freq_256_divided * 1.02)))
     {
         obj->divisor = T2_ARM_TIMER_DIVISOR_256;
-        result = CY_RSLT_SUCCESS;
     }
     else
     {
@@ -233,7 +230,7 @@ cy_rslt_t _cyhal_t2timer_start(cyhal_t2timer_t *obj)
 
     uint32_t options = obj->enabled | obj->mode | obj->int_enable | obj->divisor | \
                        obj->size | obj->counter_mode;
-    return _CY_T2TIMER_TO_HAL_RETURN(clock_auxTimerStart(obj->which_timer, obj->timer_duration, options, obj->callback_func, obj->callback_arg));
+    return _CY_T2TIMER_TO_HAL_RETURN(clock_auxTimerStart(obj->which_timer, obj->timer_duration, options, (void (*)(INT32))obj->callback_func, obj->callback_arg));
 }
 
 cy_rslt_t _cyhal_t2timer_stop(cyhal_t2timer_t *obj)
@@ -257,7 +254,7 @@ cy_rslt_t _cyhal_t2timer_reset(cyhal_t2timer_t *obj)
 
     uint32_t options = obj->enabled | obj->mode | obj->int_enable | obj->divisor | \
                        obj->size | obj->counter_mode;
-    return _CY_T2TIMER_TO_HAL_RETURN(clock_auxTimerStart(obj->which_timer, obj->timer_duration, options, obj->callback_func, obj->callback_arg));
+    return _CY_T2TIMER_TO_HAL_RETURN(clock_auxTimerStart(obj->which_timer, obj->timer_duration, options, (void (*)(INT32))obj->callback_func, obj->callback_arg));
 }
 
 uint32_t _cyhal_t2timer_read(const cyhal_t2timer_t *obj)

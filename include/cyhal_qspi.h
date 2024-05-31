@@ -130,6 +130,9 @@ extern "C" {
 /** Requested feature is not supported by this driver. */
 #define CYHAL_QSPI_RSLT_ERR_UNSUPPORTED                 \
     (CY_RSLT_CREATE_EX(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_ABSTRACTION_HAL, CYHAL_RSLT_MODULE_QSPI, 12))
+/** Bad argument. */
+#define CYHAL_QSPI_RSLT_ERR_BAD_ARGUMENT                \
+    (CY_RSLT_CREATE_EX(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_ABSTRACTION_HAL, CYHAL_RSLT_MODULE_QSPI, 13))
 
 /**
  * \}
@@ -406,6 +409,26 @@ void cyhal_qspi_register_callback(cyhal_qspi_t *obj, cyhal_qspi_event_callback_t
  * @param[in] enable         True to turn on interrupts, False to turn off
  */
 void cyhal_qspi_enable_event(cyhal_qspi_t *obj, cyhal_qspi_event_t event, uint8_t intr_priority, bool enable);
+
+/** Indicates, that \ref cyhal_qspi_is_busy function is available in this version of HAL. */
+#define CYHAL_API_AVAILABLE_QSPI_IS_BUSY
+
+/** Checks if the specified QSPI peripheral is in use
+ *
+ * @param[in] obj           The QSPI peripheral to check
+ * @return Indication of whether the QSPI is still transmitting
+ */
+bool cyhal_qspi_is_busy(cyhal_qspi_t *obj);
+
+/** Indicates, that \ref cyhal_qspi_is_pending function is available in this version of HAL. */
+#define CYHAL_API_AVAILABLE_QSPI_IS_PENDING
+
+/** Checks if an async read operation is pending
+ *
+ * @param[in] obj           The QSPI peripheral to check
+ * @return Indication of whether a QSPI async operation is pending
+ */
+bool cyhal_qspi_is_pending(cyhal_qspi_t *obj);
 
 #if defined(__cplusplus)
 }

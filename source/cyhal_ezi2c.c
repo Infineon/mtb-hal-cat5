@@ -43,29 +43,6 @@ extern "C"
 {
 #endif
 
-static inline cyhal_ezi2c_status_t _cyhal_ezi2c_convert_activity_status(uint32_t pdl_status)
-{
-    /* Structure to map EZI2C (PDL) status on HAL EZI2C status */
-    static const uint32_t status_map[] =
-    {
-        0U,                                  // Default value
-        (uint32_t)CYHAL_EZI2C_STATUS_READ1,  // CY_SCB_EZI2C_STATUS_READ1
-        (uint32_t)CYHAL_EZI2C_STATUS_WRITE1, // CY_SCB_EZI2C_STATUS_WRITE1
-        (uint32_t)CYHAL_EZI2C_STATUS_READ2,  // CY_SCB_EZI2C_STATUS_READ2
-        (uint32_t)CYHAL_EZI2C_STATUS_WRITE2, // CY_SCB_EZI2C_STATUS_WRITE2
-        (uint32_t)CYHAL_EZI2C_STATUS_BUSY,   // CY_SCB_EZI2C_STATUS_BUSY
-        (uint32_t)CYHAL_EZI2C_STATUS_ERR,    // CY_SCB_EZI2C_STATUS_ERR
-    };
-
-    cyhal_ezi2c_status_t hal_status = (cyhal_ezi2c_status_t)_cyhal_utils_convert_flags(
-        status_map, sizeof(status_map) / sizeof(uint32_t), pdl_status);
-    if ((hal_status & (CYHAL_EZI2C_STATUS_BUSY | CYHAL_EZI2C_STATUS_ERR)) == 0)
-    {
-        hal_status |= CYHAL_EZI2C_STATUS_OK;
-    }
-    return hal_status;
-}
-
 #if defined (COMPONENT_CAT5)
 static void _cyhal_ezi2c_irq_handler(_cyhal_system_irq_t irqn)
 #else
@@ -96,16 +73,19 @@ static void _cyhal_ezi2c_irq_handler(void)
 static void _cyhal_ezi2c0_irq_handler(void)
 {
     _cyhal_ezi2c_irq_handler(scb_0_interrupt_IRQn);
+    Cy_SCB_EnableInterrupt(SCB0);
 }
 
 static void _cyhal_ezi2c1_irq_handler(void)
 {
     _cyhal_ezi2c_irq_handler(scb_1_interrupt_IRQn);
+    Cy_SCB_EnableInterrupt(SCB1);
 }
 
 static void _cyhal_ezi2c2_irq_handler(void)
 {
     _cyhal_ezi2c_irq_handler(scb_2_interrupt_IRQn);
+    Cy_SCB_EnableInterrupt(SCB2);
 }
 
 static CY_SCB_IRQ_THREAD_CB_t _cyhal_irq_cb[3] = {_cyhal_ezi2c0_irq_handler, _cyhal_ezi2c1_irq_handler, _cyhal_ezi2c2_irq_handler};
@@ -184,7 +164,8 @@ static cy_rslt_t _cyhal_ezi2c_setup_resources(cyhal_ezi2c_t *obj, cyhal_gpio_t s
         return CYHAL_EZI2C_RSLT_ERR_INVALID_PIN;
     }
 
-    cy_rslt_t result = cyhal_hwmgr_reserve(&i2c_rsc);
+    cyhal_resource_inst_t rsc_to_reserve = { CYHAL_RSC_SCB, _cyhal_scb_get_block_index(found_block_idx), 0 };
+    cy_rslt_t result = cyhal_hwmgr_reserve(&rsc_to_reserve);
 
     /* Reserve the SDA pin */
     if (result == CY_RSLT_SUCCESS)
@@ -236,9 +217,9 @@ static cy_rslt_t _cyhal_ezi2c_init_hw(cyhal_ezi2c_t *obj, const cy_stc_scb_ezi2c
         obj->callback_data.callback_arg = NULL;
         obj->irq_cause = 0;
 
-        #if defined (COMPONENT_CAT5)
-            Cy_SCB_RegisterInterruptCallback(obj->base, _cyhal_irq_cb[_CYHAL_SCB_IRQ_N[scb_arr_index]]);
-        #endif
+#if defined (COMPONENT_CAT5)
+        Cy_SCB_RegisterInterruptCallback(obj->base, _cyhal_irq_cb[_CYHAL_SCB_IRQ_N[scb_arr_index]]);
+#endif
 
         _cyhal_irq_register(_CYHAL_SCB_IRQ_N[scb_arr_index], CYHAL_ISR_PRIORITY_DEFAULT, (cy_israddress)_cyhal_ezi2c_irq_handler);
     }
@@ -261,9 +242,9 @@ static void _cyhal_ezi2c_setup_and_enable(cyhal_ezi2c_t *obj, const cyhal_ezi2c_
         Cy_SCB_EZI2C_SetBuffer2(obj->base, slave2_cfg->buf, slave2_cfg->buf_size, slave2_cfg->buf_rw_boundary, &(obj->context));
     }
 
-    #if defined (COMPONENT_CAT5)
+#if defined (COMPONENT_CAT5)
         Cy_SCB_EnableInterrupt(obj->base);
-    #endif
+#endif
 
     _cyhal_irq_enable(_CYHAL_SCB_IRQ_N[scb_arr_index]);
     /* Enable EZI2C to operate */
@@ -341,7 +322,8 @@ void cyhal_ezi2c_free(cyhal_ezi2c_t *obj)
 
         if (!obj->dc_configured)
         {
-            cyhal_hwmgr_free(&(obj->resource));
+            cyhal_resource_inst_t rsc_to_free = { CYHAL_RSC_SCB, _cyhal_scb_get_block_index(obj->resource.block_num), obj->resource.channel_num };
+            cyhal_hwmgr_free(&(rsc_to_free));
         }
         obj->resource.type = CYHAL_RSC_INVALID;
     }
@@ -360,7 +342,7 @@ void cyhal_ezi2c_free(cyhal_ezi2c_t *obj)
 
 cyhal_ezi2c_status_t cyhal_ezi2c_get_activity_status(cyhal_ezi2c_t *obj)
 {
-    return _cyhal_ezi2c_convert_activity_status(Cy_SCB_EZI2C_GetActivity(obj->base, &(obj->context)));
+    return (cyhal_ezi2c_status_t)(Cy_SCB_EZI2C_GetActivity(obj->base, &(obj->context)));
 }
 
 void cyhal_ezi2c_register_callback(cyhal_ezi2c_t *obj, cyhal_ezi2c_event_callback_t callback, void *callback_arg)

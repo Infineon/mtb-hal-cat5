@@ -111,6 +111,11 @@ extern "C" {
     #define _CYHAL_QSPI_SEL3   0
 #endif
 
+#define _CYHAL_QSPI_OWNS_GPIO_CTL    ((CY_IP_MXSMIF_VERSION >= 5) && (SMIF_SMIF_GPIO_GPIO_PORT_NR))
+
+#define _CYHAL_QSPI_INVALID_BLOCK    (0xFF)
+
+
 static cyhal_qspi_t *_cyhal_qspi_config_structs[CY_IP_MXSMIF_INSTANCES];
 
 /* List of available QSPI instances */
@@ -161,7 +166,146 @@ static const _cyhal_system_irq_t _cyhal_qspi_irq_n[CY_IP_MXSMIF_INSTANCES] =
 };
 #endif
 
-static inline uint8_t _cyhal_qspi_get_block_from_irqn(_cyhal_system_irq_t irqn)
+#if (_CYHAL_QSPI_OWNS_GPIO_CTL)
+
+typedef struct
+{
+    SMIF_CORE_SMIF_GPIO_SMIF_PRT_Type* base_addr;
+    cyhal_port_t port;
+} _cyhal_qspi_port_info;
+
+static _cyhal_qspi_port_info const _cyhal_qspi_port_and_base_addr[SMIF_SMIF_NR] =
+{
+#if defined(COMPONENT_CAT1D)
+#ifdef SMIF0_CORE0
+    {
+        SMIF0_CORE0_SMIF_GPIO_SMIF_PRT0,
+        CYHAL_PORT_1
+    },
+#endif /* ifdef SMIF0_CORE0   */
+#ifdef SMIF0_CORE1
+    {
+        SMIF0_CORE1_SMIF_GPIO_SMIF_PRT0,
+        CYHAL_PORT_4
+    },
+#endif /* ifdef SMIF0_CORE1 */
+#endif /* (COMPONENT_CAT1D) */
+};
+#endif /* (_CYHAL_QSPI_OWNS_GPIO_CTL) */
+
+#if (CY_IP_MXSMIF_VERSION >= 5)
+/* MXSMIF ver. 5 has dedicated SCK signal, which is not represented by
+*  Port-Pin combination and cannot be provided by user for initialization.
+*  But, it still can controlled as GPIO and therefore SMIF functionality HSIOM
+*  required to be set in scope of QSPI initialization. */
+#define _CYHAL_QSPI_SMIF5_SCK_HSIOM_SETTING     (HSIOM_SEL_ACT_15)
+#define _CYHAL_QSPI_SMIF5_SCK_DRIVEMODE_SETTING (CY_GPIO_DM_STRONG)
+/* smif0_spihb_clk:0 is IP Block's P1.1 */
+#define _CYHAL_QSPI_SMIF5_SCK_PIN_NUM           (1U)
+#endif /* (CY_IP_MXSMIF_VERSION >= 5) */
+
+
+/*******************************************************************************
+*       (Internal) QSPI Pin Related Functions
+*******************************************************************************/
+
+static GPIO_PRT_Type* _cyhal_qspi_pin_get_port(cyhal_gpio_t pin)
+{
+    GPIO_PRT_Type *port;
+    port = Cy_GPIO_PortToAddr(CYHAL_GET_PORT(pin));
+#if (_CYHAL_QSPI_OWNS_GPIO_CTL)
+    for (uint8_t i = 0; i < SMIF_SMIF_NR; i++)
+    {
+        if (CYHAL_GET_PORT(pin) == _cyhal_qspi_port_and_base_addr[i].port)
+        {
+            port = (GPIO_PRT_Type*)_cyhal_qspi_port_and_base_addr[i].base_addr;
+            break;
+        }
+    }
+#endif /* (_CYHAL_QSPI_OWNS_GPIO_CTL) */
+    return port;
+}
+
+#if (_CYHAL_QSPI_OWNS_GPIO_CTL)
+static cy_rslt_t _cyhal_qspi_connect_pin(const cyhal_resource_pin_mapping_t *pin_connection, uint8_t drive_mode)
+{
+    cyhal_gpio_t pin = pin_connection->pin;
+    en_hsiom_sel_t hsiom = pin_connection->hsiom;
+
+    GPIO_PRT_Type *port = _cyhal_qspi_pin_get_port(pin);
+#if defined(_CYHAL_IMAGE_TYPE_SECURE)
+    Cy_GPIO_Pin_SecFastInit(port, CYHAL_GET_PIN(pin), drive_mode, 1, hsiom);
+#else
+    Cy_GPIO_Pin_FastInit(port, CYHAL_GET_PIN(pin), drive_mode, 1, hsiom);
+#endif
+
+    return CY_RSLT_SUCCESS;
+}
+
+static cy_rslt_t _cyhal_qspi_reserve_and_connect_pin(const cyhal_resource_pin_mapping_t *mapping, uint8_t drive_mode)
+{
+    cyhal_resource_inst_t pinRsc = _cyhal_utils_get_gpio_resource(mapping->pin);
+    cy_rslt_t status = cyhal_hwmgr_reserve(&pinRsc);
+    if (CY_RSLT_SUCCESS == status)
+    {
+        status = _cyhal_qspi_connect_pin(mapping, drive_mode);
+        if (CY_RSLT_SUCCESS != status)
+        {
+            cyhal_hwmgr_free(&pinRsc);
+        }
+    }
+    return status;
+}
+
+#endif /* (_CYHAL_QSPI_OWNS_GPIO_CTL) */
+
+
+static void _cyhal_qspi_release_if_used(cyhal_gpio_t *pin)
+{
+#if (_CYHAL_QSPI_OWNS_GPIO_CTL)
+    if (CYHAL_NC_PIN_VALUE != *pin)
+    {
+        /* Disconnect pin */
+        GPIO_PRT_Type *port = _cyhal_qspi_pin_get_port(*pin);
+    #if defined(_CYHAL_IMAGE_TYPE_SECURE)
+        Cy_GPIO_Pin_SecFastInit(port, CYHAL_GET_PIN(*pin), CY_GPIO_DM_HIGHZ, 1, HSIOM_SEL_GPIO);
+    #else
+        Cy_GPIO_Pin_FastInit(port, CYHAL_GET_PIN(*pin), CY_GPIO_DM_HIGHZ, 1, HSIOM_SEL_GPIO);
+    #endif
+        /* Release pin resource */
+        cyhal_resource_inst_t rsc = _cyhal_utils_get_gpio_resource(*pin);
+        cyhal_hwmgr_free(&rsc);
+        *pin = CYHAL_NC_PIN_VALUE;
+    }
+#else
+    _cyhal_utils_release_if_used(pin);
+#endif /* (_CYHAL_QSPI_OWNS_GPIO_CTL) */
+}
+
+/* Check if pin valid as resource and reserve it */
+static cy_rslt_t _cyhal_qspi_check_pin_and_reserve(const cyhal_resource_pin_mapping_t *mapping, uint8_t drive_mode)
+{
+    // Mbed calls qspi_init multiple times without calling qspi_free to update the QSPI frequency/mode.
+    // As a result, we can't worry about resource reservation if running through mbed.
+    cy_rslt_t result;
+#ifndef __MBED__
+    #if (_CYHAL_QSPI_OWNS_GPIO_CTL)
+        result = _cyhal_qspi_reserve_and_connect_pin(mapping, drive_mode);
+    #else
+        result = _cyhal_utils_reserve_and_connect(mapping, drive_mode);
+    #endif /* (_CYHAL_QSPI_OWNS_GPIO_CTL) */
+#else
+    #if (_CYHAL_QSPI_OWNS_GPIO_CTL)
+        result = _cyhal_qspi_connect_pin(mapping, drive_mode);
+    #else
+        result = cyhal_connect_pin(mapping, drive_mode);
+    #endif /* (_CYHAL_QSPI_OWNS_GPIO_CTL) */
+#endif
+    return result;
+}
+
+
+static uint8_t _cyhal_qspi_get_block_from_irqn(_cyhal_system_irq_t irqn)
 {
     for(uint8_t i = 0; i < (sizeof(_cyhal_qspi_irq_n)/sizeof(_cyhal_qspi_irq_n[0])) ;i++ )
     {
@@ -170,115 +314,9 @@ static inline uint8_t _cyhal_qspi_get_block_from_irqn(_cyhal_system_irq_t irqn)
             return i;
         }
     }
-    CY_ASSERT(false); // Should never be called with a non-SMIF IRQn
-    return 0;
+    return _CYHAL_QSPI_INVALID_BLOCK;
 }
 
-static cyhal_qspi_t *_cyhal_qspi_get_irq_obj(void)
-{
-    _cyhal_system_irq_t irqn = _cyhal_irq_get_active();
-    uint8_t block = _cyhal_qspi_get_block_from_irqn(irqn);
-    return _cyhal_qspi_config_structs[block];
-}
-
-#if CYHAL_DRIVER_AVAILABLE_SYSPM
-static void _cyhal_qspi_set_pins_frozen(cyhal_qspi_t* obj, bool freeze)
-{
-    GPIO_PRT_Type* port;
-    uint8_t pin;
-    cyhal_gpio_t gpio;
-    for(size_t i = 0; i < _CYHAL_QSPI_MAX_DATA_PINS; ++i)
-    {
-        gpio = obj->pin_io[i];
-        if(NC != gpio)
-        {
-            port = CYHAL_GET_PORTADDR(gpio);
-            pin = (uint8_t)CYHAL_GET_PIN(gpio);
-            if(freeze)
-            {
-                obj->saved_io_hsiom[i] = Cy_GPIO_GetHSIOM(port, pin);
-                Cy_GPIO_Clr(port, pin);
-                Cy_GPIO_SetHSIOM(port, pin, HSIOM_SEL_GPIO);
-            }
-            else
-            {
-                Cy_GPIO_SetHSIOM(port, pin, obj->saved_io_hsiom[i]);
-            }
-        }
-    }
-
-    gpio = obj->pin_sclk;
-    if(NC != gpio)
-    {
-        port = CYHAL_GET_PORTADDR(gpio);
-        pin = (uint8_t)CYHAL_GET_PIN(gpio);
-        if(freeze)
-        {
-            obj->saved_sclk_hsiom = Cy_GPIO_GetHSIOM(port, pin);
-            Cy_GPIO_Clr(port, pin);
-            Cy_GPIO_SetHSIOM(port, pin, HSIOM_SEL_GPIO);
-        }
-        else
-        {
-            Cy_GPIO_SetHSIOM(port, pin, obj->saved_sclk_hsiom);
-        }
-    }
-
-    for(size_t i = 0; i < SMIF_CHIP_TOP_SPI_SEL_NR; ++i)
-    {
-        gpio = obj->pin_ssel[i];
-        if(NC != gpio)
-        {
-            port = CYHAL_GET_PORTADDR(gpio);
-            pin = (uint8_t)CYHAL_GET_PIN(gpio);
-            if(freeze)
-            {
-                obj->saved_ssel_hsiom[i] = Cy_GPIO_GetHSIOM(port, pin);
-                Cy_GPIO_Set(port, pin); // The SMIF IP requires SSEL to be active low
-                Cy_GPIO_SetHSIOM(port, pin, HSIOM_SEL_GPIO);
-            }
-            else
-            {
-                Cy_GPIO_SetHSIOM(port, pin, obj->saved_ssel_hsiom[i]);
-            }
-        }
-    }
-}
-
-static bool _cyhal_qspi_pm_callback(cyhal_syspm_callback_state_t state, cyhal_syspm_callback_mode_t mode, void* callback_arg)
-{
-    CY_UNUSED_PARAMETER(state);
-    cyhal_qspi_t *obj = (cyhal_qspi_t *)callback_arg;
-    bool allow = true;
-    switch(mode)
-    {
-        case CYHAL_SYSPM_CHECK_READY:
-            allow &= obj->context.txBufferCounter == 0;
-            allow &= obj->context.rxBufferCounter == 0;
-            allow &= Cy_SMIF_GetRxFifoStatus(obj->base) == 0;
-            allow &= Cy_SMIF_GetTxFifoStatus(obj->base) == 0;
-            if (allow)
-            {
-                obj->pm_transition_pending = true;
-            }
-            break;
-        case CYHAL_SYSPM_BEFORE_TRANSITION:
-            _cyhal_qspi_set_pins_frozen(obj, true);
-            break;
-        case CYHAL_SYSPM_AFTER_TRANSITION:
-            _cyhal_qspi_set_pins_frozen(obj, false);
-            obj->pm_transition_pending = false;
-            break;
-        case CYHAL_SYSPM_CHECK_FAIL:
-            obj->pm_transition_pending = false;
-            break;
-        default:
-            CY_ASSERT(false);
-            break;
-    }
-    return allow;
-}
-#endif // CYHAL_DRIVER_AVAILABLE_SYSPM
 
 /*******************************************************************************
 *       Dispatcher Interrupt Service Routine
@@ -289,6 +327,13 @@ static bool _cyhal_qspi_pm_callback(cyhal_syspm_callback_state_t state, cyhal_sy
  * at that point which system IRQ caused the CPU IRQ. So we need to save this value at the beginning of the
  * IRQ handler when we are able to determine what it is */
 static volatile cyhal_qspi_t* _cyhal_qspi_irq_obj = NULL;
+
+static cyhal_qspi_t *_cyhal_qspi_get_irq_obj(void)
+{
+    _cyhal_system_irq_t irqn = _cyhal_irq_get_active();
+    uint8_t block = _cyhal_qspi_get_block_from_irqn(irqn);
+    return (_CYHAL_QSPI_INVALID_BLOCK != block) ? _cyhal_qspi_config_structs[block] : NULL;
+}
 
 static void _cyhal_qspi_cb_wrapper(uint32_t event)
 {
@@ -319,29 +364,14 @@ static void _cyhal_qspi_irq_handler(void)
      * just might change where the original pointer points */
     cyhal_qspi_t* old_irq_obj = (cyhal_qspi_t*)_cyhal_qspi_irq_obj;
     _cyhal_qspi_irq_obj = (cyhal_qspi_t*) _cyhal_qspi_get_irq_obj();
-    cyhal_qspi_t* obj = (cyhal_qspi_t*)_cyhal_qspi_irq_obj;
 
-    Cy_SMIF_Interrupt(obj->base, &(obj->context));
+    if (NULL != _cyhal_qspi_irq_obj)
+    {
+        cyhal_qspi_t* obj = (cyhal_qspi_t*)_cyhal_qspi_irq_obj;
+        Cy_SMIF_Interrupt(obj->base, &(obj->context));
+    }
 
     _cyhal_qspi_irq_obj = old_irq_obj;
-}
-
-/*******************************************************************************
-*       (Internal) QSPI Pin Related Functions
-*******************************************************************************/
-
-/* Check if pin valid as resource and reserve it */
-static inline cy_rslt_t _cyhal_qspi_check_pin_and_reserve(const cyhal_resource_pin_mapping_t *mapping, uint8_t drive_mode)
-{
-    // Mbed calls qspi_init multiple times without calling qspi_free to update the QSPI frequency/mode.
-    // As a result, we can't worry about resource reservation if running through mbed.
-#ifndef __MBED__
-    cy_rslt_t result = _cyhal_utils_reserve_and_connect(mapping, drive_mode);
-#else
-    cy_rslt_t result = cyhal_connect_pin(mapping, drive_mode);
-#endif
-
-    return result;
 }
 
 /*******************************************************************************
@@ -647,6 +677,105 @@ static const cyhal_resource_pin_mapping_t *_cyhal_qspi_get_dataselect(cyhal_gpio
 *       Functions
 *******************************************************************************/
 
+#if CYHAL_DRIVER_AVAILABLE_SYSPM
+static void _cyhal_qspi_set_pins_frozen(cyhal_qspi_t* obj, bool freeze)
+{
+    GPIO_PRT_Type* port;
+    uint8_t pin;
+    cyhal_gpio_t gpio;
+    for(size_t i = 0; i < _CYHAL_QSPI_MAX_DATA_PINS; ++i)
+    {
+        gpio = obj->pin_io[i];
+        if(NC != gpio)
+        {
+            port = _cyhal_qspi_pin_get_port(gpio);
+            pin = (uint8_t)CYHAL_GET_PIN(gpio);
+            if(freeze)
+            {
+                obj->saved_io_hsiom[i] = Cy_GPIO_GetHSIOM(port, pin);
+                Cy_GPIO_Clr(port, pin);
+                Cy_GPIO_SetHSIOM(port, pin, HSIOM_SEL_GPIO);
+            }
+            else
+            {
+                Cy_GPIO_SetHSIOM(port, pin, obj->saved_io_hsiom[i]);
+            }
+        }
+    }
+
+    gpio = obj->pin_sclk;
+    if(NC != gpio)
+    {
+        port = _cyhal_qspi_pin_get_port(gpio);
+        pin = (uint8_t)CYHAL_GET_PIN(gpio);
+        if(freeze)
+        {
+            obj->saved_sclk_hsiom = Cy_GPIO_GetHSIOM(port, pin);
+            Cy_GPIO_Clr(port, pin);
+            Cy_GPIO_SetHSIOM(port, pin, HSIOM_SEL_GPIO);
+        }
+        else
+        {
+            Cy_GPIO_SetHSIOM(port, pin, obj->saved_sclk_hsiom);
+        }
+    }
+
+    for(size_t i = 0; i < SMIF_CHIP_TOP_SPI_SEL_NR; ++i)
+    {
+        gpio = obj->pin_ssel[i];
+        if(NC != gpio)
+        {
+            port = _cyhal_qspi_pin_get_port(gpio);
+            pin = (uint8_t)CYHAL_GET_PIN(gpio);
+            if(freeze)
+            {
+                obj->saved_ssel_hsiom[i] = Cy_GPIO_GetHSIOM(port, pin);
+                Cy_GPIO_Set(port, pin); // The SMIF IP requires SSEL to be active low
+                Cy_GPIO_SetHSIOM(port, pin, HSIOM_SEL_GPIO);
+            }
+            else
+            {
+                Cy_GPIO_SetHSIOM(port, pin, obj->saved_ssel_hsiom[i]);
+            }
+        }
+    }
+}
+
+static bool _cyhal_qspi_pm_callback(cyhal_syspm_callback_state_t state, cyhal_syspm_callback_mode_t mode, void* callback_arg)
+{
+    CY_UNUSED_PARAMETER(state);
+    cyhal_qspi_t *obj = (cyhal_qspi_t *)callback_arg;
+    bool allow = true;
+    switch(mode)
+    {
+        case CYHAL_SYSPM_CHECK_READY:
+            allow &= obj->context.txBufferCounter == 0;
+            allow &= obj->context.rxBufferCounter == 0;
+            allow &= Cy_SMIF_GetRxFifoStatus(obj->base) == 0;
+            allow &= Cy_SMIF_GetTxFifoStatus(obj->base) == 0;
+            if (allow)
+            {
+                obj->pm_transition_pending = true;
+            }
+            break;
+        case CYHAL_SYSPM_BEFORE_TRANSITION:
+            _cyhal_qspi_set_pins_frozen(obj, true);
+            break;
+        case CYHAL_SYSPM_AFTER_TRANSITION:
+            _cyhal_qspi_set_pins_frozen(obj, false);
+            obj->pm_transition_pending = false;
+            break;
+        case CYHAL_SYSPM_CHECK_FAIL:
+            obj->pm_transition_pending = false;
+            break;
+        default:
+            obj->pm_transition_pending = false;
+            break;
+    }
+    return allow;
+}
+#endif // CYHAL_DRIVER_AVAILABLE_SYSPM
+
 static cy_rslt_t _cyhal_qspi_slave_select_check_reserve(cyhal_qspi_t *obj, cyhal_gpio_t ssel, uint8_t *found_idx,
                                                         bool reserve_n_connect)
 {
@@ -764,7 +893,8 @@ static cy_rslt_t _cyhal_qspi_process_pin_set(cyhal_qspi_t *obj, const cyhal_qspi
     if (CY_RSLT_SUCCESS == result)
     {
         /* reserve the io pins */
-        for (uint8_t i = pin_offset; (i < pin_offset + max_width) && (result == CY_RSLT_SUCCESS); i++)
+        uint8_t i = pin_offset;
+        while ((i < pin_offset + max_width) && (result == CY_RSLT_SUCCESS))
         {
             if ((NC != pin_set->io[i-pin_offset]) && (NC == obj->pin_io[i]))
             {
@@ -777,6 +907,7 @@ static cy_rslt_t _cyhal_qspi_process_pin_set(cyhal_qspi_t *obj, const cyhal_qspi
                     obj->pin_io[i] = pin_set->io[i-pin_offset];
                 }
             }
+            i++;
         }
     }
 
@@ -898,17 +1029,6 @@ static cy_rslt_t _cyhal_qspi_init_common(cyhal_qspi_t *obj, const cyhal_qspi_con
 
     if (CY_RSLT_SUCCESS == result)
     {
-        result = _cyhal_qspi_process_pin_set(obj, &pin_set, &data_select, &found_ssel_idx, !obj->dc_configured);
-    }
-
-
-    if (CY_RSLT_SUCCESS == result)
-    {
-        obj->base = _cyhal_qspi_base_addresses[obj->resource.block_num];
-    }
-
-    if (CY_RSLT_SUCCESS == result)
-    {
         if (NULL != cfg->clock)
         {
             /* Clock is provided by configuration */
@@ -934,6 +1054,17 @@ static cy_rslt_t _cyhal_qspi_init_common(cyhal_qspi_t *obj, const cyhal_qspi_con
         }
     }
 
+    if (CY_RSLT_SUCCESS == result)
+    {
+        result = _cyhal_qspi_process_pin_set(obj, &pin_set, &data_select, &found_ssel_idx, !obj->dc_configured);
+    }
+
+
+    if (CY_RSLT_SUCCESS == result)
+    {
+        obj->base = _cyhal_qspi_base_addresses[obj->resource.block_num];
+    }
+
     if (obj->is_clock_owned)
     {
         if (CY_RSLT_SUCCESS == result)
@@ -954,6 +1085,19 @@ static cy_rslt_t _cyhal_qspi_init_common(cyhal_qspi_t *obj, const cyhal_qspi_con
 
     if (CY_RSLT_SUCCESS == result)
     {
+        #if (CY_IP_MXSMIF_VERSION >= 5)
+            /* On CY_IP_MXSMIF_VERSION ver 5, SCK pin is dedicated and is not represented by GPIO name and cannot be
+             * provided by user, so QSPI code can't initialize it in a way it is done for other pins.
+             * With the help of code below, HSIOM of dedicated SCK is being switched to SMIF functionality. */
+
+            /* smif0_spihb_clk:0 is IP Block's P1.1 */
+            GPIO_PRT_Type *smif_gpio_port_to_configure = (obj->resource.block_num == 0) ?
+                (GPIO_PRT_Type*)((void*)SMIF0_CORE0_SMIF_GPIO_SMIF_PRT1) : (GPIO_PRT_Type*)((void*)SMIF0_CORE1_SMIF_GPIO_SMIF_PRT1);
+
+            Cy_GPIO_SetHSIOM(smif_gpio_port_to_configure, _CYHAL_QSPI_SMIF5_SCK_PIN_NUM, _CYHAL_QSPI_SMIF5_SCK_HSIOM_SETTING);
+            Cy_GPIO_SetDrivemode(smif_gpio_port_to_configure, _CYHAL_QSPI_SMIF5_SCK_PIN_NUM, _CYHAL_QSPI_SMIF5_SCK_DRIVEMODE_SETTING);
+        #endif
+
         /* Configure first SSEL, that was found in cfg->gpios and make it active */
         obj->slave_select = _cyhal_qspi_slave_idx_to_smif_ss(found_ssel_idx);
         Cy_SMIF_SetDataSelect(obj->base, obj->slave_select, data_select);
@@ -1097,7 +1241,7 @@ void cyhal_qspi_free(cyhal_qspi_t *obj)
         }
         for (uint8_t i = 0; (i < _CYHAL_QSPI_MAX_DATA_PINS); i++)
         {
-            _cyhal_utils_release_if_used(&(obj->pin_io[i]));
+            _cyhal_qspi_release_if_used(&(obj->pin_io[i]));
         }
     }
 
@@ -1456,6 +1600,29 @@ void cyhal_qspi_enable_event(cyhal_qspi_t *obj, cyhal_qspi_event_t event, uint8_
 
     _cyhal_system_irq_t irqn = _cyhal_qspi_irq_n[obj->resource.block_num];
     _cyhal_irq_set_priority(irqn, intr_priority);
+}
+
+static bool _cyhal_qspi_is_async_in_progress(cyhal_qspi_t *obj)
+{
+    CY_ASSERT(obj->base != NULL);
+
+    uint32_t smif_status = Cy_SMIF_GetTransferStatus(obj->base, &(obj->context));
+    return ((CY_SMIF_SEND_BUSY == smif_status) || (CY_SMIF_RX_BUSY == smif_status));
+}
+
+bool cyhal_qspi_is_busy(cyhal_qspi_t *obj)
+{
+    CY_ASSERT(obj != NULL);
+    CY_ASSERT(obj->base != NULL);
+
+    return (_cyhal_qspi_is_async_in_progress(obj) || Cy_SMIF_BusyCheck(obj->base));
+}
+
+bool cyhal_qspi_is_pending(cyhal_qspi_t *obj)
+{
+    CY_ASSERT(obj != NULL);
+
+    return _cyhal_qspi_is_async_in_progress(obj);
 }
 
 #if defined(__cplusplus)

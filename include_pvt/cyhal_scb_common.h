@@ -45,12 +45,7 @@ extern "C" {
 #endif
 
 #if defined(CY_IP_MXSCB_INSTANCES)
-#if defined(CY_DEVICE_PSOC6A256K)
-//Special case for 256k device which has 6 SCBs numbered 0, 1, 2, 4, 5, 6
-#define _SCB_ARRAY_SIZE                 (CY_IP_MXSCB_INSTANCES + 1)
-#else
 #define _SCB_ARRAY_SIZE                 (CY_IP_MXSCB_INSTANCES)
-#endif /* CY_DEVICE_PSOC6A256K */
 #elif defined(CY_IP_M0S8SCB_INSTANCES)
 #define _SCB_ARRAY_SIZE                 (CY_IP_M0S8SCB_INSTANCES)
 #elif defined(CY_IP_MXS22SCB_INSTANCES)
@@ -93,6 +88,7 @@ typedef enum
     CYHAL_SCB_OUTPUT_TRIGGER_RX_FIFO_LEVEL_REACHED, //!< Output the RX FIFO signal which is triggered when the receive FIFO has more entries than the configured level.
     CYHAL_SCB_OUTPUT_TRIGGER_TX_FIFO_LEVEL_REACHED, //!< Output the TX FIFO signal which is triggered when the transmit FIFO has less entries than the configured level.
 } cyhal_scb_output_t;
+
 
 /** The mask of available SCB blocks */
 extern const uint32_t _CYHAL_SCB_AVAILABLE_BLOCKS_MASK;

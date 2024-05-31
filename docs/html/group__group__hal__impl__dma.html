@@ -172,9 +172,13 @@ Macros</h2></td></tr>
 <tr class="memdesc:ga3b706e85f2a38facaf36c6ce52a64d19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Control line non-connection. <br /></td></tr>
 <tr class="separator:ga3b706e85f2a38facaf36c6ce52a64d19"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga6a00b2ec0dae76ae6e87630861c5d30d"><td class="memItemLeft" align="right" valign="top"><a id="ga6a00b2ec0dae76ae6e87630861c5d30d" name="ga6a00b2ec0dae76ae6e87630861c5d30d"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>_CYHAL_DMA_TDM_STRUCT_SIZE</b>&#160;&#160;&#160;0x200</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>_CYHAL_DMA_TDM_STRUCT_SIZE</b>&#160;&#160;&#160;(0x200u)</td></tr>
 <tr class="memdesc:ga6a00b2ec0dae76ae6e87630861c5d30d"><td class="mdescLeft">&#160;</td><td class="mdescRight">TDM struct size. <br /></td></tr>
 <tr class="separator:ga6a00b2ec0dae76ae6e87630861c5d30d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaaba338fa27a991e42d7c5a57aec6f5c0"><td class="memItemLeft" align="right" valign="top"><a id="gaaba338fa27a991e42d7c5a57aec6f5c0" name="gaaba338fa27a991e42d7c5a57aec6f5c0"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>_CYHAL_DMA_TDM_STRUCT_RESERVED_SIZE</b>&#160;&#160;&#160;(0x8000u)</td></tr>
+<tr class="memdesc:gaaba338fa27a991e42d7c5a57aec6f5c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">TDM struct reserved memory size. <br /></td></tr>
+<tr class="separator:gaaba338fa27a991e42d7c5a57aec6f5c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga7d9c2ad35beafbb2b97e37e4bb48ba27"><td class="memItemLeft" align="right" valign="top"><a id="ga7d9c2ad35beafbb2b97e37e4bb48ba27" name="ga7d9c2ad35beafbb2b97e37e4bb48ba27"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>_CYHAL_DMA_ADDR_SRAM_START</b>&#160;&#160;&#160;sram_adr_base</td></tr>
 <tr class="memdesc:ga7d9c2ad35beafbb2b97e37e4bb48ba27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start of SRAM address. <br /></td></tr>
@@ -208,15 +212,15 @@ Macros</h2></td></tr>
 <tr class="memdesc:gaceca22177d8eef47f625793a56bfe5bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">End of SCB2 address. <br /></td></tr>
 <tr class="separator:gaceca22177d8eef47f625793a56bfe5bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga50d3cb57ac8f6eeaf3b9a7c03a7e5ee3"><td class="memItemLeft" align="right" valign="top"><a id="ga50d3cb57ac8f6eeaf3b9a7c03a7e5ee3" name="ga50d3cb57ac8f6eeaf3b9a7c03a7e5ee3"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>_CYHAL_DMA_ADDR_TDM0_START</b>&#160;&#160;&#160;mxtdm_adr_base</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>_CYHAL_DMA_ADDR_TDM0_START</b>&#160;&#160;&#160;(mxtdm_adr_base + <a class="el" href="group__group__hal__impl__dma.html#gaaba338fa27a991e42d7c5a57aec6f5c0">_CYHAL_DMA_TDM_STRUCT_RESERVED_SIZE</a>)</td></tr>
 <tr class="memdesc:ga50d3cb57ac8f6eeaf3b9a7c03a7e5ee3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start of TDM0 address. <br /></td></tr>
 <tr class="separator:ga50d3cb57ac8f6eeaf3b9a7c03a7e5ee3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga8111715504e4e35d0d6effe316f0676a"><td class="memItemLeft" align="right" valign="top"><a id="ga8111715504e4e35d0d6effe316f0676a" name="ga8111715504e4e35d0d6effe316f0676a"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>_CYHAL_DMA_ADDR_TDM0_END</b>&#160;&#160;&#160;(mxtdm_adr_base + <a class="el" href="group__group__hal__impl__dma.html#ga6a00b2ec0dae76ae6e87630861c5d30d">_CYHAL_DMA_TDM_STRUCT_SIZE</a>)</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>_CYHAL_DMA_ADDR_TDM0_END</b>&#160;&#160;&#160;(<a class="el" href="group__group__hal__impl__dma.html#ga50d3cb57ac8f6eeaf3b9a7c03a7e5ee3">_CYHAL_DMA_ADDR_TDM0_START</a> + <a class="el" href="group__group__hal__impl__dma.html#ga6a00b2ec0dae76ae6e87630861c5d30d">_CYHAL_DMA_TDM_STRUCT_SIZE</a>)</td></tr>
 <tr class="memdesc:ga8111715504e4e35d0d6effe316f0676a"><td class="mdescLeft">&#160;</td><td class="mdescRight">End of TDM0 address. <br /></td></tr>
 <tr class="separator:ga8111715504e4e35d0d6effe316f0676a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga2d93ea6d698452bd386163af6d1b7e1b"><td class="memItemLeft" align="right" valign="top"><a id="ga2d93ea6d698452bd386163af6d1b7e1b" name="ga2d93ea6d698452bd386163af6d1b7e1b"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>_CYHAL_DMA_ADDR_TDM1_START</b>&#160;&#160;&#160;(mxtdm_adr_base + <a class="el" href="group__group__hal__impl__dma.html#ga6a00b2ec0dae76ae6e87630861c5d30d">_CYHAL_DMA_TDM_STRUCT_SIZE</a>)</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>_CYHAL_DMA_ADDR_TDM1_START</b>&#160;&#160;&#160;<a class="el" href="group__group__hal__impl__dma.html#ga8111715504e4e35d0d6effe316f0676a">_CYHAL_DMA_ADDR_TDM0_END</a></td></tr>
 <tr class="memdesc:ga2d93ea6d698452bd386163af6d1b7e1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start of TDM1 address. <br /></td></tr>
 <tr class="separator:ga2d93ea6d698452bd386163af6d1b7e1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga661951d5fa36bda97b8fa6b69abc19f9"><td class="memItemLeft" align="right" valign="top"><a id="ga661951d5fa36bda97b8fa6b69abc19f9" name="ga661951d5fa36bda97b8fa6b69abc19f9"></a>

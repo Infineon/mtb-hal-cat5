@@ -86,7 +86,7 @@ $(document).ready(function(){initNavTree('group__group__hal__results.html',''); 
   <div class="summary">
 <a href="#groups">API Reference</a> &#124;
 <a href="#enum-members">Enumerations</a>  </div>
-  <div class="headertitle"><div class="title">Result Codes<div class="ingroups"><a class="el" href="group__group__hal__types.html">HAL General Types/Macros</a> &raquo; <a class="el" href="group__group__hal__general__types.html">General Types</a></div></div></div>
+  <div class="headertitle"><div class="title">Result Codes<div class="ingroups"><a class="el" href="group__group__hal__types.html">HAL General Types/Macros</a> &raquo; <a class="el" href="group__group__hal__general__types.html">General Types</a> &#124; <a class="el" href="group__group__hal.html">HAL Drivers</a> &raquo; <a class="el" href="group__group__hal__i3c.html">I3C (Improved Inter-Integrated Circuit)</a></div></div></div>
 </div><!--header-->
 <div class="contents">
 <a name="details" id="details"></a><h2 class="groupheader">General Description</h2>
@@ -146,6 +146,9 @@ API Reference</h2></td></tr>
 <tr class="memitem:group__group__hal__results__rtc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__hal__results__rtc.html">RTC HAL Results</a></td></tr>
 <tr class="memdesc:group__group__hal__results__rtc"><td class="mdescLeft">&#160;</td><td class="mdescRight">RTC specific return codes. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:group__group__hal__results__sdio"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__hal__results__sdio.html">SDIO HAL Results</a></td></tr>
+<tr class="memdesc:group__group__hal__results__sdio"><td class="mdescLeft">&#160;</td><td class="mdescRight">SDIO specific return codes. <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:group__group__hal__results__spi"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__hal__results__spi.html">SPI HAL Results</a></td></tr>
 <tr class="memdesc:group__group__hal__results__spi"><td class="mdescLeft">&#160;</td><td class="mdescRight">SPI specific return codes. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -191,62 +194,139 @@ Enumerations</h2></td></tr>
 , <br />
 &#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a8f3c272518c2a32f2455e34137a5180d">CYHAL_RSLT_MODULE_I2S</a> = (0x0A)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a7228239f5834ed4df9600859c3588a3d">CYHAL_RSLT_MODULE_IPC</a> = (0x0B)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a12b4e2ebe92e933271f5ad4d0547fa92">CYHAL_RSLT_MODULE_I3C</a> = (0x0B)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005ab9373b6613ccb00bd4dedab0ae06d11c">CYHAL_RSLT_MODULE_INTERCONNECT</a> = (0x0C)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a7228239f5834ed4df9600859c3588a3d">CYHAL_RSLT_MODULE_IPC</a> = (0x0C)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005aa31caff90dfe21b862ea4c4d034208b6">CYHAL_RSLT_MODULE_HWMGR</a> = (0x0D)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005ab9373b6613ccb00bd4dedab0ae06d11c">CYHAL_RSLT_MODULE_INTERCONNECT</a> = (0x0D)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005ae22cca7b373e114a80c8f1aa33d42619">CYHAL_RSLT_MODULE_KEYSCAN</a> = (0x0E)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005aa31caff90dfe21b862ea4c4d034208b6">CYHAL_RSLT_MODULE_HWMGR</a> = (0x0E)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a130057944f24739b96a5552429a243a6">CYHAL_RSLT_MODULE_LPTIMER</a> = (0x0F)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005ae22cca7b373e114a80c8f1aa33d42619">CYHAL_RSLT_MODULE_KEYSCAN</a> = (0x0F)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005ab68a5786555e0e0826d28a6644baa54f">CYHAL_RSLT_MODULE_NVM</a> = (0x10)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a130057944f24739b96a5552429a243a6">CYHAL_RSLT_MODULE_LPTIMER</a> = (0x10)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a291ed2da7ed5183c3e2164ab8b6a8c3e">CYHAL_RSLT_MODULE_OPAMP</a> = (0x11)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005ab68a5786555e0e0826d28a6644baa54f">CYHAL_RSLT_MODULE_NVM</a> = (0x11)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a52c9005959fa8236fc262a990d3bd48f">CYHAL_RSLT_MODULE_PDMPCM</a> = (0x12)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a291ed2da7ed5183c3e2164ab8b6a8c3e">CYHAL_RSLT_MODULE_OPAMP</a> = (0x12)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005ac0436b7ec40cb5d645207a8bb23c0e0d">CYHAL_RSLT_MODULE_PWM</a> = (0x13)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a52c9005959fa8236fc262a990d3bd48f">CYHAL_RSLT_MODULE_PDMPCM</a> = (0x13)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005af001a4e0cb1173e8797a0a77c820bf0c">CYHAL_RSLT_MODULE_QSPI</a> = (0x14)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005ac0436b7ec40cb5d645207a8bb23c0e0d">CYHAL_RSLT_MODULE_PWM</a> = (0x14)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005af4f1d56292f0da9d3cdfa3cea392f304">CYHAL_RSLT_MODULE_QUADDEC</a> = (0x15)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005af001a4e0cb1173e8797a0a77c820bf0c">CYHAL_RSLT_MODULE_QSPI</a> = (0x15)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a14d37547bcd694a6e968b9acf3eadd7b">CYHAL_RSLT_MODULE_RTC</a> = (0x16)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005af4f1d56292f0da9d3cdfa3cea392f304">CYHAL_RSLT_MODULE_QUADDEC</a> = (0x16)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a70df074a301b74eb9ebb1f48e65c9377">CYHAL_RSLT_MODULE_SDHC</a> = (0x17)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a14d37547bcd694a6e968b9acf3eadd7b">CYHAL_RSLT_MODULE_RTC</a> = (0x17)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a9b6bd9637f353699d08637ac19f7f6fe">CYHAL_RSLT_MODULE_SDIO</a> = (0x18)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a70df074a301b74eb9ebb1f48e65c9377">CYHAL_RSLT_MODULE_SDHC</a> = (0x18)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005ab8eb6c73c4faba6bc4921c84ab03f065">CYHAL_RSLT_MODULE_SPI</a> = (0x19)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a9b6bd9637f353699d08637ac19f7f6fe">CYHAL_RSLT_MODULE_SDIO</a> = (0x19)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a2fe5f42a913a4eefbf66dbe720f90041">CYHAL_RSLT_MODULE_SYSPM</a> = (0x1A)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005ab8eb6c73c4faba6bc4921c84ab03f065">CYHAL_RSLT_MODULE_SPI</a> = (0x1A)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a421e006fc5d9ec6b40ae85276209f526">CYHAL_RSLT_MODULE_SYSTEM</a> = (0x1B)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a2fe5f42a913a4eefbf66dbe720f90041">CYHAL_RSLT_MODULE_SYSPM</a> = (0x1B)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a9616896e7258cd18f880ec0745c66bc3">CYHAL_RSLT_MODULE_TDM</a> = (0x1C)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a421e006fc5d9ec6b40ae85276209f526">CYHAL_RSLT_MODULE_SYSTEM</a> = (0x1C)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a95968938f689d6e820293e66ffd59b15">CYHAL_RSLT_MODULE_TIMER</a> = (0x1D)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a9616896e7258cd18f880ec0745c66bc3">CYHAL_RSLT_MODULE_TDM</a> = (0x1D)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a9d65008cd494335a5b5decf3533efed2">CYHAL_RSLT_MODULE_TRNG</a> = (0x1E)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a95968938f689d6e820293e66ffd59b15">CYHAL_RSLT_MODULE_TIMER</a> = (0x1E)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a61db0997675c2dc43ad7cf91e7160be5">CYHAL_RSLT_MODULE_UART</a> = (0x1F)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a9d65008cd494335a5b5decf3533efed2">CYHAL_RSLT_MODULE_TRNG</a> = (0x1F)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a608cd624d7042ae5d77c6134f7ea382f">CYHAL_RSLT_MODULE_USB</a> = (0x20)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a61db0997675c2dc43ad7cf91e7160be5">CYHAL_RSLT_MODULE_UART</a> = (0x20)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a012172915d19c167e1db5ff7e188adba">CYHAL_RSLT_MODULE_WDT</a> = (0x21)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a608cd624d7042ae5d77c6134f7ea382f">CYHAL_RSLT_MODULE_USB</a> = (0x21)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005af99e4705ecb46e6ebf1ce9e9fb73c171">CYHAL_RSLT_MODULE_IMPL_TCPWM</a> = (0x22)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a012172915d19c167e1db5ff7e188adba">CYHAL_RSLT_MODULE_WDT</a> = (0x22)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005aa7ba6553c921351f322f391838049f91">CYHAL_RSLT_MODULE_IMPL_SCB</a> = (0x23)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005af99e4705ecb46e6ebf1ce9e9fb73c171">CYHAL_RSLT_MODULE_IMPL_TCPWM</a> = (0x23)
 , <br />
-&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005abb3e7eab4c1403e33f9d069725a14787">CYHAL_RSLT_MODULE_T2TIMER</a> = (0x24)
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005aa7ba6553c921351f322f391838049f91">CYHAL_RSLT_MODULE_IMPL_SCB</a> = (0x24)
+, <br />
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005abb3e7eab4c1403e33f9d069725a14787">CYHAL_RSLT_MODULE_T2TIMER</a> = (0x25)
+, <br />
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a71dcff74719c74dc169094df0ca5f322">CYHAL_RSLT_MODULE_ETHERNET</a> = (0x26)
+, <br />
+&#160;&#160;<a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a82e9bedf130a012018f6663811a8c18e">CYHAL_RSLT_MODULE_OTP</a> = (0x27)
 <br />
  }</td></tr>
 <tr class="memdesc:ga84f32ecb6376e2088d4f048e35f52005"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enum to specify module IDs for <a class="el" href="group__group__result.html#gaca79700fcc701534ce61778a9bcf57d1">cy_rslt_t</a> values returned from the HAL.  <a href="group__group__hal__results.html#ga84f32ecb6376e2088d4f048e35f52005">More...</a><br /></td></tr>
 <tr class="separator:ga84f32ecb6376e2088d4f048e35f52005"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader">I3C Results</h2></td></tr>
+<tr class="memitem:ga2ef8893c936ec9fb95f5837b72737980"><td class="memItemLeft" align="right" valign="top"><a id="ga2ef8893c936ec9fb95f5837b72737980" name="ga2ef8893c936ec9fb95f5837b72737980"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>CYHAL_I3C_RSLT_ERR_INVALID_PIN</b>&#160;&#160;&#160;    (<a class="el" href="group__group__result.html#ga7b3e119b13a8bb398f429a22d8cf4dcd">CY_RSLT_CREATE_EX</a>(<a class="el" href="group__group__result.html#gga379d2c0a6a4ef22f04e53e8eb4c9ee79aac3d9861cc429ed0a29962e7829f4160">CY_RSLT_TYPE_ERROR</a>, <a class="el" href="group__group__result.html#gga9008565cba0207520330a1cb8509a8d0a79b500d6463aadd493b3812f779f75df">CY_RSLT_MODULE_ABSTRACTION_HAL</a>, <a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a12b4e2ebe92e933271f5ad4d0547fa92">CYHAL_RSLT_MODULE_I3C</a>, 0))</td></tr>
+<tr class="memdesc:ga2ef8893c936ec9fb95f5837b72737980"><td class="mdescLeft">&#160;</td><td class="mdescRight">The requested resource type is invalid. <br /></td></tr>
+<tr class="separator:ga2ef8893c936ec9fb95f5837b72737980"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8aa20e36f3e7a697b3f2f3494788754f"><td class="memItemLeft" align="right" valign="top"><a id="ga8aa20e36f3e7a697b3f2f3494788754f" name="ga8aa20e36f3e7a697b3f2f3494788754f"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>CYHAL_I3C_RSLT_ERR_CAN_NOT_REACH_DR</b>&#160;&#160;&#160;    (<a class="el" href="group__group__result.html#ga7b3e119b13a8bb398f429a22d8cf4dcd">CY_RSLT_CREATE_EX</a>(<a class="el" href="group__group__result.html#gga379d2c0a6a4ef22f04e53e8eb4c9ee79aac3d9861cc429ed0a29962e7829f4160">CY_RSLT_TYPE_ERROR</a>, <a class="el" href="group__group__result.html#gga9008565cba0207520330a1cb8509a8d0a79b500d6463aadd493b3812f779f75df">CY_RSLT_MODULE_ABSTRACTION_HAL</a>, <a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a12b4e2ebe92e933271f5ad4d0547fa92">CYHAL_RSLT_MODULE_I3C</a>, 1))</td></tr>
+<tr class="memdesc:ga8aa20e36f3e7a697b3f2f3494788754f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Can not reach desired data rate. <br /></td></tr>
+<tr class="separator:ga8aa20e36f3e7a697b3f2f3494788754f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga974cbda9432769133f8ede7c44a930b4"><td class="memItemLeft" align="right" valign="top"><a id="ga974cbda9432769133f8ede7c44a930b4" name="ga974cbda9432769133f8ede7c44a930b4"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>CYHAL_I3C_RSLT_ERR_INVALID_ADDRESS_SIZE</b>&#160;&#160;&#160;    (<a class="el" href="group__group__result.html#ga7b3e119b13a8bb398f429a22d8cf4dcd">CY_RSLT_CREATE_EX</a>(<a class="el" href="group__group__result.html#gga379d2c0a6a4ef22f04e53e8eb4c9ee79aac3d9861cc429ed0a29962e7829f4160">CY_RSLT_TYPE_ERROR</a>, <a class="el" href="group__group__result.html#gga9008565cba0207520330a1cb8509a8d0a79b500d6463aadd493b3812f779f75df">CY_RSLT_MODULE_ABSTRACTION_HAL</a>, <a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a12b4e2ebe92e933271f5ad4d0547fa92">CYHAL_RSLT_MODULE_I3C</a>, 2))</td></tr>
+<tr class="memdesc:ga974cbda9432769133f8ede7c44a930b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Address size is not correct, should be one or two bytes. <br /></td></tr>
+<tr class="separator:ga974cbda9432769133f8ede7c44a930b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga45f786216b46a00fc27820ffecf0d990"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__hal__results.html#ga45f786216b46a00fc27820ffecf0d990">CYHAL_I3C_RSLT_ERR_TX_RX_BUFFERS_ARE_EMPTY</a>&#160;&#160;&#160;    (<a class="el" href="group__group__result.html#ga7b3e119b13a8bb398f429a22d8cf4dcd">CY_RSLT_CREATE_EX</a>(<a class="el" href="group__group__result.html#gga379d2c0a6a4ef22f04e53e8eb4c9ee79aac3d9861cc429ed0a29962e7829f4160">CY_RSLT_TYPE_ERROR</a>, <a class="el" href="group__group__result.html#gga9008565cba0207520330a1cb8509a8d0a79b500d6463aadd493b3812f779f75df">CY_RSLT_MODULE_ABSTRACTION_HAL</a>, <a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a12b4e2ebe92e933271f5ad4d0547fa92">CYHAL_RSLT_MODULE_I3C</a>, 3))</td></tr>
+<tr class="memdesc:ga45f786216b46a00fc27820ffecf0d990"><td class="mdescLeft">&#160;</td><td class="mdescRight">User buffer is empty (TX and RX).  <a href="group__group__hal__results.html#ga45f786216b46a00fc27820ffecf0d990">More...</a><br /></td></tr>
+<tr class="separator:ga45f786216b46a00fc27820ffecf0d990"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gafde9de3d00e54c9c9043e584a49d2f67"><td class="memItemLeft" align="right" valign="top"><a id="gafde9de3d00e54c9c9043e584a49d2f67" name="gafde9de3d00e54c9c9043e584a49d2f67"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>CYHAL_I3C_RSLT_ERR_PREVIOUS_ASYNC_PENDING</b>&#160;&#160;&#160;    (<a class="el" href="group__group__result.html#ga7b3e119b13a8bb398f429a22d8cf4dcd">CY_RSLT_CREATE_EX</a>(<a class="el" href="group__group__result.html#gga379d2c0a6a4ef22f04e53e8eb4c9ee79aac3d9861cc429ed0a29962e7829f4160">CY_RSLT_TYPE_ERROR</a>, <a class="el" href="group__group__result.html#gga9008565cba0207520330a1cb8509a8d0a79b500d6463aadd493b3812f779f75df">CY_RSLT_MODULE_ABSTRACTION_HAL</a>, <a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a12b4e2ebe92e933271f5ad4d0547fa92">CYHAL_RSLT_MODULE_I3C</a>, 4))</td></tr>
+<tr class="memdesc:gafde9de3d00e54c9c9043e584a49d2f67"><td class="mdescLeft">&#160;</td><td class="mdescRight">Previous Async operation is pending. <br /></td></tr>
+<tr class="separator:gafde9de3d00e54c9c9043e584a49d2f67"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga06ff38f39fde4dc4d215a059771be24d"><td class="memItemLeft" align="right" valign="top"><a id="ga06ff38f39fde4dc4d215a059771be24d" name="ga06ff38f39fde4dc4d215a059771be24d"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>CYHAL_I3C_RSLT_ERR_PM_CALLBACK</b>&#160;&#160;&#160;    (<a class="el" href="group__group__result.html#ga7b3e119b13a8bb398f429a22d8cf4dcd">CY_RSLT_CREATE_EX</a>(<a class="el" href="group__group__result.html#gga379d2c0a6a4ef22f04e53e8eb4c9ee79aac3d9861cc429ed0a29962e7829f4160">CY_RSLT_TYPE_ERROR</a>, <a class="el" href="group__group__result.html#gga9008565cba0207520330a1cb8509a8d0a79b500d6463aadd493b3812f779f75df">CY_RSLT_MODULE_ABSTRACTION_HAL</a>, <a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a12b4e2ebe92e933271f5ad4d0547fa92">CYHAL_RSLT_MODULE_I3C</a>, 5))</td></tr>
+<tr class="memdesc:ga06ff38f39fde4dc4d215a059771be24d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Failed to register I3C pm callback. <br /></td></tr>
+<tr class="separator:ga06ff38f39fde4dc4d215a059771be24d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga963086cd0ccd733bc43a614509c5f0e6"><td class="memItemLeft" align="right" valign="top"><a id="ga963086cd0ccd733bc43a614509c5f0e6" name="ga963086cd0ccd733bc43a614509c5f0e6"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>CYHAL_I3C_RSLT_ERR_OPERATION_TIMEOUT</b>&#160;&#160;&#160;    (<a class="el" href="group__group__result.html#ga7b3e119b13a8bb398f429a22d8cf4dcd">CY_RSLT_CREATE_EX</a>(<a class="el" href="group__group__result.html#gga379d2c0a6a4ef22f04e53e8eb4c9ee79aac3d9861cc429ed0a29962e7829f4160">CY_RSLT_TYPE_ERROR</a>, <a class="el" href="group__group__result.html#gga9008565cba0207520330a1cb8509a8d0a79b500d6463aadd493b3812f779f75df">CY_RSLT_MODULE_ABSTRACTION_HAL</a>, <a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a12b4e2ebe92e933271f5ad4d0547fa92">CYHAL_RSLT_MODULE_I3C</a>, 6))</td></tr>
+<tr class="memdesc:ga963086cd0ccd733bc43a614509c5f0e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">I3C operation failed with timeout. <br /></td></tr>
+<tr class="separator:ga963086cd0ccd733bc43a614509c5f0e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga115fe14442e18185785b59e09f738139"><td class="memItemLeft" align="right" valign="top"><a id="ga115fe14442e18185785b59e09f738139" name="ga115fe14442e18185785b59e09f738139"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>CYHAL_I3C_RSLT_ERR_BAD_ARGUMENT</b>&#160;&#160;&#160;    (<a class="el" href="group__group__result.html#ga7b3e119b13a8bb398f429a22d8cf4dcd">CY_RSLT_CREATE_EX</a>(<a class="el" href="group__group__result.html#gga379d2c0a6a4ef22f04e53e8eb4c9ee79aac3d9861cc429ed0a29962e7829f4160">CY_RSLT_TYPE_ERROR</a>, <a class="el" href="group__group__result.html#gga9008565cba0207520330a1cb8509a8d0a79b500d6463aadd493b3812f779f75df">CY_RSLT_MODULE_ABSTRACTION_HAL</a>, <a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a12b4e2ebe92e933271f5ad4d0547fa92">CYHAL_RSLT_MODULE_I3C</a>, 7))</td></tr>
+<tr class="memdesc:ga115fe14442e18185785b59e09f738139"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bad argument provided. <br /></td></tr>
+<tr class="separator:ga115fe14442e18185785b59e09f738139"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5387790fabda360d1f9a75368ee01ef4"><td class="memItemLeft" align="right" valign="top"><a id="ga5387790fabda360d1f9a75368ee01ef4" name="ga5387790fabda360d1f9a75368ee01ef4"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>CYHAL_I3C_RSLT_ERR_UNSUPPORTED</b>&#160;&#160;&#160;    (<a class="el" href="group__group__result.html#ga7b3e119b13a8bb398f429a22d8cf4dcd">CY_RSLT_CREATE_EX</a>(<a class="el" href="group__group__result.html#gga379d2c0a6a4ef22f04e53e8eb4c9ee79aac3d9861cc429ed0a29962e7829f4160">CY_RSLT_TYPE_ERROR</a>, <a class="el" href="group__group__result.html#gga9008565cba0207520330a1cb8509a8d0a79b500d6463aadd493b3812f779f75df">CY_RSLT_MODULE_ABSTRACTION_HAL</a>, <a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a12b4e2ebe92e933271f5ad4d0547fa92">CYHAL_RSLT_MODULE_I3C</a>, 8))</td></tr>
+<tr class="memdesc:ga5387790fabda360d1f9a75368ee01ef4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unsupported by this device. <br /></td></tr>
+<tr class="separator:ga5387790fabda360d1f9a75368ee01ef4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6eecda8ecbf6cf700be8654776e6c138"><td class="memItemLeft" align="right" valign="top"><a id="ga6eecda8ecbf6cf700be8654776e6c138" name="ga6eecda8ecbf6cf700be8654776e6c138"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>CYHAL_I3C_RSLT_ERR_NO_ACK</b>&#160;&#160;&#160;    (<a class="el" href="group__group__result.html#ga7b3e119b13a8bb398f429a22d8cf4dcd">CY_RSLT_CREATE_EX</a>(<a class="el" href="group__group__result.html#gga379d2c0a6a4ef22f04e53e8eb4c9ee79aac3d9861cc429ed0a29962e7829f4160">CY_RSLT_TYPE_ERROR</a>, <a class="el" href="group__group__result.html#gga9008565cba0207520330a1cb8509a8d0a79b500d6463aadd493b3812f779f75df">CY_RSLT_MODULE_ABSTRACTION_HAL</a>, <a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a12b4e2ebe92e933271f5ad4d0547fa92">CYHAL_RSLT_MODULE_I3C</a>, 9))</td></tr>
+<tr class="memdesc:ga6eecda8ecbf6cf700be8654776e6c138"><td class="mdescLeft">&#160;</td><td class="mdescRight">No ACK received. <br /></td></tr>
+<tr class="separator:ga6eecda8ecbf6cf700be8654776e6c138"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga2a4ba0659f58ca0cabaed951251385c4"><td class="memItemLeft" align="right" valign="top"><a id="ga2a4ba0659f58ca0cabaed951251385c4" name="ga2a4ba0659f58ca0cabaed951251385c4"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>CYHAL_I3C_RSLT_ERR_CMD_ERROR</b>&#160;&#160;&#160;    (<a class="el" href="group__group__result.html#ga7b3e119b13a8bb398f429a22d8cf4dcd">CY_RSLT_CREATE_EX</a>(<a class="el" href="group__group__result.html#gga379d2c0a6a4ef22f04e53e8eb4c9ee79aac3d9861cc429ed0a29962e7829f4160">CY_RSLT_TYPE_ERROR</a>, <a class="el" href="group__group__result.html#gga9008565cba0207520330a1cb8509a8d0a79b500d6463aadd493b3812f779f75df">CY_RSLT_MODULE_ABSTRACTION_HAL</a>, <a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a12b4e2ebe92e933271f5ad4d0547fa92">CYHAL_RSLT_MODULE_I3C</a>, 10))</td></tr>
+<tr class="memdesc:ga2a4ba0659f58ca0cabaed951251385c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Command error. <br /></td></tr>
+<tr class="separator:ga2a4ba0659f58ca0cabaed951251385c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8ef8a8f3080d177fdcc9ebc817785e6a"><td class="memItemLeft" align="right" valign="top"><a id="ga8ef8a8f3080d177fdcc9ebc817785e6a" name="ga8ef8a8f3080d177fdcc9ebc817785e6a"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>CYHAL_I3C_RSLT_ERR_BUFFERS_NULL_PTR</b>&#160;&#160;&#160;    (<a class="el" href="group__group__result.html#ga7b3e119b13a8bb398f429a22d8cf4dcd">CY_RSLT_CREATE_EX</a>(<a class="el" href="group__group__result.html#gga379d2c0a6a4ef22f04e53e8eb4c9ee79aac3d9861cc429ed0a29962e7829f4160">CY_RSLT_TYPE_ERROR</a>, <a class="el" href="group__group__result.html#gga9008565cba0207520330a1cb8509a8d0a79b500d6463aadd493b3812f779f75df">CY_RSLT_MODULE_ABSTRACTION_HAL</a>, <a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a12b4e2ebe92e933271f5ad4d0547fa92">CYHAL_RSLT_MODULE_I3C</a>, 11))</td></tr>
+<tr class="memdesc:ga8ef8a8f3080d177fdcc9ebc817785e6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The pointer to RX or TX Buffer is not valid. <br /></td></tr>
+<tr class="separator:ga8ef8a8f3080d177fdcc9ebc817785e6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae77a7e863b8af5f2114e71c6d1fee9e3"><td class="memItemLeft" align="right" valign="top"><a id="gae77a7e863b8af5f2114e71c6d1fee9e3" name="gae77a7e863b8af5f2114e71c6d1fee9e3"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>CYHAL_I3C_RSLT_WARN_DEVICE_BUSY</b>&#160;&#160;&#160;    (<a class="el" href="group__group__result.html#ga7b3e119b13a8bb398f429a22d8cf4dcd">CY_RSLT_CREATE_EX</a>(<a class="el" href="group__group__result.html#gga379d2c0a6a4ef22f04e53e8eb4c9ee79a63c4a05c8e5321bd44378a894fb947f5">CY_RSLT_TYPE_WARNING</a>, <a class="el" href="group__group__result.html#gga9008565cba0207520330a1cb8509a8d0a79b500d6463aadd493b3812f779f75df">CY_RSLT_MODULE_ABSTRACTION_HAL</a>, <a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a12b4e2ebe92e933271f5ad4d0547fa92">CYHAL_RSLT_MODULE_I3C</a>, 20))</td></tr>
+<tr class="memdesc:gae77a7e863b8af5f2114e71c6d1fee9e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Other operation in progress. <br /></td></tr>
+<tr class="separator:gae77a7e863b8af5f2114e71c6d1fee9e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="ga45f786216b46a00fc27820ffecf0d990" name="ga45f786216b46a00fc27820ffecf0d990"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga45f786216b46a00fc27820ffecf0d990">&#9670;&nbsp;</a></span>CYHAL_I3C_RSLT_ERR_TX_RX_BUFFERS_ARE_EMPTY</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CYHAL_I3C_RSLT_ERR_TX_RX_BUFFERS_ARE_EMPTY&#160;&#160;&#160;    (<a class="el" href="group__group__result.html#ga7b3e119b13a8bb398f429a22d8cf4dcd">CY_RSLT_CREATE_EX</a>(<a class="el" href="group__group__result.html#gga379d2c0a6a4ef22f04e53e8eb4c9ee79aac3d9861cc429ed0a29962e7829f4160">CY_RSLT_TYPE_ERROR</a>, <a class="el" href="group__group__result.html#gga9008565cba0207520330a1cb8509a8d0a79b500d6463aadd493b3812f779f75df">CY_RSLT_MODULE_ABSTRACTION_HAL</a>, <a class="el" href="group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a12b4e2ebe92e933271f5ad4d0547fa92">CYHAL_RSLT_MODULE_I3C</a>, 3))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>User buffer is empty (TX and RX). </p>
+<p >Should be at least TX or RX or both buffers </p>
+
+</div>
+</div>
 <h2 class="groupheader">Enumeration Type Documentation</h2>
 <a id="ga84f32ecb6376e2088d4f048e35f52005" name="ga84f32ecb6376e2088d4f048e35f52005"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga84f32ecb6376e2088d4f048e35f52005">&#9670;&nbsp;</a></span>cyhal_rslt_module_chip</h2>
@@ -281,6 +361,8 @@ Enumerations</h2></td></tr>
 <tr><td class="fieldname"><a id="gga84f32ecb6376e2088d4f048e35f52005a48c873ac3890a78ae0379e725396c607" name="gga84f32ecb6376e2088d4f048e35f52005a48c873ac3890a78ae0379e725396c607"></a>CYHAL_RSLT_MODULE_I2C&#160;</td><td class="fielddoc"><p >An error occurred in I2C module. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="gga84f32ecb6376e2088d4f048e35f52005a8f3c272518c2a32f2455e34137a5180d" name="gga84f32ecb6376e2088d4f048e35f52005a8f3c272518c2a32f2455e34137a5180d"></a>CYHAL_RSLT_MODULE_I2S&#160;</td><td class="fielddoc"><p >An error occurred in I2S module. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga84f32ecb6376e2088d4f048e35f52005a12b4e2ebe92e933271f5ad4d0547fa92" name="gga84f32ecb6376e2088d4f048e35f52005a12b4e2ebe92e933271f5ad4d0547fa92"></a>CYHAL_RSLT_MODULE_I3C&#160;</td><td class="fielddoc"><p >An error occurred in I3C module. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="gga84f32ecb6376e2088d4f048e35f52005a7228239f5834ed4df9600859c3588a3d" name="gga84f32ecb6376e2088d4f048e35f52005a7228239f5834ed4df9600859c3588a3d"></a>CYHAL_RSLT_MODULE_IPC&#160;</td><td class="fielddoc"><p >An error occurred in IPC module. </p>
 </td></tr>
@@ -333,6 +415,10 @@ Enumerations</h2></td></tr>
 <tr><td class="fieldname"><a id="gga84f32ecb6376e2088d4f048e35f52005aa7ba6553c921351f322f391838049f91" name="gga84f32ecb6376e2088d4f048e35f52005aa7ba6553c921351f322f391838049f91"></a>CYHAL_RSLT_MODULE_IMPL_SCB&#160;</td><td class="fielddoc"><p >An error occurred in SCB module (SCB based drivers are: I2C, SPI, UART) </p>
 </td></tr>
 <tr><td class="fieldname"><a id="gga84f32ecb6376e2088d4f048e35f52005abb3e7eab4c1403e33f9d069725a14787" name="gga84f32ecb6376e2088d4f048e35f52005abb3e7eab4c1403e33f9d069725a14787"></a>CYHAL_RSLT_MODULE_T2TIMER&#160;</td><td class="fielddoc"><p >An error occurred in T2Timer module. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga84f32ecb6376e2088d4f048e35f52005a71dcff74719c74dc169094df0ca5f322" name="gga84f32ecb6376e2088d4f048e35f52005a71dcff74719c74dc169094df0ca5f322"></a>CYHAL_RSLT_MODULE_ETHERNET&#160;</td><td class="fielddoc"><p >An error occurred in Ethernet module. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga84f32ecb6376e2088d4f048e35f52005a82e9bedf130a012018f6663811a8c18e" name="gga84f32ecb6376e2088d4f048e35f52005a82e9bedf130a012018f6663811a8c18e"></a>CYHAL_RSLT_MODULE_OTP&#160;</td><td class="fielddoc"><p >An error occurred in OTP module. </p>
 </td></tr>
 </table>
 

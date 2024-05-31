@@ -110,20 +110,20 @@ cy_rslt_t cyhal_hwmgr_init(void);
  * Calling this again for the same block will result in error since the hardware
  * block is already marked as consumed.
  *
- * @param[in] obj  The resource object that should be reserved
+ * @param[in] resource The resource object that should be reserved
  * @return The status of the reserve request
  *
  * See \ref subsection_hwmgr_snippet_1
  */
-cy_rslt_t cyhal_hwmgr_reserve(const cyhal_resource_inst_t* obj);
+cy_rslt_t cyhal_hwmgr_reserve(const cyhal_resource_inst_t* resource);
 
 /** Free the specified resource to allow it to be reused.
  *
- * @param[in,out] obj The resource object to free
+ * @param[in,out] resource The resource object to free
  *
  * See \ref subsection_hwmgr_snippet_1
  */
-void cyhal_hwmgr_free(const cyhal_resource_inst_t* obj);
+void cyhal_hwmgr_free(const cyhal_resource_inst_t* resource);
 
 /** Allocates a free block of the specified type if available
  * This function is used when the exact block number and channel number of the
@@ -133,11 +133,11 @@ void cyhal_hwmgr_free(const cyhal_resource_inst_t* obj);
  * it should not be called again.
  *
  * @param[in]  type The type of resource to allocate.
- * @param[out] obj  The resource object.
+ * @param[out] resource The resource object.
  * @return The status of the allocate request.
  *
  */
-cy_rslt_t cyhal_hwmgr_allocate(cyhal_resource_t type, cyhal_resource_inst_t* obj);
+cy_rslt_t cyhal_hwmgr_allocate(cyhal_resource_t type, cyhal_resource_inst_t* resource);
 
 #if defined(__cplusplus)
 }

@@ -20,6 +20,7 @@ var group__group__hal__dma =
       [ "dest", "group__group__hal__dma.html#a441e10ce6c695f05aaf2a6d128c46b81", null ]
     ] ],
     [ "cyhal_dma_init", "group__group__hal__dma.html#gab9c200507a8ee87b894150416e4f5dd1", null ],
+    [ "CYHAL_API_AVAILABLE_DMA_GET_MAX_ELEMENTS_PER_BURST", "group__group__hal__dma.html#ga194384ce7d983a690840b5ad29a23a3e", null ],
     [ "cyhal_dma_event_callback_t", "group__group__hal__dma.html#ga8d2fdb7ab4e9ba5367ef596ad42bbe3f", null ],
     [ "cyhal_dma_direction_t", "group__group__hal__dma.html#ga430c1e3ddedade3b6f7ef1f8532e665b", [
       [ "CYHAL_DMA_DIRECTION_MEM2MEM", "group__group__hal__dma.html#gga430c1e3ddedade3b6f7ef1f8532e665ba86dedc0ee3d9bf091e9f936040e2066a", null ],
@@ -37,7 +38,8 @@ var group__group__hal__dma =
       [ "CYHAL_DMA_DST_MISAL", "group__group__hal__dma.html#ggad4507e9f3660b19e1ddc3085a96279e2aa975cfc15572bcde29d3b79771f3f69d", null ],
       [ "CYHAL_DMA_CURR_PTR_NULL", "group__group__hal__dma.html#ggad4507e9f3660b19e1ddc3085a96279e2a5d44bed82a7ab60351ccdc8be3ccac85", null ],
       [ "CYHAL_DMA_ACTIVE_CH_DISABLED", "group__group__hal__dma.html#ggad4507e9f3660b19e1ddc3085a96279e2ac6197710bf44a105b69558913826465e", null ],
-      [ "CYHAL_DMA_DESCR_BUS_ERROR", "group__group__hal__dma.html#ggad4507e9f3660b19e1ddc3085a96279e2ad48347e72e87bd61c17fdab21128a0ef", null ]
+      [ "CYHAL_DMA_DESCR_BUS_ERROR", "group__group__hal__dma.html#ggad4507e9f3660b19e1ddc3085a96279e2ad48347e72e87bd61c17fdab21128a0ef", null ],
+      [ "CYHAL_DMA_GENERIC_ERROR", "group__group__hal__dma.html#ggad4507e9f3660b19e1ddc3085a96279e2a642aeaae71d44d241fc1ed638e600a3c", null ]
     ] ],
     [ "cyhal_dma_input_t", "group__group__hal__dma.html#ga5d4f22832c99a570fc99e9f3e64e46c0", [
       [ "CYHAL_DMA_INPUT_TRIGGER_SINGLE_ELEMENT", "group__group__hal__dma.html#gga5d4f22832c99a570fc99e9f3e64e46c0a7a41409940a58fbe674d52d63c50feb9", null ],
@@ -68,5 +70,6 @@ var group__group__hal__dma =
     [ "cyhal_dma_connect_digital", "group__group__hal__dma.html#ga2933aee1aa2f446f6aedf86ffee28040", null ],
     [ "cyhal_dma_enable_output", "group__group__hal__dma.html#ga49f5cc82d015e6798c7578fe5b837dd6", null ],
     [ "cyhal_dma_disconnect_digital", "group__group__hal__dma.html#gaae942b5203638d1580b23e826bb04d53", null ],
-    [ "cyhal_dma_disable_output", "group__group__hal__dma.html#gae6e7c942c2943ae20266611f8891002e", null ]
+    [ "cyhal_dma_disable_output", "group__group__hal__dma.html#gae6e7c942c2943ae20266611f8891002e", null ],
+    [ "cyhal_dma_get_max_elements_per_burst", "group__group__hal__dma.html#ga26bef1a4962ad9f720e57333ff31ac98", null ]
 ];

@@ -64,7 +64,7 @@ $(function() {
 </div>
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(document).ready(function(){initNavTree('uniontRTC__REAL__TIME__CLOCK.html',''); initResizable(); });
+$(document).ready(function(){initNavTree('group__group__hal__impl__adcmic.html',''); initResizable(); });
 /* @license-end */
 </script>
 <div id="doc-content">
@@ -83,59 +83,30 @@ $(document).ready(function(){initNavTree('uniontRTC__REAL__TIME__CLOCK.html','')
 </div>
 
 <div class="header">
-  <div class="summary">
-<a href="#pub-attribs">Data Fields</a>  </div>
-  <div class="headertitle"><div class="title">tRTC_REAL_TIME_CLOCK Union Reference</div></div>
+  <div class="headertitle"><div class="title">ADC (Analog Digital Converter)<div class="ingroups"><a class="el" href="group__group__hal__impl.html">CAT5 (AIROC™) Implementation Specific</a></div></div></div>
 </div><!--header-->
 <div class="contents">
-<a name="details" id="details"></a><h2 class="groupheader">Description</h2>
-<div class="textblock"><p >TODO: very simple guesstimplementation, not connected to anything yet. </p>
-<p >Remove once ROM stuff is accessible </p>
-</div><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
-Data Fields</h2></td></tr>
-<tr class="memitem:a3234db783863d854609a2f51210a9345"><td class="memItemLeft" align="right" valign="top"><a id="a3234db783863d854609a2f51210a9345" name="a3234db783863d854609a2f51210a9345"></a>
-<a class="el" href="structreg16map__t.html">reg16map_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>reg16map</b></td></tr>
-<tr class="memdesc:a3234db783863d854609a2f51210a9345"><td class="mdescLeft">&#160;</td><td class="mdescRight">Real-time clock register mapped into subsections. <br /></td></tr>
-<tr class="separator:a3234db783863d854609a2f51210a9345"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6f6022fdecf2b050c3d7b01a3f619e56"><td class="memItemLeft" align="right" valign="top"><a id="a6f6022fdecf2b050c3d7b01a3f619e56" name="a6f6022fdecf2b050c3d7b01a3f619e56"></a>
-uint64_t&#160;</td><td class="memItemRight" valign="bottom"><b>rtc64</b></td></tr>
-<tr class="memdesc:a6f6022fdecf2b050c3d7b01a3f619e56"><td class="mdescLeft">&#160;</td><td class="mdescRight">Real-time clock register as one full value. <br /></td></tr>
-<tr class="separator:a6f6022fdecf2b050c3d7b01a3f619e56"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table>
-<h2 class="groupheader">Field Documentation</h2>
-<a id="a3234db783863d854609a2f51210a9345" name="a3234db783863d854609a2f51210a9345"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3234db783863d854609a2f51210a9345">&#9670;&nbsp;</a></span>reg16map</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structreg16map__t.html">reg16map_t</a> tRTC_REAL_TIME_CLOCK::reg16map</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Real-time clock register mapped into subsections. </p>
-
-</div>
-</div>
-<a id="a6f6022fdecf2b050c3d7b01a3f619e56" name="a6f6022fdecf2b050c3d7b01a3f619e56"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6f6022fdecf2b050c3d7b01a3f619e56">&#9670;&nbsp;</a></span>rtc64</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint64_t tRTC_REAL_TIME_CLOCK::rtc64</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Real-time clock register as one full value. </p>
-
-</div>
-</div>
+<h1><a class="anchor" id="cyhal_adcmic_impl_features"></a>
+Features</h1>
+<p >The CAT5 ADC supports the following features:</p><ul>
+<li>Resolution: 15 bit</li>
+<li>Input range from 0V to 1V</li>
+<li>Sample rate: Fixed 4096 ksps</li>
+<li>Minimum acquisition time: Up to 244 ns</li>
+<li>SW-based async transfer only (DMA is not supported)</li>
+<li>VREF: <a class="el" href="group__group__hal__adc.html#ggad77d58d52432f1f68f869b047b1a9bbeac3e8e93e60d21bfe83545ac9e4f8ca15">CYHAL_ADC_REF_INTERNAL</a> (0.5V) only</li>
+<li>Single ended vneg: <a class="el" href="group__group__hal__adc.html#ggac9e066ac01bed2c374c3d0e164988d97a10b9c188fccf67e20b0fce8d6fef6bc0">CYHAL_ADC_VNEG_VSSA</a></li>
+<li>Programmable gains of 8/8, 8/7, 8/4, 8/1</li>
+<li>DC measurement through 8 pins</li>
+<li>ADC Mic audio through MIC_P pin to the PDM-PCM</li>
+</ul>
+<p >The following functions are not supported:</p><ul>
+<li>Differential channels</li>
+<li>Continuous scanning</li>
+<li>Averaging. In <a class="el" href="group__group__hal__adc.html#structcyhal__adc__config__t">cyhal_adc_config_t</a>, average count must be 1 and average_mode_flags must be 0. In <a class="el" href="group__group__hal__adc.html#structcyhal__adc__channel__config__t">cyhal_adc_channel_config_t</a>, enable_averaging must be false.</li>
+<li>External vref and bypass pins</li>
+</ul>
+<p >There are 8 power gain amplifier (PGA) levels in the hardware. These are truncated to the 3 levels suported by the HAL. The default power is set to maximum gain. To control the gain, use <a class="el" href="group__group__hal__adc.html#gacfbd0adfbe5291b0cf131b6b07c4053b">cyhal_adc_set_power</a>. </p>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part

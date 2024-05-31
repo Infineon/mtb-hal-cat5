@@ -41,6 +41,7 @@
 #include "cyhal_pwm.h"
 #include "cyhal_quaddec.h"
 #include "cyhal_rtc.h"
+#include "cyhal_sdio.h"
 #include "cyhal_spi.h"
 #include "cyhal_syspm.h"
 #include "cyhal_system.h"

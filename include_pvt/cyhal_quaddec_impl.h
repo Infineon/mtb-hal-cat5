@@ -33,7 +33,7 @@
 #if defined(__cplusplus)
 extern "C" {
 #endif /* __cplusplus */
-
+#if defined(COMPONENT_CAT5)
 /** \addtogroup group_hal_impl_quaddec Quadrature Decoder
  * \ingroup group_hal_impl
  * \{
@@ -42,7 +42,18 @@ extern "C" {
  * Therefore the phiA, phiB, and index pins must be the same for all
  * quadrature decoders in the design.
  */
-
+#else
+/** \addtogroup group_hal_impl_quaddec Quadrature Decoder
+ * \ingroup group_hal_impl
+ * \{
+ * \section group_hal_impl_quaddec_interconnect Interconnect
+ * In PSoC™ Quadrature Decoder channels can configure multiple input and output
+ * triggers simultaneously. 1 or more input triggers can be configured to
+ * initiate different PWM actions (e.g start, stop, reload, etc) with
+ * configurable edge detection on that incoming signal. Output triggers are
+ * based on certain events (e.g overflow, cc_match, etc).
+ */
+#endif
 __STATIC_INLINE uint32_t _cyhal_quaddec_convert_event(cyhal_quaddec_event_t event)
 {
     uint32_t pdl_event = 0U;

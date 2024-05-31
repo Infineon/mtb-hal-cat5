@@ -313,11 +313,15 @@ static const cyhal_source_t _cyhal_audioss_tx_trigger[] =
 };
 #endif /* !defined (COMPONENT_CAT5) */
 
+#if defined(COMPONENT_CAT5)
+static _cyhal_audioss_t* _cyhal_audioss_config_structs[TDM_NR];
+#else
 static _cyhal_audioss_t* _cyhal_audioss_config_structs[CY_IP_MXTDM_INSTANCES];
+#endif
 
-// These structures will most probably be cleaned up a bit once we have more details 
+// These structures will most probably be cleaned up a bit once we have more details
 // on TDM interrupts for CAT5. Seems like there are no separate lines for tx and
-// rx interrupts but it will be confirmed once we have a working patch. 
+// rx interrupts but it will be confirmed once we have a working patch.
 static const _cyhal_system_irq_t _cyhal_audioss_tx_irq_n[] =
 {
 #if defined (TDM0)
@@ -354,32 +358,26 @@ static const _cyhal_system_irq_t _cyhal_audioss_rx_irq_n[] =
 #endif
 };
 
+#if !defined (COMPONENT_CAT5)
 static uint8_t _cyhal_audioss_get_block_from_irqn(_cyhal_system_irq_t irqn)
 {
 #if defined (TDM0)
-    #if defined (COMPONENT_CAT5)
-        if (irqn == tdm_0_interrupts_IRQn)
-    #else
-        if ((irqn == tdm_0_interrupts_tx_0_IRQn) || (irqn == tdm_0_interrupts_rx_0_IRQn))
-    #endif
-            return 0;
+    if ((irqn == tdm_0_interrupts_tx_0_IRQn) || (irqn == tdm_0_interrupts_rx_0_IRQn))
+        return 0;
 #endif
 #if defined (TDM1)
-    #if defined (COMPONENT_CAT5)
-        if (irqn == tdm_1_interrupts_IRQn)
-    #else
-        if ((irqn == tdm_1_interrupts_tx_0_IRQn) || (irqn == tdm_1_interrupts_rx_0_IRQn))
-    #endif
-            return 1;
+    if ((irqn == tdm_1_interrupts_tx_0_IRQn) || (irqn == tdm_1_interrupts_rx_0_IRQn))
+        return 1;
 #endif
     CY_ASSERT(false); // Should never be called with a non-TDM IRQn
     return 0;
 }
+#endif
 
 #if defined (COMPONENT_CAT5)
 static void _cyhal_audioss_irq_handler(UINT8 instance, BOOL8 rx_int);
-static void _cyhal_audioss_irq_handler_rx(_cyhal_system_irq_t irqn);
-static void _cyhal_audioss_irq_handler_tx(_cyhal_system_irq_t irqn);
+static void _cyhal_audioss_irq_handler_rx(uint8_t instance);
+static void _cyhal_audioss_irq_handler_tx(uint8_t instance);
 #else
 static void _cyhal_audioss_irq_handler_rx(void);
 static void _cyhal_audioss_irq_handler_tx(void);
@@ -401,7 +399,7 @@ static void _cyhal_audioss_dma_handler_rx(void *callback_arg, cyhal_dma_event_t 
 #endif /* (CYHAL_DRIVER_AVAILABLE_DMA) */
 #endif /* defined(_CYHAL_AUDIOSS_RX_ENABLED) */
 static uint32_t _cyhal_audioss_disable_events(_cyhal_audioss_t *obj, bool tx);
-static void _cyhal_audioss_restore_events(_cyhal_audioss_t *obj, bool tx, uint32_t old_events);
+static void _cyhal_audioss_restore_events(_cyhal_audioss_t *obj, bool tx, uint32_t events);
 #if (CYHAL_DRIVER_AVAILABLE_DMA)
 static cy_rslt_t _cyhal_audioss_dma_perform_tx(_cyhal_audioss_t *obj);
 static void _cyhal_audioss_dma_handler_tx(void *callback_arg, cyhal_dma_event_t event);
@@ -451,6 +449,13 @@ cy_rslt_t _cyhal_audioss_init_clock(_cyhal_audioss_t *obj, const cyhal_clock_t* 
     }
 #endif
 
+#if defined(COMPONENT_CAT5) && defined (CYW55500)
+    if (CY_RSLT_SUCCESS == result)
+    {
+        // Enable Audio clock
+        Cy_AudioTDM_EnableClock(obj->base);
+    }
+#endif
     return result;
 }
 
@@ -477,9 +482,13 @@ cy_rslt_t _cyhal_audioss_init_pdl(_cyhal_audioss_t *obj, const _cyhal_audioss_pd
 
 cy_rslt_t _cyhal_audioss_init_hw(_cyhal_audioss_t *obj, const _cyhal_audioss_pdl_config_t* pdl_config)
 {
+    uint8_t tdm_inst = obj->resource.block_num;
 #if defined(CY_IP_MXAUDIOSS)
     obj->base = _cyhal_audioss_base[obj->resource.block_num];
 #elif defined(CY_IP_MXTDM)
+    #if defined (COMPONENT_CAT5)
+    tdm_inst = obj->resource.channel_num;
+    #endif
     obj->base = &(_cyhal_audioss_base[obj->resource.block_num]->TDM_STRUCT[obj->resource.channel_num]);
 #endif
 
@@ -520,21 +529,21 @@ cy_rslt_t _cyhal_audioss_init_hw(_cyhal_audioss_t *obj, const _cyhal_audioss_pdl
 #if (CYHAL_DRIVER_AVAILABLE_SYSPM)
         _cyhal_syspm_register_peripheral_callback(&(obj->pm_callback));
 #endif /*  (CYHAL_DRIVER_AVAILABLE_SYSPM) */
-        _cyhal_audioss_config_structs[obj->resource.block_num] = obj;
+        _cyhal_audioss_config_structs[tdm_inst] = obj;
 #if defined(CY_IP_MXAUDIOSS)
-        _cyhal_irq_register(_cyhal_audioss_irq_n[obj->resource.block_num], CYHAL_ISR_PRIORITY_DEFAULT, _cyhal_audioss_irq_handler);
-        _cyhal_irq_enable(_cyhal_audioss_irq_n[obj->resource.block_num]);
+        _cyhal_irq_register(_cyhal_audioss_irq_n[tdm_inst], CYHAL_ISR_PRIORITY_DEFAULT, _cyhal_audioss_irq_handler);
+        _cyhal_irq_enable(_cyhal_audioss_irq_n[tdm_inst]);
 #elif defined(CY_IP_MXTDM)
     #if defined (COMPONENT_CAT5)
         Cy_AudioTDM_RegisterInterruptCallback(obj->base,  _cyhal_audioss_irq_handler);
         Cy_AudioTDM_EnableInterrupt(obj->base); // Enables both TX and RX
     #endif
 
-        _cyhal_irq_register(_cyhal_audioss_rx_irq_n[obj->resource.block_num], CYHAL_ISR_PRIORITY_DEFAULT, (cy_israddress)_cyhal_audioss_irq_handler_rx);
-        _cyhal_irq_enable(_cyhal_audioss_rx_irq_n[obj->resource.block_num]);
+        _cyhal_irq_register(_cyhal_audioss_rx_irq_n[tdm_inst], CYHAL_ISR_PRIORITY_DEFAULT, (cy_israddress)_cyhal_audioss_irq_handler_rx);
+        _cyhal_irq_enable(_cyhal_audioss_rx_irq_n[tdm_inst]);
 
-        _cyhal_irq_register(_cyhal_audioss_tx_irq_n[obj->resource.block_num], CYHAL_ISR_PRIORITY_DEFAULT, (cy_israddress)_cyhal_audioss_irq_handler_tx );
-        _cyhal_irq_enable(_cyhal_audioss_tx_irq_n[obj->resource.block_num]);
+        _cyhal_irq_register(_cyhal_audioss_tx_irq_n[tdm_inst], CYHAL_ISR_PRIORITY_DEFAULT, (cy_israddress)_cyhal_audioss_irq_handler_tx );
+        _cyhal_irq_enable(_cyhal_audioss_tx_irq_n[tdm_inst]);
 #else
 #error "Unrecognized audio IP"
 #endif
@@ -647,7 +656,7 @@ cy_rslt_t _cyhal_audioss_init(_cyhal_audioss_t *obj, const _cyhal_audioss_pins_t
 #elif defined(CY_IP_MXTDM)
     cyhal_resource_t rsc_type = CYHAL_RSC_TDM;
 #endif
-        
+
     if(CY_RSLT_SUCCESS == result && NULL != tx_pins) /* It is valid to leave either tx or rx empty */
     {
         if(NULL != tx_sck_map && NULL != tx_ws_map && NULL != tx_sdo_map
@@ -792,7 +801,7 @@ cy_rslt_t _cyhal_audioss_init(_cyhal_audioss_t *obj, const _cyhal_audioss_pins_t
             obj->pin_rx_sck = rx_pins->sck; // The SCK and WS are tied to the TX on this device
             obj->pin_rx_ws = rx_pins->ws;
         }
-#else        
+#else
         if(CY_RSLT_SUCCESS == result)
         {
             obj->pin_rx_sdi = rx_pins->data;
@@ -1838,6 +1847,9 @@ static uint8_t _cyhal_audioss_rounded_word_length(_cyhal_audioss_t *obj, bool is
     uint8_t word_length = obj->word_length_tx;
 #endif
     CY_ASSERT(word_length <= 32);
+    //CAT5 - FIFO is 32 bit wide. Transfers expect to be 32 bit wide.
+    //8bit and 16bit word data to be send in 32bit buffers for CAT5
+#if !defined (COMPONENT_CAT5)
     if(word_length <= 8)
     {
         return 8u;
@@ -1846,7 +1858,7 @@ static uint8_t _cyhal_audioss_rounded_word_length(_cyhal_audioss_t *obj, bool is
     {
         return 16u;
     }
-
+#endif
     return 32u;
 }
 #endif /* (CYHAL_DRIVER_AVAILABLE_DMA) */
@@ -2142,37 +2154,45 @@ static void _cyhal_audioss_irq_handler(void)
 #elif defined(CY_IP_MXTDM)
 
 #if defined (COMPONENT_CAT5)
-static void _cyhal_audioss_irq_handler_rx(_cyhal_system_irq_t irqn)
+static void _cyhal_audioss_irq_handler_rx(uint8_t instance)
 {
+    _cyhal_audioss_t* obj = _cyhal_audioss_config_structs[instance];
 #else
 static void _cyhal_audioss_irq_handler_rx()
 {
     _cyhal_system_irq_t irqn = _cyhal_irq_get_active();
-#endif
     uint8_t block = _cyhal_audioss_get_block_from_irqn(irqn);
     _cyhal_audioss_t* obj = _cyhal_audioss_config_structs[block];
+#endif
 
     uint32_t interrupt_status = Cy_AudioTDM_GetRxInterruptStatusMasked(&obj->base->TDM_RX_STRUCT);
     Cy_AudioTDM_ClearRxInterrupt(&obj->base->TDM_RX_STRUCT, interrupt_status);
     uint32_t event = obj->interface->convert_interrupt_cause(interrupt_status, false);
     _cyhal_audioss_process_event(obj, event);
+#if defined (COMPONENT_CAT5)
+    Cy_AudioTDM_EnableInterrupt(obj->base);
+#endif
 }
 
 #if defined (COMPONENT_CAT5)
-static void _cyhal_audioss_irq_handler_tx(_cyhal_system_irq_t irqn)
+static void _cyhal_audioss_irq_handler_tx(uint8_t instance)
 {
+    _cyhal_audioss_t* obj = _cyhal_audioss_config_structs[instance];
 #else
 static void _cyhal_audioss_irq_handler_tx()
 {
     _cyhal_system_irq_t irqn = _cyhal_irq_get_active();
-#endif
     uint8_t block = _cyhal_audioss_get_block_from_irqn(irqn);
-    _cyhal_audioss_t* obj = _cyhal_audioss_config_structs[block];
+     _cyhal_audioss_t* obj = _cyhal_audioss_config_structs[block];
+#endif
 
     uint32_t interrupt_status = Cy_AudioTDM_GetTxInterruptStatusMasked(&obj->base->TDM_TX_STRUCT);
     Cy_AudioTDM_ClearTxInterrupt(&obj->base->TDM_TX_STRUCT, interrupt_status);
     uint32_t event = obj->interface->convert_interrupt_cause(interrupt_status, true);
     _cyhal_audioss_process_event(obj, event);
+#if defined (COMPONENT_CAT5)
+    Cy_AudioTDM_EnableInterrupt(obj->base);
+#endif
 }
 
 #if defined (COMPONENT_CAT5)
@@ -2261,38 +2281,37 @@ static uint32_t _cyhal_audioss_disable_events(_cyhal_audioss_t *obj, bool tx)
 {
 #if defined(CY_IP_MXAUDIOSS)
     CY_UNUSED_PARAMETER(tx);
-    uint32_t old_interrupt_mask = Cy_I2S_GetInterruptMask(obj->base);
+    uint32_t events = Cy_I2S_GetInterruptMask(obj->base);
     Cy_I2S_SetInterruptMask(obj->base, 0u);
-    return old_interrupt_mask;
 #elif defined(CY_IP_MXTDM)
-    uint32_t old_interrupt_mask;
+    uint32_t events;
     if(tx)
     {
-        old_interrupt_mask = Cy_AudioTDM_GetTxInterruptMask(&obj->base->TDM_TX_STRUCT);
+        events = Cy_AudioTDM_GetTxInterruptMask(&obj->base->TDM_TX_STRUCT);
         Cy_AudioTDM_SetTxInterruptMask(&obj->base->TDM_TX_STRUCT, 0u);
     }
     else
     {
-        old_interrupt_mask = Cy_AudioTDM_GetRxInterruptMask(&obj->base->TDM_RX_STRUCT);
+        events = Cy_AudioTDM_GetRxInterruptMask(&obj->base->TDM_RX_STRUCT);
         Cy_AudioTDM_SetRxInterruptMask(&obj->base->TDM_RX_STRUCT, 0u);
     }
-    return old_interrupt_mask;
 #endif
+    return events;
 }
 
-static void _cyhal_audioss_restore_events(_cyhal_audioss_t *obj, bool tx, uint32_t old_events)
+static void _cyhal_audioss_restore_events(_cyhal_audioss_t *obj, bool tx, uint32_t events)
 {
 #if defined(CY_IP_MXAUDIOSS)
     CY_UNUSED_PARAMETER(tx);
-    Cy_I2S_SetInterruptMask(obj->base, old_events);
+    Cy_I2S_SetInterruptMask(obj->base, events);
 #elif defined(CY_IP_MXTDM)
     if(tx)
     {
-        Cy_AudioTDM_SetTxInterruptMask(&obj->base->TDM_TX_STRUCT, old_events);
+        Cy_AudioTDM_SetTxInterruptMask(&obj->base->TDM_TX_STRUCT, events);
     }
     else
     {
-        Cy_AudioTDM_SetRxInterruptMask(&obj->base->TDM_RX_STRUCT, old_events);
+        Cy_AudioTDM_SetRxInterruptMask(&obj->base->TDM_RX_STRUCT, events);
     }
 #endif
 }
@@ -2312,6 +2331,14 @@ static cy_rslt_t _cyhal_audioss_dma_perform_rx(_cyhal_audioss_t *obj)
         // Only want the user callback to be call on the last dma transfer.
         cyhal_dma_enable_event(&(obj->rx_dma), CYHAL_DMA_TRANSFER_COMPLETE, obj->async_dma_priority, true);
     }
+#if defined (COMPONENT_CAT5)
+    else
+    {
+        //On CAT5,DMA status is cleared only when the interrupt is enabled. This is needed for
+        //further DMA transfers to work.
+        cyhal_dma_enable_event(&(obj->rx_dma), CYHAL_DMA_TRANSFER_COMPLETE, obj->async_dma_priority, true);
+    }
+#endif
 
     cyhal_dma_cfg_t dma_cfg =
     {
@@ -2325,7 +2352,11 @@ static cy_rslt_t _cyhal_audioss_dma_perform_rx(_cyhal_audioss_t *obj)
         .dst_increment = 1,
         .transfer_width = _cyhal_audioss_rounded_word_length(obj, false),
         .length = transfer_size,
+#if defined(COMPONENT_CAT5)   
+        .burst_size = 128,
+#else
         .burst_size = 0,
+#endif
         .action = CYHAL_DMA_TRANSFER_FULL,
     };
     cy_rslt_t result = cyhal_dma_configure(&(obj->rx_dma), &dma_cfg);
@@ -2371,6 +2402,14 @@ static cy_rslt_t _cyhal_audioss_dma_perform_tx(_cyhal_audioss_t *obj)
         // Only want the user callback to be call on the last dma transfer.
         cyhal_dma_enable_event(&(obj->tx_dma), CYHAL_DMA_TRANSFER_COMPLETE, obj->async_dma_priority, true);
     }
+#if defined (COMPONENT_CAT5)
+    else
+    {
+        //On CAT5,DMA status is cleared only when the interrupt is enabled. This is needed for
+        //further DMA transfers to work.
+        cyhal_dma_enable_event(&(obj->tx_dma), CYHAL_DMA_TRANSFER_COMPLETE, obj->async_dma_priority, true);
+    }
+#endif
 
     cyhal_dma_cfg_t dma_cfg =
     {
@@ -2384,7 +2423,11 @@ static cy_rslt_t _cyhal_audioss_dma_perform_tx(_cyhal_audioss_t *obj)
         .dst_increment = 0,
         .transfer_width = _cyhal_audioss_rounded_word_length(obj, true),
         .length = transfer_size,
+#if defined(COMPONENT_CAT5)
+        .burst_size = 128,
+#else
         .burst_size = 0,
+#endif
         .action = CYHAL_DMA_TRANSFER_FULL,
     };
     cy_rslt_t result = cyhal_dma_configure(&(obj->tx_dma), &dma_cfg);
@@ -2460,9 +2503,20 @@ static void _cyhal_audioss_dma_handler_rx(void *callback_arg, cyhal_dma_event_t 
     CY_ASSERT(CYHAL_DMA_TRANSFER_COMPLETE == event);
 
     _cyhal_audioss_t *obj = (_cyhal_audioss_t*)callback_arg;
-    obj->async_rx_buff = NULL;
-    cyhal_dma_enable_event(&obj->rx_dma, CYHAL_DMA_TRANSFER_COMPLETE, obj->async_dma_priority, false);
-    _cyhal_audioss_process_event(obj, obj->interface->event_rx_complete);
+#if defined (COMPONENT_CAT5)
+    if( 0 != obj->async_rx_length )
+    {
+        cyhal_dma_enable_event(&obj->rx_dma, CYHAL_DMA_TRANSFER_COMPLETE, obj->async_dma_priority, false);
+        //Receive of subsequent packets will be triggered from the IRQ
+        return;
+    }
+    else
+#endif
+    {
+        obj->async_rx_buff = NULL;
+        cyhal_dma_enable_event(&obj->rx_dma, CYHAL_DMA_TRANSFER_COMPLETE, obj->async_dma_priority, false);
+        _cyhal_audioss_process_event(obj, obj->interface->event_rx_complete);
+    }
 }
 #endif /* defined(_CYHAL_AUDIOSS_RX_ENABLED) && (CYHAL_DRIVER_AVAILABLE_DMA) */
 
@@ -2475,9 +2529,20 @@ static void _cyhal_audioss_dma_handler_tx(void *callback_arg, cyhal_dma_event_t 
     CY_ASSERT(CYHAL_DMA_TRANSFER_COMPLETE == event);
 
     _cyhal_audioss_t *obj = (_cyhal_audioss_t*)callback_arg;
-    obj->async_tx_buff = NULL;
-    cyhal_dma_enable_event(&obj->tx_dma, CYHAL_DMA_TRANSFER_COMPLETE, obj->async_dma_priority, false);
-    _cyhal_audioss_process_event(obj, obj->interface->event_tx_complete);
+#if defined (COMPONENT_CAT5)
+    if( 0 != obj->async_tx_length )
+    {
+        cyhal_dma_enable_event(&obj->tx_dma, CYHAL_DMA_TRANSFER_COMPLETE, obj->async_dma_priority, false);
+        //Transfer of subsequent packets will be triggered from the IRQ
+        return;
+    }
+    else
+#endif
+    {
+        obj->async_tx_buff = NULL;
+        cyhal_dma_enable_event(&obj->tx_dma, CYHAL_DMA_TRANSFER_COMPLETE, obj->async_dma_priority, false);
+        _cyhal_audioss_process_event(obj, obj->interface->event_tx_complete);
+    }
 }
 #endif /* (CYHAL_DRIVER_AVAILABLE_DMA) */
 

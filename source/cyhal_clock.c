@@ -37,6 +37,9 @@ extern "C"
 {
 #endif
 
+//Requesting a frequency less than 12MHz results in PLL clock request to fail
+#define PLL_MIN_FREQUENCY (12000000UL)
+
 const cyhal_clock_tolerance_t CYHAL_TOLERANCE_0_P = {CYHAL_TOLERANCE_PERCENT, 0};
 const cyhal_clock_tolerance_t CYHAL_TOLERANCE_1_P = {CYHAL_TOLERANCE_PERCENT, 1};
 const cyhal_clock_tolerance_t CYHAL_TOLERANCE_5_P = {CYHAL_TOLERANCE_PERCENT, 5};
@@ -131,6 +134,7 @@ cyhal_clock_feature_t cyhal_clock_get_features(const cyhal_clock_t *clock)
         case CYHAL_CLOCK_BLOCK_TDM:
         case CYHAL_CLOCK_BLOCK_CPU:
             features |= CYHAL_CLOCK_FEATURE_FREQUENCY;
+            break;
         default:
             break;
     }
@@ -177,9 +181,6 @@ bool _cyhal_clock_is_divider_valid(const cyhal_resource_inst_t *resource, uint32
     return valid;
 }
 
-// There's no way to query for the Audio PLL frequency. Keep track of it internally
-static uint32_t clk_audio_pll = 0UL;
-
 uint32_t cyhal_clock_get_frequency(const cyhal_clock_t *clock)
 {
     CY_ASSERT(NULL != clock);
@@ -195,18 +196,12 @@ uint32_t cyhal_clock_get_frequency(const cyhal_clock_t *clock)
             freq = _cyhal_utils_peri_pclk_get_freq(0, clock);
             break;
         case CYHAL_CLOCK_BLOCK_TDM:
-            freq = clk_audio_pll;
+            freq = btss_system_clockGetAudioPllFreq();
             break;
         case CYHAL_CLOCK_BLOCK_CPU:
             cpu_freq = btss_system_clockGetCpuFreq();
             switch (cpu_freq)
             {
-                case BTSS_SYSTEM_CPU_CLK_24MHZ:
-                    freq = 24000000UL;
-                    break;
-                case BTSS_SYSTEM_CPU_CLK_32MHZ:
-                    freq = 32000000UL;
-                    break;
                 case BTSS_SYSTEM_CPU_CLK_48MHZ:
                     freq = 48000000UL;
                     break;
@@ -234,7 +229,7 @@ cy_rslt_t cyhal_clock_set_frequency(cyhal_clock_t *clock, uint32_t hz, const cyh
     CY_UNUSED_PARAMETER(tolerance);
     CY_ASSERT(NULL != clock);
     cy_rslt_t status = CY_RSLT_SUCCESS;
-    bool rom_status;
+    bool rom_status = 1;
     BTSS_SYSTEM_CPU_CLK_FREQ_t freq;
     
     switch (clock->block)
@@ -245,32 +240,23 @@ cy_rslt_t cyhal_clock_set_frequency(cyhal_clock_t *clock, uint32_t hz, const cyh
             status = _cyhal_utils_peri_pclk_set_freq(0, clock, hz, 1);
             break;
         case CYHAL_CLOCK_BLOCK_TDM:
-        //We will probably be able to introduce a switch case here as well to only set available frequency
-        //the same way it is done for the CPU block. Allowed frequencies are believed to be 24000000,
-        //36000000 and 48000000.
-            if(clk_audio_pll == 0) 
+            if(hz < PLL_MIN_FREQUENCY)
             {
-                //For now this is our only way to check that the PLL has been previously locked, once a FW API to query
-                //the audio pll frequency is available (ticket BTSDK-8479) this function will be revisited. 
-                rom_status = btss_system_clockRequestForAudioPll(BTSS_SYSTEM_AUDIO_PLL_CLK_REQ_LOCK_TO_SPEED, hz);
+                 status = CYHAL_CLOCK_RSLT_ERR_FREQ;
             }
             else
             {
-                rom_status = btss_system_clockRequestForAudioPll(BTSS_SYSTEM_AUDIO_PLL_CLK_REQ_UNLOCK_TO_SPEED, hz);
+                if (btss_system_clockGetAudioPllFreq())
+                {
+                    rom_status = btss_system_clockRequestForAudioPll(BTSS_SYSTEM_AUDIO_PLL_CLK_REQ_UNLOCK_TO_SPEED, btss_system_clockGetAudioPllFreq());
+                }
                 rom_status = rom_status ? btss_system_clockRequestForAudioPll(BTSS_SYSTEM_AUDIO_PLL_CLK_REQ_LOCK_TO_SPEED, hz) : rom_status;
+                status = rom_status ? CY_RSLT_SUCCESS : CYHAL_CLOCK_RSLT_ERR_FREQ;
             }
-            status = rom_status ? CY_RSLT_SUCCESS : CYHAL_CLOCK_RSLT_ERR_FREQ;
-            clk_audio_pll = (status == CY_RSLT_SUCCESS) ? hz : 0UL;
             break;
         case CYHAL_CLOCK_BLOCK_CPU:
             switch (hz)
             {
-                case 24000000UL:
-                    freq = BTSS_SYSTEM_CPU_CLK_24MHZ;
-                    break;
-                case 32000000UL:
-                    freq = BTSS_SYSTEM_CPU_CLK_32MHZ;
-                    break;
                 case 48000000UL:
                     freq = BTSS_SYSTEM_CPU_CLK_48MHZ;
                     break;

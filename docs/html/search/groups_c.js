@@ -1,9 +1,12 @@
 var searchData=
 [
-  ['spi_20_28serial_20peripheral_20interface_29_0',['SPI (Serial Peripheral Interface)',['../group__group__hal__impl__spi.html',1,'(Global Namespace)'],['../group__group__hal__spi.html',1,'(Global Namespace)']]],
-  ['spi_20hal_20results_1',['SPI HAL Results',['../group__group__hal__results__spi.html',1,'']]],
-  ['syspm_20hal_20results_2',['SYSPM HAL Results',['../group__group__hal__results__syspm.html',1,'']]],
-  ['system_3',['System',['../group__group__hal__system.html',1,'']]],
-  ['system_20hal_20results_4',['SYSTEM HAL Results',['../group__group__hal__results__system.html',1,'']]],
-  ['system_20power_20management_5',['System Power Management',['../group__group__hal__syspm.html',1,'']]]
+  ['sdio_20_28secure_20digital_20input_20output_29_0',['SDIO (Secure Digital Input Output)',['../group__group__hal__impl__sdio.html',1,'(Global Namespace)'],['../group__group__hal__sdio.html',1,'(Global Namespace)']]],
+  ['sdio_20hal_20results_1',['SDIO HAL Results',['../group__group__hal__results__sdio.html',1,'']]],
+  ['spi_20_28serial_20peripheral_20interface_29_2',['SPI (Serial Peripheral Interface)',['../group__group__hal__impl__spi.html',1,'(Global Namespace)'],['../group__group__hal__spi.html',1,'(Global Namespace)']]],
+  ['spi_20hal_20results_3',['SPI HAL Results',['../group__group__hal__results__spi.html',1,'']]],
+  ['syspm_4',['Syspm',['../group__group__hal__impl__syspm.html',1,'']]],
+  ['syspm_20hal_20results_5',['SYSPM HAL Results',['../group__group__hal__results__syspm.html',1,'']]],
+  ['system_6',['System',['../group__group__hal__system.html',1,'']]],
+  ['system_20hal_20results_7',['SYSTEM HAL Results',['../group__group__hal__results__system.html',1,'']]],
+  ['system_20power_20management_8',['System Power Management',['../group__group__hal__syspm.html',1,'']]]
 ];

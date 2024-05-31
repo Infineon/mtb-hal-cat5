@@ -211,7 +211,8 @@ cy_rslt_t cyhal_rtc_read(cyhal_rtc_t *obj, struct tm *time);
 /** Write the specified time and date to the RTC peripheral
  *
  * @param[in] obj  RTC object
- * @param[in] time The time to be set (see: https://en.cppreference.com/w/cpp/chrono/c/tm)
+ * @param[in] time The time to be set (see: https://en.cppreference.com/w/cpp/chrono/c/tm).
+ * Specify the local time to set to the RTC.
  * @return The status of the write request
  */
 cy_rslt_t cyhal_rtc_write(cyhal_rtc_t *obj, const struct tm *time);

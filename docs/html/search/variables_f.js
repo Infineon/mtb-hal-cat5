@@ -14,6 +14,7 @@ var searchData=
   ['ssel_11',['ssel',['../group__group__hal__qspi.html#ad983d763a009536ffbd385d25b2cea11',1,'cyhal_qspi_slave_pin_config_t']]],
   ['start_5faddress_12',['start_address',['../structcyhal__flash__block__info__t.html#a7066dc8bfd2f85ba0a0a8fa61afe9a9d',1,'cyhal_flash_block_info_t']]],
   ['states_13',['states',['../group__group__hal__syspm.html#a30d05805c7003766b01d970c6c5519ea',1,'cyhal_syspm_callback_data_t']]],
-  ['stop_5fbits_14',['stop_bits',['../group__group__hal__uart.html#a6864a54db95005a564fd8617f9029e20',1,'cyhal_uart_cfg_t']]],
-  ['sub_5faddress_5fsize_15',['sub_address_size',['../group__group__hal__ezi2c.html#a87dc9cd1a382761d0d165326a249a734',1,'cyhal_ezi2c_cfg_t']]]
+  ['static_5faddress_14',['static_address',['../group__group__hal__i3c.html#a2a338b3f67bd93069946c3029ffcee8b',1,'cyhal_i3c_device_info_t']]],
+  ['stop_5fbits_15',['stop_bits',['../group__group__hal__uart.html#a6864a54db95005a564fd8617f9029e20',1,'cyhal_uart_cfg_t']]],
+  ['sub_5faddress_5fsize_16',['sub_address_size',['../group__group__hal__ezi2c.html#a87dc9cd1a382761d0d165326a249a734',1,'cyhal_ezi2c_cfg_t']]]
 ];

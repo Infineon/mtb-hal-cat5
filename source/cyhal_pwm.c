@@ -80,7 +80,11 @@ extern "C" {
 #else
 #define _CYHAL_PWM_MAX_WIDTH         16
 #endif
+#if defined (COMPONENT_CAT5)
+#define _CYHAL_PWM_MAX_DEAD_TIME_CYCLES    65535 //GRP_AMC_PRESENT=1, max dead time 655535 counter cycles
+#else
 #define _CYHAL_PWM_MAX_DEAD_TIME_CYCLES    255
+#endif
 static const uint32_t _CYHAL_PWM_US_PER_SEC = 1000000u;
 
 #if defined(CY_IP_MXTCPWM) && (CY_IP_MXTCPWM_VERSION >= 2)
@@ -219,46 +223,55 @@ static cy_rslt_t _cyhal_pwm_init_clock(cyhal_pwm_t *obj, uint32_t dead_time_us, 
             result = CYHAL_PWM_RSLT_FAILED_CLOCK_INIT;
         }
     }
-    else if (CY_RSLT_SUCCESS == (result = _cyhal_utils_allocate_clock(&obj->tcpwm.clock, &obj->tcpwm.resource, CYHAL_CLOCK_BLOCK_PERIPHERAL_16BIT, true)))
+    else
     {
-        obj->tcpwm.dedicated_clock = true;
-        uint32_t source_hz = _cyhal_utils_get_peripheral_clock_frequency(&(obj->tcpwm.resource));
-        uint32_t div = 0;
-        if (dead_time_us > 0)
+        result = _cyhal_utils_allocate_clock(&obj->tcpwm.clock, &obj->tcpwm.resource, CYHAL_CLOCK_BLOCK_PERIPHERAL_16BIT, true);
+        if (CY_RSLT_SUCCESS == result)
         {
-            div = (((uint64_t)source_hz * dead_time_us) / (_CYHAL_PWM_US_PER_SEC * _CYHAL_PWM_MAX_DEAD_TIME_CYCLES)) + 1;
-            #if defined (COMPONENT_CAT5)
-                /* TODO: dividers are limited on this device. Need to investigate a better solution.
-                 * Refer to TCPWM_TPORT_CLK_DIV_SEL_t. Below is an approximation that will hopefully
-                   give good enough scale when configuring the PWM in the configure() function.
-                 */
-                if(( div % 2 != 0) && ( div != 1 ) && ( div < 12 ))
-                {
-                    div++;
-                }
-                else if ((div > 12) && (div < 16))
-                {
-                    div = 16;
-                }
-                else if (div > 16)
-                {
-                    div = 32; // Max allowed
-                }
-            #endif
-        }
-        else
-        {
-            div = 1; /* Will be adjusted as necessary when the period is set */
-        }
+            obj->tcpwm.dedicated_clock = true;
+            uint32_t source_hz = _cyhal_utils_get_peripheral_clock_frequency(&(obj->tcpwm.resource));
+            uint32_t div = 0;
+            if (dead_time_us > 0)
+            {
+                div = (uint32_t)((((uint64_t)source_hz * dead_time_us) / ((uint64_t)_CYHAL_PWM_US_PER_SEC * _CYHAL_PWM_MAX_DEAD_TIME_CYCLES)) + 1);
+                #if defined (COMPONENT_CAT5)
+                    /* Dividers are limited on this device. Need to investigate a better solution.
+                    * Refer to TCPWM_TPORT_CLK_DIV_SEL_t. Below is an approximation that will hopefully
+                    * give good enough scale when configuring the PWM in the configure() function.
+                    */
+                    if(( div % 2 != 0) && ( div != 1 ) && ( div < 12 ))
+                    {
+                        div++;
+                    }
+                    else if ((div > 12) && (div <= 16))
+                    {
+                        div = 16;
+                    }
+                    else if ((div > 16) && (div <= 32))
+                    {
+                        div = 32; // Max allowed
+                    }
+                    else if( div > 32)
+                    {
+                        div = 0; // Not valid
+                    }
+                #endif
+            }
+            else
+            {
+                div = 1; /* Will be adjusted as necessary when the period is set */
+            }
 
-        if (0 == div ||
-            CY_SYSCLK_SUCCESS != _cyhal_utils_peri_pclk_set_divider(pclk, &(obj->tcpwm.clock), div - 1) ||
-            CY_SYSCLK_SUCCESS != _cyhal_utils_peri_pclk_enable_divider(pclk, &(obj->tcpwm.clock)) ||
-            CY_SYSCLK_SUCCESS != _cyhal_utils_peri_pclk_assign_divider(pclk, &(obj->tcpwm.clock)))
-        {
-            result = CYHAL_PWM_RSLT_FAILED_CLOCK_INIT;
+            if (0 == div ||
+                CY_SYSCLK_SUCCESS != _cyhal_utils_peri_pclk_set_divider(pclk, &(obj->tcpwm.clock), div - 1) ||
+                CY_SYSCLK_SUCCESS != _cyhal_utils_peri_pclk_enable_divider(pclk, &(obj->tcpwm.clock)) ||
+                CY_SYSCLK_SUCCESS != _cyhal_utils_peri_pclk_assign_divider(pclk, &(obj->tcpwm.clock)))
+            {
+                result = CYHAL_PWM_RSLT_FAILED_CLOCK_INIT;
+            }
         }
     }
+
     if (CY_RSLT_SUCCESS == result)
     {
         obj->tcpwm.clock_hz = cyhal_clock_get_frequency(&obj->tcpwm.clock);
@@ -322,7 +335,7 @@ cy_rslt_t cyhal_pwm_init_cfg(cyhal_pwm_t *obj, const cyhal_pwm_configurator_t *c
 cy_rslt_t cyhal_pwm_init_adv(cyhal_pwm_t *obj, cyhal_gpio_t pin, cyhal_gpio_t compl_pin, cyhal_pwm_alignment_t pwm_alignment, bool continuous, uint32_t dead_time_us, bool invert, const cyhal_clock_t *clk)
 {
     CY_ASSERT(NULL != obj);
-
+    const cyhal_resource_pin_mapping_t* map = NULL;
     cy_rslt_t result = CY_RSLT_SUCCESS;
     memset(obj, 0, sizeof(cyhal_pwm_t));
     /* Explicitly marked not allocated resources as invalid to prevent freeing them. */
@@ -330,8 +343,23 @@ cy_rslt_t cyhal_pwm_init_adv(cyhal_pwm_t *obj, cyhal_gpio_t pin, cyhal_gpio_t co
     obj->pin                 = CYHAL_NC_PIN_VALUE;
     obj->pin_compl           = CYHAL_NC_PIN_VALUE;
 
-    const cyhal_resource_pin_mapping_t* map = _CYHAL_UTILS_TRY_ALLOC(pin, CYHAL_RSC_TCPWM, cyhal_pin_map_tcpwm_line);
-
+#if defined(COMPONENT_CAT5) && defined(CYHAL_PIN_MAP_DRIVE_MODE_TCPWM_LINE_COMPL)
+    if ( NC != compl_pin )
+    {
+        /* When the compl_pin is specified, just look for Group1 counters and Group 2 -
+        counter 1 and 2 as there is no compl_pin available for the rest of the
+        Group 2 counters */
+        cyhal_resource_pin_mapping_t pin_map_tcpwm_line[12];
+        memcpy(&pin_map_tcpwm_line,&cyhal_pin_map_tcpwm_line,sizeof(pin_map_tcpwm_line));
+        map = _CYHAL_UTILS_TRY_ALLOC(pin, CYHAL_RSC_TCPWM, pin_map_tcpwm_line);
+    }
+    else
+    {
+        map = _CYHAL_UTILS_TRY_ALLOC(pin, CYHAL_RSC_TCPWM, cyhal_pin_map_tcpwm_line);
+    }
+#else
+    map = _CYHAL_UTILS_TRY_ALLOC(pin, CYHAL_RSC_TCPWM, cyhal_pin_map_tcpwm_line);
+#endif
     bool swapped = false;
     #if defined(CYHAL_PIN_MAP_DRIVE_MODE_TCPWM_LINE_COMPL)
     if (map == NULL)
@@ -358,10 +386,6 @@ cy_rslt_t cyhal_pwm_init_adv(cyhal_pwm_t *obj, cyhal_gpio_t pin, cyhal_gpio_t co
     if (CY_RSLT_SUCCESS == result)
     {
         obj->pin = pin;
-        #if defined (COMPONENT_CAT5)
-            Cy_TCPWM_SelectTrigmuxOutput(TCPWM_TRIGMUX_OUTPUT_LINE_OUT);
-            Cy_TCPWM_SelectInputSignalForWGPOMux(map->channel_num, (TCPWM_LOGIC_TRIGMUX_INPUT_t)(TCPWM_LOGIC_TRIGMUX_WGPO_INPUT_LINE_OUT_0 + map->channel_num));
-        #endif
     }
 
     if (CY_RSLT_SUCCESS == result && NC != compl_pin)
@@ -384,10 +408,6 @@ cy_rslt_t cyhal_pwm_init_adv(cyhal_pwm_t *obj, cyhal_gpio_t pin, cyhal_gpio_t co
             if (CY_RSLT_SUCCESS == result)
             {
                 obj->pin_compl = compl_pin;
-                #if defined (COMPONENT_CAT5)
-                    Cy_TCPWM_SelectTrigmuxOutput(TCPWM_TRIGMUX_OUTPUT_LINE_OUT);
-                    Cy_TCPWM_SelectInputSignalForWGPOMux(map_compl->channel_num, (TCPWM_LOGIC_TRIGMUX_INPUT_t)(TCPWM_LOGIC_TRIGMUX_WGPO_INPUT_LINE_OUT_0 + map_compl->channel_num));
-                #endif
             }
         }
     #else
@@ -408,7 +428,11 @@ cy_rslt_t cyhal_pwm_init_adv(cyhal_pwm_t *obj, cyhal_gpio_t pin, cyhal_gpio_t co
 
     if (CY_RSLT_SUCCESS == result)
     {
+        #if defined(COMPONENT_CAT5)
+        uint16_t dead_time = (uint16_t)(((uint64_t)dead_time_us *obj->tcpwm.clock_hz) / _CYHAL_PWM_US_PER_SEC);
+        #else
         uint8_t dead_time = (uint8_t)(dead_time_us * obj->tcpwm.clock_hz / _CYHAL_PWM_US_PER_SEC);
+        #endif
 
         cy_stc_tcpwm_pwm_config_t pdl_config =
         {
@@ -436,7 +460,11 @@ cy_rslt_t cyhal_pwm_init_adv(cyhal_pwm_t *obj, cyhal_gpio_t pin, cyhal_gpio_t co
             .killInputMode     = CY_TCPWM_INPUT_RISINGEDGE,
             .killInput         = CY_TCPWM_INPUT_0,
             .countInputMode    = CY_TCPWM_INPUT_LEVEL,
-            .countInput        = CY_TCPWM_INPUT_1
+            .countInput        = CY_TCPWM_INPUT_1,
+        #if defined(COMPONENT_CAT5) //Configurations needed for center align mode
+            .compare0MatchUp   = true,
+            .compare0MatchDown = true,
+        #endif
         };
 
         result = _cyhal_pwm_init_hw(obj, &pdl_config, swapped);
@@ -475,7 +503,7 @@ cy_rslt_t cyhal_pwm_set_period(cyhal_pwm_t *obj, uint32_t period_us, uint32_t pu
     return result;
 }
 
-cy_rslt_t cyhal_pwm_set_duty_cycle(cyhal_pwm_t *obj, float duty_cycle, uint32_t frequencyhal_hz)
+cy_rslt_t cyhal_pwm_set_duty_cycle(cyhal_pwm_t *obj, cy_float32_t duty_cycle, uint32_t frequencyhal_hz)
 {
     CY_ASSERT(NULL != obj);
     if (duty_cycle < 0.0f || duty_cycle > 100.0f || frequencyhal_hz < 1)

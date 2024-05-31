@@ -33,19 +33,55 @@
 extern "C" {
 #endif
 
+/** \addtogroup group_hal_impl_syspm Syspm
+ * \ingroup group_hal_impl
+ * \{
+ * \section group_hal_impl_syspm_process Low power entry/exit
+ * On this device, low power mode (LPM) entry is only allowed when no threads are active
+ * and when the low power callbacks succeed. The power modes are implemented as follows.
+ * 
+ * * Deep Sleep mode - The HAL implmentation maps this to PDS (Power Down Sleep) mode.
+ *   Peripheral clocks are turned off and allows lower power to be consumed.
+ * * Other sleep modes are not supported yet
+ * 
+ * 
+ * \} group_hal_impl_syspm */
+
 /**
 * \cond INTERNAL
 */
 
+/** Sleep mode */
+#if defined(CYW55900)
+#define _CYHAL_SYSPM_SLEEP_MODE         BTSS_SYSTEM_SLEEP_MODE_NO_TRANSPORT
+#else
+#if defined(CYHAL_SYSPM_WITH_TRANSPORT_MODE)
+#define _CYHAL_SYSPM_SLEEP_MODE         BTSS_SYSTEM_SLEEP_MODE_WITH_TRANSPORT
+#else
+#define _CYHAL_SYSPM_SLEEP_MODE         BTSS_SYSTEM_SLEEP_MODE_NO_TRANSPORT
+#endif
+#endif
+
+/** EPDS Sleep state */
+#define CYHAL_SYSPM_EPDS_ENABLED        (0)
+/*******************************************************************************
+*       Data Structures
+*******************************************************************************/
+/* Connection type definition */
+/** Represents an association between a pin and wake-up sources */
+typedef struct
+{
+    BTSS_SYSTEM_SLEEP_PMU_WAKE_SRC_t    wakeup_src;     //!< Wake-up source associated to the pin
+    cyhal_gpio_t                        pin;            //!< The GPIO pin
+} _cyhal_wakeup_src_pin_mapping_t;
+
+/*******************************************************************************
+*       Functions
+*******************************************************************************/
+
 void _cyhal_syspm_register_peripheral_callback(cyhal_syspm_callback_data_t *callback_data);
 void _cyhal_syspm_unregister_peripheral_callback(cyhal_syspm_callback_data_t *callback_data);
-
-cy_rslt_t cyhal_syspm_tickless_sleep_deepsleep(cyhal_lptimer_t *obj, uint32_t desired_ms, uint32_t *actual_ms, bool deep_sleep);
-/*
-#define cyhal_syspm_tickless_deepsleep(obj, desired_ms, actual_ms) cyhal_syspm_tickless_sleep_deepsleep(obj, desired_ms, actual_ms, true)
-
-#define cyhal_syspm_tickless_sleep(obj, desired_ms, actual_ms) cyhal_syspm_tickless_sleep_deepsleep(obj, desired_ms, actual_ms, false)
-*/
+cy_rslt_t _cyhal_syspm_set_wakeup_source(cyhal_gpio_t pin, bool polarity, bool enable);
 /** \endcond */
 
 #if defined(__cplusplus)

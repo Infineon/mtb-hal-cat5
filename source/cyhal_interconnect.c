@@ -41,14 +41,19 @@ cy_rslt_t cyhal_connect_pin(const cyhal_resource_pin_mapping_t *pin_connection, 
     cyhal_pinmux_t functionality = pin_connection->functionality;
     bool status = true;
 
-    // Skip drive mode setup and evaluation for GPIOs as it is done in the GPIO driver.
-    // TODO: Init value appears to always be high for peripherals. Revisit if it is not.
-    if (pin_connection->block_num != CYHAL_RSC_GPIO)
-        status = btss_pad_setHwConfig((BTSS_PAD_LIST_t)pin, (BTSS_PAD_HW_CONFIG_t)drive_mode);
-    
-    if (status)
-        status = btss_pad_assignFunction((BTSS_PAD_LIST_t)pin, (BTSS_PINMUX_FUNC_LIST_t)functionality);
-    
+    // Skip configuration if the connection is direct
+    if ((BTSS_PAD_LIST_t)pin < PAD_MAX_NUM)
+    {
+        // Skip drive mode setup and evaluation for GPIOs as it is done in the GPIO driver.
+        // Init value appears to always be high for peripherals. Revisit if it is not.
+        if (pin_connection->block_num != CYHAL_RSC_GPIO)
+            status = btss_pad_setHwConfig((BTSS_PAD_LIST_t)pin, (BTSS_PAD_HW_CONFIG_t)drive_mode);
+        
+        // FUNC_NONE is currently not supported. Remove the check when it is.
+        if (status && (functionality != FUNC_NONE))
+            status = btss_pad_assignFunction((BTSS_PAD_LIST_t)pin, (BTSS_PINMUX_FUNC_LIST_t)functionality);
+    }
+
     return (status) ? CY_RSLT_SUCCESS : CYHAL_INTERCONNECT_RSLT_INVALID_CONNECTION;
 }
 

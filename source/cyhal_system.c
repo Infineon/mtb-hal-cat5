@@ -42,7 +42,7 @@ cy_rslt_t cyhal_system_delay_ms(uint32_t milliseconds)
 #if defined(CY_RTOS_AWARE) || defined(COMPONENT_RTOS_AWARE)
     return cy_rtos_delay_milliseconds(milliseconds);
 #else
-    for (uint16_t msec = 0; msec < milliseconds; msec++)
+    for (uint32_t msec = 0; msec < milliseconds; msec++)
     {
         cyhal_system_delay_us(1000);
     }
@@ -58,6 +58,15 @@ cy_rslt_t cyhal_system_set_isr(int32_t irq_num, int32_t irq_src, uint8_t priorit
     CY_UNUSED_PARAMETER(priority);
     CY_UNUSED_PARAMETER(handler);
     return CYHAL_SYSTEM_RSLT_ERR_NOT_SUPPORTED;
+}
+
+void cyhal_system_delay_us(uint16_t microseconds)
+{
+    Cy_SysLib_DelayUs(microseconds%1000);
+    for (uint16_t msec = 0; msec < (microseconds/1000); msec++)
+    {
+        Cy_SysLib_DelayUs(1000);
+    }
 }
 
 #if defined(__cplusplus)

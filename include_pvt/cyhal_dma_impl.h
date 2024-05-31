@@ -79,65 +79,67 @@ extern "C" {
  */
 
 /** Default DMA channel priority */
-#define CYHAL_DMA_PRIORITY_DEFAULT     0u
+#define CYHAL_DMA_PRIORITY_DEFAULT              0u
 /** High DMA channel priority */
-#define CYHAL_DMA_PRIORITY_HIGH        0u
+#define CYHAL_DMA_PRIORITY_HIGH                 0u
 /** Medium DMA channel priority */
-#define CYHAL_DMA_PRIORITY_MEDIUM      0u
+#define CYHAL_DMA_PRIORITY_MEDIUM               0u
 /** Low DMA channel priority */
-#define CYHAL_DMA_PRIORITY_LOW         0u
+#define CYHAL_DMA_PRIORITY_LOW                  0u
 
 /** Channel dedicated to memory-UART transactions */
-#define _CYHAL_DMA_CH_PERIPH_TO_MEM    2u
+#define _CYHAL_DMA_CH_PERIPH_TO_MEM             2u
 /** Channel dedicated to UART-memory transactions */
-#define _CYHAL_DMA_CH_MEM_TO_PERIPH    1u
+#define _CYHAL_DMA_CH_MEM_TO_PERIPH             1u
 /** Channel dedicated to memory-memory transactions */
-#define _CYHAL_DMA_CH_MEM_TO_MEM       _CYHAL_DMA_CH_MEM_TO_PERIPH
+#define _CYHAL_DMA_CH_MEM_TO_MEM                _CYHAL_DMA_CH_MEM_TO_PERIPH
 
 /** Channel dedicated to memory-TDM0 transactions */
-#define _CYHAL_DMA_CH_MEM_TO_TDM0      4u
+#define _CYHAL_DMA_CH_MEM_TO_TDM0               4u
 /** Channel dedicated to TDM0-memory transactions */
-#define _CYHAL_DMA_CH_TDM0_TO_MEM      5u
+#define _CYHAL_DMA_CH_TDM0_TO_MEM               5u
 /** Channel dedicated to memory-TDM1 transactions */
-#define _CYHAL_DMA_CH_MEM_TO_TDM1      6u
+#define _CYHAL_DMA_CH_MEM_TO_TDM1               6u
 /** Channel dedicated to TDM1-memory transactions */
-#define _CYHAL_DMA_CH_TDM1_TO_MEM      7u
+#define _CYHAL_DMA_CH_TDM1_TO_MEM               7u
 
 /** Unallocated channel */
-#define _CYHAL_DMA_CH_NOT_ALLOCATED    255u
+#define _CYHAL_DMA_CH_NOT_ALLOCATED             255u
 
 /** Control line m2m-connection */
-#define _CYHAL_DMAC_CONTROL_LINE_M2M   0u
+#define _CYHAL_DMAC_CONTROL_LINE_M2M            0u
 /** Control line non-connection */
-#define _CYHAL_DMAC_CONTROL_LINE_NONE  255u
+#define _CYHAL_DMAC_CONTROL_LINE_NONE           255u
 
 /** TDM struct size */
-#define _CYHAL_DMA_TDM_STRUCT_SIZE     0x200
+#define _CYHAL_DMA_TDM_STRUCT_SIZE              (0x200u)
+/** TDM struct reserved memory size */
+#define _CYHAL_DMA_TDM_STRUCT_RESERVED_SIZE     (0x8000u)
 
 /** Start of SRAM address */
-#define _CYHAL_DMA_ADDR_SRAM_START     sram_adr_base
+#define _CYHAL_DMA_ADDR_SRAM_START              sram_adr_base
 /** End of SRAM address */
-#define _CYHAL_DMA_ADDR_SRAM_END       cc312_adr_base
+#define _CYHAL_DMA_ADDR_SRAM_END                cc312_adr_base
 /** Start of SCB0 address */
-#define _CYHAL_DMA_ADDR_SCB0_START     scb0_adr_base
+#define _CYHAL_DMA_ADDR_SCB0_START              scb0_adr_base
 /** End of SCB0 address */
-#define _CYHAL_DMA_ADDR_SCB0_END       scb1_adr_base
+#define _CYHAL_DMA_ADDR_SCB0_END                scb1_adr_base
 /** Start of SCB1 address */
-#define _CYHAL_DMA_ADDR_SCB1_START     scb1_adr_base
+#define _CYHAL_DMA_ADDR_SCB1_START              scb1_adr_base
 /** End of SCB1 address */
-#define _CYHAL_DMA_ADDR_SCB1_END       driver_cfg_adr_base
+#define _CYHAL_DMA_ADDR_SCB1_END                driver_cfg_adr_base
 /** Start of SCB2 address */
-#define _CYHAL_DMA_ADDR_SCB2_START     scb2_adr_base
+#define _CYHAL_DMA_ADDR_SCB2_START              scb2_adr_base
 /** End of SCB2 address */
-#define _CYHAL_DMA_ADDR_SCB2_END       mxtdm_adr_base
+#define _CYHAL_DMA_ADDR_SCB2_END                mxtdm_adr_base
 /** Start of TDM0 address */
-#define _CYHAL_DMA_ADDR_TDM0_START     mxtdm_adr_base
+#define _CYHAL_DMA_ADDR_TDM0_START              (mxtdm_adr_base + _CYHAL_DMA_TDM_STRUCT_RESERVED_SIZE)
 /** End of TDM0 address */
-#define _CYHAL_DMA_ADDR_TDM0_END       (mxtdm_adr_base + _CYHAL_DMA_TDM_STRUCT_SIZE)
+#define _CYHAL_DMA_ADDR_TDM0_END                (_CYHAL_DMA_ADDR_TDM0_START + _CYHAL_DMA_TDM_STRUCT_SIZE)
 /** Start of TDM1 address */
-#define _CYHAL_DMA_ADDR_TDM1_START     (mxtdm_adr_base + _CYHAL_DMA_TDM_STRUCT_SIZE)
+#define _CYHAL_DMA_ADDR_TDM1_START              _CYHAL_DMA_ADDR_TDM0_END
 /** End of TDM1 address */
-#define _CYHAL_DMA_ADDR_TDM1_END       (_CYHAL_DMA_ADDR_TDM0_END + _CYHAL_DMA_TDM_STRUCT_SIZE)
+#define _CYHAL_DMA_ADDR_TDM1_END                (_CYHAL_DMA_ADDR_TDM0_END + _CYHAL_DMA_TDM_STRUCT_SIZE)
 
 /** \} group_hal_impl_dma */
 

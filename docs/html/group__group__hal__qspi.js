@@ -41,6 +41,8 @@ var group__group__hal__qspi =
       [ "bus_width", "group__group__hal__qspi.html#aaea78d2eed5d55bf6a19b3a4933520d2", null ],
       [ "data_rate", "group__group__hal__qspi.html#ae1ed362731f051e94dc58a95e0888c4d", null ]
     ] ],
+    [ "CYHAL_API_AVAILABLE_QSPI_IS_BUSY", "group__group__hal__qspi.html#gacb304c84279b78796de2ae3c3db6e422", null ],
+    [ "CYHAL_API_AVAILABLE_QSPI_IS_PENDING", "group__group__hal__qspi.html#gab1995fd5d12c0450e7a4d60569b4352b", null ],
     [ "cyhal_qspi_event_callback_t", "group__group__hal__qspi.html#ga42887dff6257345711b353990edb1ab1", null ],
     [ "cyhal_qspi_bus_width_t", "group__group__hal__qspi.html#gaddc93a79f0708fd53897d0c37bc7544b", [
       [ "CYHAL_QSPI_CFG_BUS_SINGLE", "group__group__hal__qspi.html#ggaddc93a79f0708fd53897d0c37bc7544bab14f0354fdb42ea40c30274df3eeb74f", null ],
@@ -76,5 +78,7 @@ var group__group__hal__qspi =
     [ "cyhal_qspi_write_async", "group__group__hal__qspi.html#ga9521128b942f52fe2146cac081d48d02", null ],
     [ "cyhal_qspi_transfer", "group__group__hal__qspi.html#gad3d0ba591bae66de98b2eac59b915ed1", null ],
     [ "cyhal_qspi_register_callback", "group__group__hal__qspi.html#ga3650436f640ed3e7640dafaa90268700", null ],
-    [ "cyhal_qspi_enable_event", "group__group__hal__qspi.html#ga133e886b33443ee76ad7239623290079", null ]
+    [ "cyhal_qspi_enable_event", "group__group__hal__qspi.html#ga133e886b33443ee76ad7239623290079", null ],
+    [ "cyhal_qspi_is_busy", "group__group__hal__qspi.html#ga75378b66a53b60c9f6c663d7fc191d7c", null ],
+    [ "cyhal_qspi_is_pending", "group__group__hal__qspi.html#ga0ac80239c538348d4de0b8893ef1de2c", null ]
 ];

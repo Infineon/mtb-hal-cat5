@@ -31,6 +31,7 @@
 #include "cyhal_interconnect.h"
 #include "cyhal_system.h"
 #include "cyhal_utils.h"
+#include "cyhal_syspm.h"
 
 #if (CYHAL_DRIVER_AVAILABLE_GPIO)
 
@@ -62,7 +63,48 @@ CY_NOINIT static BTSS_GPIO_t _cyhal_pad_btss_map[BT_GPIO_LAST];
 #define _CYHAL_GPIO_GET_BTSS_MAP(pin)               _cyhal_pad_btss_map[pin]
 #define _CYHAL_GPIO_SET_BTSS_MAP(pin, btss_pin)     _cyhal_pad_btss_map[pin] = btss_pin
 
-static BTSS_GPIO_t _cyhal_gpio_convert_func_to_btss(BTSS_PINMUX_FUNC_LIST_t functionality)
+bool _cyhal_gpio_switch_and_set(cyhal_gpio_t gpio)
+{
+
+    BTSS_PINMUX_FUNC_LIST_t func = FUNC_NONE;
+    /* Set GPIO drive mode */
+    bool pdl_status = btss_pad_setHwConfig((BTSS_PAD_LIST_t)gpio, (BTSS_PAD_HW_CONFIG_t)CYHAL_GPIO_DRIVE_STRONG);
+
+    if(pdl_status)
+    {
+        uint8_t arr_size = sizeof (cyhal_pin_map_sw_gpio)/ sizeof(cyhal_resource_pin_mapping_t);
+        for (uint8_t pinIdx = 0; pinIdx < arr_size; pinIdx++)
+        {
+            /* There are 40+ pin pads and 24 pinmux selections for SW GPIO*/
+            if (cyhal_pin_map_sw_gpio[pinIdx].pin == (cyhal_gpio_t)gpio)
+            {
+                func = cyhal_pin_map_sw_gpio[pinIdx].functionality;
+                break;
+            }
+        }
+
+        if (func != FUNC_NONE)
+        {
+            /* Assign the GPIO function */
+            pdl_status = btss_pad_assignFunction((BTSS_PAD_LIST_t)gpio, func);
+            if (pdl_status)
+            {
+                BTSS_GPIO_t btss_gpio = (BTSS_GPIO_t)_cyhal_gpio_convert_func_to_btss(func);
+                /* Set GPIO Output direction to output and force it to logic high (locking the communication)*/
+                btss_gpio_setDirection(btss_gpio, true);
+                btss_gpio_write(btss_gpio, true);
+                /* Restore direction before going to sleep to avoid GPIO stuck at wake-up.
+                   This is not chnaging the output driver mode that still follow the 
+                   btss_pad_setHwConfig() set at the beginning of this function.
+                   It just prepare for the correct setup afterwards */
+                btss_gpio_setDirection(btss_gpio, false);
+            }
+        }
+    }
+    return pdl_status;
+}
+
+BTSS_GPIO_t _cyhal_gpio_convert_func_to_btss(BTSS_PINMUX_FUNC_LIST_t functionality)
 {
     BTSS_GPIO_t btss_pin = BTSS_GPIO_0;
 
@@ -307,6 +349,9 @@ void cyhal_gpio_enable_event(cyhal_gpio_t pin, cyhal_gpio_event_t event, uint8_t
     {
         btss_gpio_configInterrupt(btss_pin, trigger);
         btss_gpio_enableInterrupt(btss_pin, enable);
+#if (CYHAL_DRIVER_AVAILABLE_SYSPM == 1)
+        (void)_cyhal_syspm_set_wakeup_source(pin, ((event == CYHAL_GPIO_IRQ_RISE)? true : false), enable);
+#endif
     }
     else
     {

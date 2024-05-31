@@ -59,7 +59,6 @@
 * \note For applications that require printing messages on a UART terminal using printf(),
 * the <a href="https://github.com/infineon/retarget-io">retarget-io</a> utility library can be used directly.
 *
-*
 * \section subsection_uart_features Features
 * * Configurable UART baud rate - \ref cyhal_uart_set_baud
 * * Configurable data frame size, STOP bits and parity - \ref cyhal_uart_cfg_t
@@ -68,7 +67,7 @@
 * Interrupts are handled by callbacks based on events \ref cyhal_uart_event_t
 * If an event is disabled, the underlying interrupt is still enabled. Enabling or disabling
 * an event only enables or disables the callback.
-* \note Care must be exercised whenusing the \ref CYHAL_UART_IRQ_RX_NOT_EMPTY event.
+* \note Care must be exercised when using the \ref CYHAL_UART_IRQ_RX_NOT_EMPTY event.
 * The callback must read all available received data or the interrupt will not be cleared
 * leading to the callback being immediately retriggered.
 * \section subsection_uart_quickstart Quick Start
@@ -163,10 +162,10 @@ typedef enum
     CYHAL_UART_IRQ_NONE                = 0,      //!< No interrupt
     CYHAL_UART_IRQ_TX_TRANSMIT_IN_FIFO = 1 << 1, //!< All TX data from transmit has been moved to the HW TX FIFO buffer
     CYHAL_UART_IRQ_TX_DONE             = 1 << 2, //!< All TX data has been transmitted (applicable only for cyhal_uart_write_async)
-    CYHAL_UART_IRQ_TX_ERROR            = 1 << 3, //!< An error occurred during TX
+    CYHAL_UART_IRQ_RX_DONE             = 1 << 3, //!< All RX data has been received (applicable only for cyhal_uart_read_async)
     CYHAL_UART_IRQ_RX_FULL             = 1 << 4, //!< The SW RX buffer (if used) is full. Additional data will be stored in the HW RX FIFO buffer
-    CYHAL_UART_IRQ_RX_DONE             = 1 << 5, //!< All RX data has been received (applicable only for cyhal_uart_read_async)
-    CYHAL_UART_IRQ_RX_ERROR            = 1 << 6, //!< An error occurred during RX
+    CYHAL_UART_IRQ_RX_ERROR            = 1 << 5, //!< An error occurred during RX
+    CYHAL_UART_IRQ_TX_ERROR            = 1 << 6, //!< An error occurred during TX
     CYHAL_UART_IRQ_RX_NOT_EMPTY        = 1 << 7, //!< The HW RX FIFO buffer is not empty
     CYHAL_UART_IRQ_TX_EMPTY            = 1 << 8, //!< The HW TX FIFO buffer is empty
     CYHAL_UART_IRQ_TX_FIFO             = 1 << 9, //!< Number of entries in the HW TX FIFO is less than the TX FIFO trigger level
@@ -470,7 +469,8 @@ cy_rslt_t cyhal_uart_disable_output(cyhal_uart_t *obj, cyhal_uart_output_t outpu
  */
 cy_rslt_t cyhal_uart_init_cfg(cyhal_uart_t *obj, const cyhal_uart_configurator_t *cfg);
 
-/** Configure UART RX software buffer, which will extend the hardware RX FIFO buffer. \ref cyhal_uart_init function does
+/** Configure UART RX software buffer, which will extend the hardware RX FIFO buffer only
+ * for SW async mode. \ref cyhal_uart_init function does
  * not require this function call if a non-null value was provided for `rx_buffer`.
  *
  * @param[in]  obj              The UART peripheral to configure

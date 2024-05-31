@@ -108,6 +108,12 @@ extern "C" {
 /** No channels available */
 #define CYHAL_ADC_RSLT_NO_CHANNELS                      \
     (CY_RSLT_CREATE_EX(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_ABSTRACTION_HAL, CYHAL_RSLT_MODULE_ADC, 3))
+/** Hardware/Operation is busy */
+#define CYHAL_ADC_RSLT_ERR_BUSY                         \
+    (CY_RSLT_CREATE_EX(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_ABSTRACTION_HAL, CYHAL_RSLT_MODULE_ADC, 4))
+/** Unsupported by this device */
+#define CYHAL_ADC_RSLT_ERR_UNSUPPORTED                  \
+    (CY_RSLT_CREATE_EX(CY_RSLT_TYPE_ERROR, CY_RSLT_MODULE_ABSTRACTION_HAL, CYHAL_RSLT_MODULE_ADC, 5))
 
 /**
  * \}
@@ -425,6 +431,34 @@ int32_t cyhal_adc_read(const cyhal_adc_channel_t *obj);
  * @return An unsigned 32 bit value representing the current input in microvolts
  */
 int32_t cyhal_adc_read_uv(const cyhal_adc_channel_t *obj);
+
+/** Returns true if the most recently triggered conversion has completed for the specified channel.
+ *
+ * If continuous conversion is enabled, returns true if at least one conversion has completed.
+ *
+ * @param[in] obj          The ADC object
+ * @return True if conversion completed, false if still ongoing
+ */
+bool cyhal_adc_is_conversion_complete(const cyhal_adc_channel_t *obj);
+
+/** Reads the result of the most recent scan for the specified channel and writes it to the given `result` location.
+ *
+ * This function will return an error if no scan was completed.
+ * 
+ * @param[in] obj          The ADC object
+ * @param[out] result      Scanned result 
+ * @return The status of the read operation 
+ */
+cy_rslt_t cyhal_adc_read_latest(const cyhal_adc_channel_t* obj, int32_t *result);
+
+/** Triggers start of conversion for all enabled channels.
+ *
+ * The function returns without waiting for the conversion to complete.
+ *
+ * @param[in] obj          The ADC object
+ * @return The status of the conversion request
+ */
+cy_rslt_t cyhal_adc_start_convert(cyhal_adc_t *obj);
 
 /** Scan the specified ADC channels in the background and copy the results
   * into the array pointed to by `result_list`.

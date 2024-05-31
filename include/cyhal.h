@@ -104,6 +104,8 @@
 */
 /** Macro specifying whether the DMA driver is available for the current device \def CYHAL_DRIVER_AVAILABLE_DMA
 */
+/** Macro specifying whether the Ethernet driver is available for the current device \def CYHAL_DRIVER_AVAILABLE_ETHERNET
+*/
 /** Macro specifying whether the EzI2C driver is available for the current device \def CYHAL_DRIVER_AVAILABLE_EZI2C
 */
 /** Macro specifying whether the NVM driver is available for the current device \def CYHAL_DRIVER_AVAILABLE_NVM
@@ -115,6 +117,8 @@
 /** Macro specifying whether the HwMgr driver is available for the current device \def CYHAL_DRIVER_AVAILABLE_HWMGR
 */
 /** Macro specifying whether the I2C driver is available for the current device \def CYHAL_DRIVER_AVAILABLE_I2C
+*/
+/** Macro specifying whether the I3C driver is available for the current device \def CYHAL_DRIVER_AVAILABLE_I3C
 */
 /** Macro specifying whether the I2S driver is available for the current device \def CYHAL_DRIVER_AVAILABLE_I2S
 */
@@ -145,6 +149,10 @@
 /** Macro specifying whether the SDHC driver is available for the current device \def CYHAL_DRIVER_AVAILABLE_SDHC
 */
 /** Macro specifying whether the SDIO driver is available for the current device \def CYHAL_DRIVER_AVAILABLE_SDIO
+*/
+/** Macro specifying whether the SDIO host driver is available for the current device \def CYHAL_DRIVER_AVAILABLE_SDIO_HOST
+*/
+/** Macro specifying whether the SDIO dev driver is available for the current device \def CYHAL_DRIVER_AVAILABLE_SDIO_DEV
 */
 /** Macro specifying whether the SPI driver is available for the current device \def CYHAL_DRIVER_AVAILABLE_SPI
 */

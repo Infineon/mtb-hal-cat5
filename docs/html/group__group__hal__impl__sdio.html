@@ -64,7 +64,7 @@ $(function() {
 </div>
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(document).ready(function(){initNavTree('structrtcHWTimeStamp.html',''); initResizable(); });
+$(document).ready(function(){initNavTree('group__group__hal__impl__sdio.html',''); initResizable(); });
 /* @license-end */
 </script>
 <div id="doc-content">
@@ -83,39 +83,12 @@ $(document).ready(function(){initNavTree('structrtcHWTimeStamp.html',''); initRe
 </div>
 
 <div class="header">
-  <div class="summary">
-<a href="#pub-attribs">Data Fields</a>  </div>
-  <div class="headertitle"><div class="title">rtcHWTimeStamp Struct Reference</div></div>
+  <div class="headertitle"><div class="title">SDIO (Secure Digital Input Output)<div class="ingroups"><a class="el" href="group__group__hal__impl.html">CAT5 (AIROC™) Implementation Specific</a></div></div></div>
 </div><!--header-->
 <div class="contents">
-<a name="details" id="details"></a><h2 class="groupheader">Description</h2>
-<div class="textblock"><p >TODO: very simple guesstimplementation, not connected to anything yet. </p>
-<p >Remove once ROM stuff is accessible </p>
-</div><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
-Data Fields</h2></td></tr>
-<tr class="memitem:aa756015d682518b36632124efadbefd6"><td class="memItemLeft" align="right" valign="top"><a id="aa756015d682518b36632124efadbefd6" name="aa756015d682518b36632124efadbefd6"></a>
-uint64_t&#160;</td><td class="memItemRight" valign="bottom"><b>rtc64</b></td></tr>
-<tr class="memdesc:aa756015d682518b36632124efadbefd6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stores the value read from hardware RTC. <br /></td></tr>
-<tr class="separator:aa756015d682518b36632124efadbefd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table>
-<h2 class="groupheader">Field Documentation</h2>
-<a id="aa756015d682518b36632124efadbefd6" name="aa756015d682518b36632124efadbefd6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa756015d682518b36632124efadbefd6">&#9670;&nbsp;</a></span>rtc64</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint64_t rtcHWTimeStamp::rtc64</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Stores the value read from hardware RTC. </p>
-
-</div>
-</div>
+<p >The SDIO device HAL implemenation for CAT5 is available only for CYW955900 family of devices. </p>
+<p >SDIO host functionality is not available on these devices.</p>
+<dl class="section note"><dt>Note</dt><dd><a class="el" href="group__group__hal__sdio.html#ga578b8e176f1aa9444c2da358547ec3df">cyhal_sdio_register_callback</a> parameter <b>callback_arg</b> for this function is slightly different from other HAL register_callback functions. If the parameter <b>callback_arg</b> is NULL the returned argument of the callback is the pointer to the internal SDIO Event Data structure sdiod_event_data_t. </dd></dl>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part

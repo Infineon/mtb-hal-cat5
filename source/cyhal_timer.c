@@ -121,20 +121,25 @@ cy_rslt_t _cyhal_timer_init_hw(cyhal_timer_t *obj, const cy_stc_tcpwm_counter_co
             result = CYHAL_TIMER_RSLT_ERR_CLOCK_INIT;
         }
     }
-    else if (CY_RSLT_SUCCESS == (result = _cyhal_utils_allocate_clock(&(obj->tcpwm.clock), timer, CYHAL_CLOCK_BLOCK_PERIPHERAL_16BIT, true)))
+    else
     {
-        obj->tcpwm.dedicated_clock = true;
-        #if defined(COMPONENT_CAT5)
-        // CAT5 lacks hardware required to divide from 96MHz to 1MHz
-        result = cyhal_timer_set_frequency(obj, CYHAL_TIMER_DEFAULT_FREQ * 3);
-        #else
-        result = cyhal_timer_set_frequency(obj, CYHAL_TIMER_DEFAULT_FREQ);
-        #endif
+        result = _cyhal_utils_allocate_clock(&(obj->tcpwm.clock), timer, CYHAL_CLOCK_BLOCK_PERIPHERAL_16BIT, true);
         if (CY_RSLT_SUCCESS == result)
         {
-            if (CY_SYSCLK_SUCCESS != _cyhal_utils_peri_pclk_assign_divider(pclk, &(obj->tcpwm.clock)))
+            obj->tcpwm.dedicated_clock = true;
+            #if defined(COMPONENT_CAT5)
+            /* CAT5 lacks hardware required to divide from 192MHz to 1MHz.
+               Max divider value possible is 32 */
+            result = cyhal_timer_set_frequency(obj, CYHAL_TIMER_DEFAULT_FREQ * 6);
+            #else
+            result = cyhal_timer_set_frequency(obj, CYHAL_TIMER_DEFAULT_FREQ);
+            #endif
+            if (CY_RSLT_SUCCESS == result)
             {
-                result = CYHAL_TIMER_RSLT_ERR_CLOCK_INIT;
+                if (CY_SYSCLK_SUCCESS != _cyhal_utils_peri_pclk_assign_divider(pclk, &(obj->tcpwm.clock)))
+                {
+                    result = CYHAL_TIMER_RSLT_ERR_CLOCK_INIT;
+                }
             }
         }
     }
@@ -282,7 +287,7 @@ cy_rslt_t cyhal_timer_configure(cyhal_timer_t *obj, const cyhal_timer_cfg_t *cfg
 cy_rslt_t cyhal_timer_set_frequency(cyhal_timer_t *obj, uint32_t hz)
 {
     cy_rslt_t result = CY_RSLT_SUCCESS;
-    
+
     #if defined(COMPONENT_CAT5)
     if(obj->is_t2timer)
     {

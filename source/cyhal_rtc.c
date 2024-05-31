@@ -88,24 +88,39 @@ extern "C" {
 static volatile uint16_t _cyhal_rtc_state = _CYHAL_RTC_STATE_NEVER_INITALIZED;
 static cy_stc_rtc_dst_t *_cyhal_rtc_dst;
 // Alarms aren't supported, so we need a way to know when we have transitioned into or out of DST.
-// _cyhal_rts_is_dst records the last _cyhal_rtc_get_dst_status value found when reading or writing,
+// _cyhal_rts_is_dst records the last dst status value found when reading or writing,
 // and when crossing into/out of DST, adds or removes an hour from the hardware RTC
 static bool _cyhal_rtc_is_dst;
-// _cyhal_retc_when_last_dst records a timestamp of the last time we updated _cyhal_rtc_is_dst, to
-// protect against edge cases where _cyhal_rtc_is_dst is no longer reliable
-static RTC_TIME_t *_cyhal_rtc_when_last_dst;
 
-/* Check for transition into or out of DST, and update time if appropriate */
-static void _cyhal_check_for_dst_transition(RTC_TIME_t * time)
+//This is to handle the DST stop condition, for last one hour before the DST stop time, where device could be with/within the DST.
+//After the DST stop time, time is decremented by an hour and this flag would be set. Once set,this flag would be cleared after an hour.
+//For eg. If the DST end time is 2 AM, when the time is first between 1 AM and 2AM on the DST stop day, time is within the DST.( flag would be false)
+//DST ends at 2 AM and the time is decremented to 1AM. The time again would be between 1AM and 2 AM and time is then out of the DST. ( flag would be true)
+static bool _cyhal_rtc_dst_stop_hour;
+
+/* Check for transition into or out of DST, and update time if required
+*
+* \param time - Current Time
+*
+* \param is_set
+* true  - When the DST check is performed as part of time set operation. Time passed includes
+*         the DST offset. No time adjustment required. Just set/clear the flags.
+* false - When the DST check is performed as part of time get operation. Adjust the RTC
+*         time if the conditions are met
+*
+* \return
+* Returns true if the current time is within the DST and false otherwise
+*
+*/
+static bool _cyhal_check_for_dst_transition(RTC_TIME_t * time, bool is_set)
 {
     if(_cyhal_rtc_dst == NULL)
     {
         // DST hasn't been set: do nothing
-        return;
+        return false;
     }
 
     uint32_t dstStartTime;
-    uint32_t lastUpdateTime;
     uint32_t currentTime;
     uint32_t dstStopTime;
     uint32_t dstStartDayOfMonth;
@@ -143,63 +158,96 @@ static void _cyhal_check_for_dst_transition(RTC_TIME_t * time)
                                    | (_cyhal_rtc_dst->startDst.hour));
     dstStopTime  =    ((uint32_t) (_cyhal_rtc_dst->stopDst.month << _CYHAL_RTC_MONTHS_PLACE)   | (dstStopDayOfMonth << _CYHAL_RTC_DAYOFMONTHS_PLACE) \
                                    | (_cyhal_rtc_dst->stopDst.hour));
-    lastUpdateTime  = ((uint32_t) (_cyhal_rtc_when_last_dst->month << _CYHAL_RTC_MONTHS_PLACE) | (_cyhal_rtc_when_last_dst->day << _CYHAL_RTC_DAYOFMONTHS_PLACE) \
-                                   | (_cyhal_rtc_when_last_dst->hour));
     currentTime  =     ((uint32_t) (time->month << _CYHAL_RTC_MONTHS_PLACE)                    | (time->day << _CYHAL_RTC_DAYOFMONTHS_PLACE) \
                                    | (time->hour));
 
-    // Case 1:      DST declared while active and still active:     Do nothing
-    // Case 1.1:    DST declared while active and no longer active: Decrement time by an hour
-    if((lastUpdateTime > dstStartTime) && (lastUpdateTime < dstStopTime))
+    //The time set request. Local Time set includes the DST offset. No need to adjust the RTC time.
+    if(is_set == true)
     {
-        /* Check for passed dstStopTime and the 'an hour before/after DST event' period */
-        if(((currentTime > dstStopTime) || (1UL == (dstStopTime - currentTime))) && (_cyhal_rtc_is_dst == true))
+        //The time set is within the DST
+        if((currentTime >= dstStartTime) && (currentTime < dstStopTime))
         {
-            // We have exited DST
-            adjustVal = -1;
+           //DST flag is not set
+            if(_cyhal_rtc_is_dst == false)
+            {
+                //_cyhal_rtc_dst_stop_hour flag is being checked to cover an edge case in which time is set when
+                //in the last one hour before the DST stop time.
+                if( _cyhal_rtc_dst_stop_hour == true )
+                {
+                    /* Check for the 'an hour before/after DST event' period */
+                    if( (dstStopTime - currentTime) != 1)
+                    {
+                        //No need to adjust the time since the local time includes the DST offset. Just set the dst flag.
+                        _cyhal_rtc_is_dst = true;
+                    }
+                }
+                else
+                {
+                    _cyhal_rtc_is_dst = true;
+                }
+            }
+            //No action required if the DST flag is set already
+        }
+        //Time set is out of the DST
+        else
+        {
+            //Clear the dst flag
             _cyhal_rtc_is_dst = false;
+            _cyhal_rtc_dst_stop_hour = false;
         }
     }
-    // Case 2:      DST declared in the future and not yet active:  Do nothing
-    // Case 2.1:    DST declared in the future and now active:      Increment time by an hour
-    // Case 2.2:    DST delcared in the future and now concluded:   Decrement, if we last checked while it was active
-    else if(lastUpdateTime < dstStartTime)
+    //Time get reuest
+    else
     {
-        /* Check for the 'an hour before/after DST event' period */
-        if((1UL == (currentTime - dstStartTime)) && (_cyhal_rtc_is_dst == false))
+        //Check if the time is within the DST.
+        if((currentTime >= dstStartTime) && (currentTime < dstStopTime))
         {
-            // We have entered DST
-            adjustVal = 1;
-            _cyhal_rtc_is_dst = true;
+            //Check if the time is within the DST for the first time. And not in the DST last hour
+            if((_cyhal_rtc_is_dst == false) && (_cyhal_rtc_dst_stop_hour == false))
+            {
+                // We have entered DST.Increment the time by an hour on entering the DST for the first time
+                adjustVal = 1;
+                _cyhal_rtc_is_dst = true;
+            }
         }
-        else if((currentTime > dstStopTime) && (_cyhal_rtc_is_dst == true))
+        //Time is past the DST stop time
+        else if(currentTime >= dstStopTime )
         {
-            // We have exited DST
-            adjustVal = -1;
+            // Not in the DST last hour
+            if(_cyhal_rtc_dst_stop_hour == false)
+            {
+                //Check if the time is past the DST stop for the first time.
+                if(_cyhal_rtc_is_dst == true)
+                {
+                    // We have exited DST.Decrement the time by an hour on exiting the DST for the first time
+                    adjustVal = -1;
+                    _cyhal_rtc_is_dst = false;
+                    _cyhal_rtc_dst_stop_hour = true;
+                }
+            }
+            //Clearing the flag once the time is past the DST stop time
+            else
+            {
+                _cyhal_rtc_dst_stop_hour = false;
+            }
+        }
+        else//No action really required when current time is less than the DST start time. But clearing the flags
+        {
+            //Clear the dst flag
             _cyhal_rtc_is_dst = false;
+            _cyhal_rtc_dst_stop_hour = false;
         }
-    }
-    // Case 3:      DST declared in the past, for whaetever reason
-    //              This also captures long-expired DST cases 1-2
-    else if(lastUpdateTime > dstStopTime)
-    {
-        _cyhal_rtc_is_dst = _cyhal_rtc_get_dst_status(_cyhal_rtc_dst, time);
     }
 
     // If appropriate, update RTC clock
     if(adjustVal != 0)
     {
         uint32_t savedIntrStatus = cyhal_system_critical_section_enter();
-        rtc_getRTCTime(time);
         time->hour += adjustVal;
         rtc_setRTCTime(time);
         cyhal_system_critical_section_exit(savedIntrStatus);
     }
-
-    // Update lastUpdateTime to now
-    uint32_t savedIntrStatus = cyhal_system_critical_section_enter();
-    rtc_getRTCTime(_cyhal_rtc_when_last_dst);
-    cyhal_system_critical_section_exit(savedIntrStatus);
+    return _cyhal_rtc_is_dst;
 }
 
 /* Set RTC peripheral time, minus DST */
@@ -209,8 +257,8 @@ static void _cyhal_rtc_set_rtc_time(RTC_TIME_t * time)
     rtc_setRTCTime(time);
     cyhal_system_critical_section_exit(savedIntrStatus);
 
-    // Check for transition into/out of DST.  This will adjust time value if needed
-    _cyhal_check_for_dst_transition(time);
+    // Check for transition into/out of DST.
+    _cyhal_check_for_dst_transition(time,true);
 }
 
 /* Get RTC peripheral time, plus DST */
@@ -221,7 +269,7 @@ static void _cyhal_rtc_get_rtc_time(RTC_TIME_t * time)
     cyhal_system_critical_section_exit(savedIntrStatus);
 
     // Check for transition into/out of DST.  This will adjust time value if needed
-    _cyhal_check_for_dst_transition(time);
+    _cyhal_check_for_dst_transition(time,false);
 }
 
 static cy_rslt_t _cyhal_rtc_init_common(const RTC_TIME_t* default_time)
@@ -255,7 +303,7 @@ static cy_rslt_t _cyhal_rtc_init_common(const RTC_TIME_t* default_time)
 
     _cyhal_rtc_dst = NULL;
     _cyhal_rtc_is_dst = false;
-    _cyhal_rtc_when_last_dst = NULL;
+    _cyhal_rtc_dst_stop_hour = false;
 
     return rslt;
 }
@@ -300,7 +348,7 @@ void cyhal_rtc_free(cyhal_rtc_t *obj)
 
     _cyhal_rtc_dst = NULL;
     _cyhal_rtc_is_dst = false;
-    _cyhal_rtc_when_last_dst = NULL;
+    _cyhal_rtc_dst_stop_hour = false;
 }
 
 bool cyhal_rtc_is_enabled(cyhal_rtc_t *obj)
@@ -371,10 +419,12 @@ cy_rslt_t cyhal_rtc_set_dst(cyhal_rtc_t *obj, const cyhal_rtc_dst_t *start, cons
     CY_ASSERT(NULL != start);
     CY_ASSERT(NULL != stop);
 
+    static RTC_TIME_t rtc_time;
+
     obj->dst.startDst.format = (cy_rtc_dst_format_t)(start->format);
     obj->dst.startDst.hour = start->hour;
     // Adjust for 0=Jan vs 1=Jan
-    obj->dst.startDst.month = stop->month - 1;
+    obj->dst.startDst.month = start->month - 1;
     if(start->format == CYHAL_RTC_DST_RELATIVE)
     {
         obj->dst.startDst.weekOfMonth = start->weekOfMonth;
@@ -400,9 +450,13 @@ cy_rslt_t cyhal_rtc_set_dst(cyhal_rtc_t *obj, const cyhal_rtc_dst_t *start, cons
     }
 
     _cyhal_rtc_dst = &(obj->dst);
-    _cyhal_rtc_get_rtc_time(_cyhal_rtc_when_last_dst);
-    _cyhal_rtc_is_dst = _cyhal_rtc_get_dst_status(_cyhal_rtc_dst, _cyhal_rtc_when_last_dst);
 
+    uint32_t savedIntrStatus = cyhal_system_critical_section_enter();
+    rtc_getRTCTime(&rtc_time);
+    cyhal_system_critical_section_exit(savedIntrStatus);
+
+    // Check for transition into/out of DST.
+    _cyhal_check_for_dst_transition(&rtc_time, true);
     return CY_RSLT_SUCCESS;
 }
 
@@ -413,7 +467,7 @@ bool cyhal_rtc_is_dst(cyhal_rtc_t *obj)
 
     RTC_TIME_t dateTime;
     _cyhal_rtc_get_rtc_time(&dateTime);
-    return _cyhal_rtc_get_dst_status(_cyhal_rtc_dst, &dateTime);
+    return _cyhal_check_for_dst_transition(&dateTime,false);
 }
 
 cy_rslt_t cyhal_rtc_set_alarm(cyhal_rtc_t *obj, const struct tm *time, cyhal_alarm_active_t active)
@@ -468,69 +522,6 @@ cy_rslt_t _cyhal_rtc_set_rtc_direct(uint16_t sec, uint16_t min, uint16_t hour,
     return status;
 }
 
-bool _cyhal_rtc_get_dst_status(cy_stc_rtc_dst_t const *dstTime, RTC_TIME_t const *timeDate)
-{
-    uint32_t dstStartTime;
-    uint32_t currentTime;
-    uint32_t dstStopTime;
-    uint32_t dstStartDayOfMonth;
-    uint32_t dstStopDayOfMonth;
-    bool status = false;
-
-    CY_ASSERT_L1(NULL != dstTime);
-    CY_ASSERT_L1(NULL != timeDate);
-
-    /* Calculate a day-of-month value for the relative DST start structure */
-    if (CY_RTC_DST_FIXED == dstTime->startDst.format)
-    {
-        dstStartDayOfMonth = dstTime->startDst.dayOfMonth;
-    }
-    else
-    {
-        dstStartDayOfMonth = _cyhal_rtc_relative_to_fixed(&dstTime->startDst);
-    }
-
-    /* Calculate the day of a month value for the relative DST stop structure */
-    if (CY_RTC_DST_FIXED == dstTime->stopDst.format)
-    {
-        dstStopDayOfMonth = dstTime->stopDst.dayOfMonth;
-    }
-    else
-    {
-        dstStopDayOfMonth = _cyhal_rtc_relative_to_fixed(&dstTime->stopDst);
-    }
-
-    /* The function forms the date and time values for the DST start time,
-    *  the DST Stop Time and for the Current Time. The function that compares
-    *  the three formed values returns "true" under condition that:
-    *  dstStartTime < currentTime < dstStopTime.
-    *  The date and time value are formed this way:
-    *  [13-10] - Month
-    *  [9-5]   - Day of Month
-    *  [0-4]   - Hour
-    */
-    dstStartTime = ((uint32_t) (dstTime->startDst.month << _CYHAL_RTC_MONTHS_PLACE) | (dstStartDayOfMonth << _CYHAL_RTC_MONTHS_PLACE) \
-                                | (dstTime->startDst.hour));
-    currentTime  = ((uint32_t) (timeDate->month << _CYHAL_RTC_MONTHS_PLACE)         | (timeDate->day << _CYHAL_RTC_MONTHS_PLACE)      \
-                                | (timeDate->hour));
-    dstStopTime  = ((uint32_t) (dstTime->stopDst.month << _CYHAL_RTC_MONTHS_PLACE)  | (dstStopDayOfMonth << _CYHAL_RTC_MONTHS_PLACE)  \
-                                | (dstTime->stopDst.hour));
-
-    if ((dstStartTime <= currentTime) && (dstStopTime > currentTime))
-    {
-        status = true;
-
-        /* Check for the 'an hour before/after DST event' period */
-        if (1UL == (dstStopTime - currentTime))
-        {
-            /* End DST means fall back an hour, so 5 am currentTime is equal to 6 am dstStopTime */
-            status = false;
-        }
-    }
-
-    return (status);
-}
-
 uint32_t _cyhal_rtc_days_in_month(uint32_t month, uint32_t year)
 {
     UINT8 months[12] ={31,28,31,30,31,30,31,31,30,31,30,31};
@@ -553,14 +544,16 @@ uint32_t _cyhal_rtc_relative_to_fixed(cy_rtc_dst_t const *convertDst)
     RTC_TIME_t timebuf;
 
     /* Read the current year */
-    _cyhal_rtc_get_rtc_time(&timebuf);
+    uint32_t savedIntrStatus = cyhal_system_critical_section_enter();
+    rtc_getRTCTime(&timebuf);
+    cyhal_system_critical_section_exit(savedIntrStatus);
 
     currentYear = timebuf.year;
 
     /* Start with min values, see cy_rtc_dst_t */
     currentDayOfMonth  = 0x1U;
     currentWeekOfMonth = 0x0U;
-    // TODO: depending on how ROM calculates year, may need to adjust currentYear.  Appears to be small-value-year + 2010, unsure though
+    /* currentYear requires to be always > 2010 */
     daysInMonth = _cyhal_rtc_days_in_month(convertDst->month, currentYear);
     tmpDayOfMonth  = currentDayOfMonth;
 
@@ -576,15 +569,55 @@ uint32_t _cyhal_rtc_relative_to_fixed(cy_rtc_dst_t const *convertDst)
     return(tmpDayOfMonth);
 }
 
-/* 
- * Calc the day of week using Zeller's congruence algorithm.  Assumes HAL style values, so day[1-31],
- * month[0-11], and four digit year, and returns dayOfWeek[0-6]
- */
+/*  Zeller's congruence is an algorithm used to calculate the day of the week
+* for any date.Returns day of the week for the year, month, and day of month that are passed
+* as parameters.
+*
+* For the Georgian calendar, Zeller's congruence is:
+* h = (q + [(13 * (m + 1))/5] + K + [K/4] + [J/4] - 2J) mod 7
+*
+* h - The day of the week (0 = Saturday, 1 = Sunday, 2 = Monday, ., 6 = Friday).
+* q - The day of the month.
+* m - The month (3 = March, 4 = April, 5 = May, ..., 14 = February)
+* K - The year of the century (year mod 100).
+* J - The zero-based century (actually [year/100]) For example, the zero-based
+* centuries for 1995 and 2000 are 19 and 20 respectively (not to be
+* confused with the common ordinal century enumeration which indicates
+* 20th for both cases).
+* The formulas rely on the mathematician's definition of modulo division, which means that
+* -2 mod 7 is equal to positive 5. Unfortunately, in the truncating way most computer languages
+* implement the remainder function, -2 mod 7 returns a result of -2. So, to implement Zeller's
+* congruence on a computer, the formulas should be altered slightly to ensure a positive numerator.
+* The simplest way to do this is to replace - 2J by + 5J. So the formula becomes
+*
+* h = (q + [(13 * (m + 1))/5] + K + [K/4] + [J/4] + 5J) mod 7
+*
+* \note In this algorithm January and February are counted as months 13 and 14
+* of the previous year.
+*
+* \param dayOfMonth
+* The day of the month, Valid range [1..31]
+*
+* \param month
+* The month of the year[0-11]
+*
+* \param year
+* The year value. Valid range non-zero value.
+*
+* \return
+* Returns a day of the week, [0-6]
+*
+*/
 uint32_t _cyhal_rtc_calculate_day_of_week(uint16_t dayOfMonth, uint16_t month, uint16_t year)
 {
+    if (month < 2 ) {
+        month += 12;
+        year -= 1;
+    }
+
     // This algorithm is structured 0 = Saturday, need to adjust (+6)%7 to convert to 0 = Sunday for HAL and tm
     // It does expect Jan = 1 with month though, hence the +2 instead of +1 there
-    return ((((dayOfMonth + ((13 * (month + 2))/5) + (year % 100) + ((year % 100) / 4) + ((year / 100) / 4)- ((year / 100) * 2)) % 7) + 6) % 7);
+    return ((dayOfMonth + ((13 * (month + 2))/5) + (year % 100) + ((year % 100) / 4) + ((year / 100) / 4) + (5 *(year / 100)) + 6) % 7);
 }
 
 #if defined(__cplusplus)

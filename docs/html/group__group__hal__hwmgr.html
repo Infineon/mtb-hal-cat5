@@ -101,9 +101,9 @@ Features</h1>
 Quick Start</h1>
 <ul>
 <li><a class="el" href="group__group__hal__hwmgr.html#ga903814cf5fa0cbc8c55c703a3275628c">cyhal_hwmgr_init</a> is used to initialize the hardware manager to keep track of resources being used.</li>
-<li><a class="el" href="group__group__hal__hwmgr.html#ga33e7c9bb9beaedeb87825dadf604a0b9">cyhal_hwmgr_reserve</a> reserves a specified resource if available.</li>
-<li><a class="el" href="group__group__hal__hwmgr.html#gaa1979bd596d90251c7b861a7e94b884f">cyhal_hwmgr_free</a> frees the specified resource.</li>
-<li><a class="el" href="group__group__hal__hwmgr.html#ga16c02006114bccbf64acbdfd5f2066c2">cyhal_hwmgr_allocate</a> can be used to allocate a free block of specified resource, if available.</li>
+<li><a class="el" href="group__group__hal__hwmgr.html#ga6b85e9db035df46699ceb7b0b216d331">cyhal_hwmgr_reserve</a> reserves a specified resource if available.</li>
+<li><a class="el" href="group__group__hal__hwmgr.html#gaf3df57fc0e637ce72b042878302bd8ed">cyhal_hwmgr_free</a> frees the specified resource.</li>
+<li><a class="el" href="group__group__hal__hwmgr.html#ga6738f65367aa97400100bf43c48452fb">cyhal_hwmgr_allocate</a> can be used to allocate a free block of specified resource, if available.</li>
 </ul>
 <h1><a class="anchor" id="section_hwmgr_snippets"></a>
 Code snippets</h1>
@@ -123,17 +123,17 @@ Snippet 1: Freeing a block used by PDL or configurators</h2>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// If the resource is no longer needed and can be used by the HAL, free the resource in Hardware</span></div>
 <div class="line">    <span class="comment">// Manager</span></div>
-<div class="line">    <a class="code hl_function" href="group__group__hal__hwmgr.html#gaa1979bd596d90251c7b861a7e94b884f">cyhal_hwmgr_free</a>(&amp;resource);</div>
+<div class="line">    <a class="code hl_function" href="group__group__hal__hwmgr.html#gaf3df57fc0e637ce72b042878302bd8ed">cyhal_hwmgr_free</a>(&amp;resource);</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// Disconnect any interconnects used between resources and pin</span></div>
 <div class="line">    _cyhal_utils_disconnect_and_free(P0_0);</div>
 <div class="line"> </div>
 <div class="line">    <span class="comment">// resource can now be used by HAL</span></div>
 <div class="line"> </div>
-<div class="ttc" id="agroup__group__hal__hwmgr_html_gaa1979bd596d90251c7b861a7e94b884f"><div class="ttname"><a href="group__group__hal__hwmgr.html#gaa1979bd596d90251c7b861a7e94b884f">cyhal_hwmgr_free</a></div><div class="ttdeci">void cyhal_hwmgr_free(const cyhal_resource_inst_t *obj)</div><div class="ttdoc">Free the specified resource to allow it to be reused.</div><div class="ttdef"><b>Definition:</b> cyhal_hwmgr.c:196</div></div>
-<div class="ttc" id="agroup__group__hal__impl__hw__types_html_ad111187a65d182386ea96858369b83d4"><div class="ttname"><a href="group__group__hal__impl__hw__types.html#ad111187a65d182386ea96858369b83d4">cyhal_resource_inst_t::type</a></div><div class="ttdeci">cyhal_resource_t type</div><div class="ttdoc">The resource block type.</div><div class="ttdef"><b>Definition:</b> cyhal_hw_resources.h:173</div></div>
-<div class="ttc" id="agroup__group__hal__impl__hw__types_html_gga63b023ea7b5e73db59ddc0423c77975baa445456a2983f23d4be55613f2d09eb6"><div class="ttname"><a href="group__group__hal__impl__hw__types.html#gga63b023ea7b5e73db59ddc0423c77975baa445456a2983f23d4be55613f2d09eb6">CYHAL_RSC_TCPWM</a></div><div class="ttdeci">@ CYHAL_RSC_TCPWM</div><div class="ttdef"><b>Definition:</b> cyhal_hw_resources.h:135</div></div>
-<div class="ttc" id="agroup__group__hal__impl__hw__types_html_structcyhal__resource__inst__t"><div class="ttname"><a href="group__group__hal__impl__hw__types.html#structcyhal__resource__inst__t">cyhal_resource_inst_t</a></div><div class="ttdoc">Represents a particular instance of a resource on the chip.</div><div class="ttdef"><b>Definition:</b> cyhal_hw_resources.h:172</div></div>
+<div class="ttc" id="agroup__group__hal__hwmgr_html_gaf3df57fc0e637ce72b042878302bd8ed"><div class="ttname"><a href="group__group__hal__hwmgr.html#gaf3df57fc0e637ce72b042878302bd8ed">cyhal_hwmgr_free</a></div><div class="ttdeci">void cyhal_hwmgr_free(const cyhal_resource_inst_t *resource)</div><div class="ttdoc">Free the specified resource to allow it to be reused.</div><div class="ttdef"><b>Definition:</b> cyhal_hwmgr.c:202</div></div>
+<div class="ttc" id="agroup__group__hal__impl__hw__types_html_ad111187a65d182386ea96858369b83d4"><div class="ttname"><a href="group__group__hal__impl__hw__types.html#ad111187a65d182386ea96858369b83d4">cyhal_resource_inst_t::type</a></div><div class="ttdeci">cyhal_resource_t type</div><div class="ttdoc">The resource block type.</div><div class="ttdef"><b>Definition:</b> cyhal_hw_resources.h:184</div></div>
+<div class="ttc" id="agroup__group__hal__impl__hw__types_html_gga63b023ea7b5e73db59ddc0423c77975baa445456a2983f23d4be55613f2d09eb6"><div class="ttname"><a href="group__group__hal__impl__hw__types.html#gga63b023ea7b5e73db59ddc0423c77975baa445456a2983f23d4be55613f2d09eb6">CYHAL_RSC_TCPWM</a></div><div class="ttdeci">@ CYHAL_RSC_TCPWM</div><div class="ttdef"><b>Definition:</b> cyhal_hw_resources.h:146</div></div>
+<div class="ttc" id="agroup__group__hal__impl__hw__types_html_structcyhal__resource__inst__t"><div class="ttname"><a href="group__group__hal__impl__hw__types.html#structcyhal__resource__inst__t">cyhal_resource_inst_t</a></div><div class="ttdoc">Represents a particular instance of a resource on the chip.</div><div class="ttdef"><b>Definition:</b> cyhal_hw_resources.h:183</div></div>
 </div><!-- fragment --> <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="groups" name="groups"></a>
 API Reference</h2></td></tr>
@@ -146,15 +146,15 @@ Functions</h2></td></tr>
 <tr class="memitem:ga903814cf5fa0cbc8c55c703a3275628c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__group__result.html#gaca79700fcc701534ce61778a9bcf57d1">cy_rslt_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__hal__hwmgr.html#ga903814cf5fa0cbc8c55c703a3275628c">cyhal_hwmgr_init</a> (void)</td></tr>
 <tr class="memdesc:ga903814cf5fa0cbc8c55c703a3275628c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the hardware manager to keep track of what resources are being used.  <a href="group__group__hal__hwmgr.html#ga903814cf5fa0cbc8c55c703a3275628c">More...</a><br /></td></tr>
 <tr class="separator:ga903814cf5fa0cbc8c55c703a3275628c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga33e7c9bb9beaedeb87825dadf604a0b9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__group__result.html#gaca79700fcc701534ce61778a9bcf57d1">cy_rslt_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__hal__hwmgr.html#ga33e7c9bb9beaedeb87825dadf604a0b9">cyhal_hwmgr_reserve</a> (const <a class="el" href="group__group__hal__impl__hw__types.html#structcyhal__resource__inst__t">cyhal_resource_inst_t</a> *obj)</td></tr>
-<tr class="memdesc:ga33e7c9bb9beaedeb87825dadf604a0b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reserve the specified resource.  <a href="group__group__hal__hwmgr.html#ga33e7c9bb9beaedeb87825dadf604a0b9">More...</a><br /></td></tr>
-<tr class="separator:ga33e7c9bb9beaedeb87825dadf604a0b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaa1979bd596d90251c7b861a7e94b884f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__hal__hwmgr.html#gaa1979bd596d90251c7b861a7e94b884f">cyhal_hwmgr_free</a> (const <a class="el" href="group__group__hal__impl__hw__types.html#structcyhal__resource__inst__t">cyhal_resource_inst_t</a> *obj)</td></tr>
-<tr class="memdesc:gaa1979bd596d90251c7b861a7e94b884f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Free the specified resource to allow it to be reused.  <a href="group__group__hal__hwmgr.html#gaa1979bd596d90251c7b861a7e94b884f">More...</a><br /></td></tr>
-<tr class="separator:gaa1979bd596d90251c7b861a7e94b884f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga16c02006114bccbf64acbdfd5f2066c2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__group__result.html#gaca79700fcc701534ce61778a9bcf57d1">cy_rslt_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__hal__hwmgr.html#ga16c02006114bccbf64acbdfd5f2066c2">cyhal_hwmgr_allocate</a> (<a class="el" href="group__group__hal__impl__hw__types.html#ga63b023ea7b5e73db59ddc0423c77975b">cyhal_resource_t</a> type, <a class="el" href="group__group__hal__impl__hw__types.html#structcyhal__resource__inst__t">cyhal_resource_inst_t</a> *obj)</td></tr>
-<tr class="memdesc:ga16c02006114bccbf64acbdfd5f2066c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocates a free block of the specified type if available This function is used when the exact block number and channel number of the resource is not known.  <a href="group__group__hal__hwmgr.html#ga16c02006114bccbf64acbdfd5f2066c2">More...</a><br /></td></tr>
-<tr class="separator:ga16c02006114bccbf64acbdfd5f2066c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6b85e9db035df46699ceb7b0b216d331"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__group__result.html#gaca79700fcc701534ce61778a9bcf57d1">cy_rslt_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__hal__hwmgr.html#ga6b85e9db035df46699ceb7b0b216d331">cyhal_hwmgr_reserve</a> (const <a class="el" href="group__group__hal__impl__hw__types.html#structcyhal__resource__inst__t">cyhal_resource_inst_t</a> *resource)</td></tr>
+<tr class="memdesc:ga6b85e9db035df46699ceb7b0b216d331"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reserve the specified resource.  <a href="group__group__hal__hwmgr.html#ga6b85e9db035df46699ceb7b0b216d331">More...</a><br /></td></tr>
+<tr class="separator:ga6b85e9db035df46699ceb7b0b216d331"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf3df57fc0e637ce72b042878302bd8ed"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__hal__hwmgr.html#gaf3df57fc0e637ce72b042878302bd8ed">cyhal_hwmgr_free</a> (const <a class="el" href="group__group__hal__impl__hw__types.html#structcyhal__resource__inst__t">cyhal_resource_inst_t</a> *resource)</td></tr>
+<tr class="memdesc:gaf3df57fc0e637ce72b042878302bd8ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Free the specified resource to allow it to be reused.  <a href="group__group__hal__hwmgr.html#gaf3df57fc0e637ce72b042878302bd8ed">More...</a><br /></td></tr>
+<tr class="separator:gaf3df57fc0e637ce72b042878302bd8ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6738f65367aa97400100bf43c48452fb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__group__result.html#gaca79700fcc701534ce61778a9bcf57d1">cy_rslt_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__group__hal__hwmgr.html#ga6738f65367aa97400100bf43c48452fb">cyhal_hwmgr_allocate</a> (<a class="el" href="group__group__hal__impl__hw__types.html#ga63b023ea7b5e73db59ddc0423c77975b">cyhal_resource_t</a> type, <a class="el" href="group__group__hal__impl__hw__types.html#structcyhal__resource__inst__t">cyhal_resource_inst_t</a> *resource)</td></tr>
+<tr class="memdesc:ga6738f65367aa97400100bf43c48452fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocates a free block of the specified type if available This function is used when the exact block number and channel number of the resource is not known.  <a href="group__group__hal__hwmgr.html#ga6738f65367aa97400100bf43c48452fb">More...</a><br /></td></tr>
+<tr class="separator:ga6738f65367aa97400100bf43c48452fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="ga903814cf5fa0cbc8c55c703a3275628c" name="ga903814cf5fa0cbc8c55c703a3275628c"></a>
@@ -178,8 +178,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ga33e7c9bb9beaedeb87825dadf604a0b9" name="ga33e7c9bb9beaedeb87825dadf604a0b9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga33e7c9bb9beaedeb87825dadf604a0b9">&#9670;&nbsp;</a></span>cyhal_hwmgr_reserve()</h2>
+<a id="ga6b85e9db035df46699ceb7b0b216d331" name="ga6b85e9db035df46699ceb7b0b216d331"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga6b85e9db035df46699ceb7b0b216d331">&#9670;&nbsp;</a></span>cyhal_hwmgr_reserve()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -188,18 +188,18 @@ Functions</h2></td></tr>
           <td class="memname"><a class="el" href="group__group__result.html#gaca79700fcc701534ce61778a9bcf57d1">cy_rslt_t</a> cyhal_hwmgr_reserve </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="group__group__hal__impl__hw__types.html#structcyhal__resource__inst__t">cyhal_resource_inst_t</a> *&#160;</td>
-          <td class="paramname"><em>obj</em></td><td>)</td>
+          <td class="paramname"><em>resource</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Reserve the specified resource. </p>
-<p >The exact block number and channel number must be specified. If this is not know, use <a class="el" href="group__group__hal__hwmgr.html#ga16c02006114bccbf64acbdfd5f2066c2">cyhal_hwmgr_allocate</a>.</p>
+<p >The exact block number and channel number must be specified. If this is not know, use <a class="el" href="group__group__hal__hwmgr.html#ga6738f65367aa97400100bf43c48452fb">cyhal_hwmgr_allocate</a>.</p>
 <dl class="section note"><dt>Note</dt><dd>This function is called by the init function of hardware blocks. Calling this again for the same block will result in error since the hardware block is already marked as consumed.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">obj</td><td>The resource object that should be reserved </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">resource</td><td>The resource object that should be reserved </td></tr>
   </table>
   </dd>
 </dl>
@@ -208,8 +208,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="gaa1979bd596d90251c7b861a7e94b884f" name="gaa1979bd596d90251c7b861a7e94b884f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaa1979bd596d90251c7b861a7e94b884f">&#9670;&nbsp;</a></span>cyhal_hwmgr_free()</h2>
+<a id="gaf3df57fc0e637ce72b042878302bd8ed" name="gaf3df57fc0e637ce72b042878302bd8ed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf3df57fc0e637ce72b042878302bd8ed">&#9670;&nbsp;</a></span>cyhal_hwmgr_free()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -218,7 +218,7 @@ Functions</h2></td></tr>
           <td class="memname">void cyhal_hwmgr_free </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="group__group__hal__impl__hw__types.html#structcyhal__resource__inst__t">cyhal_resource_inst_t</a> *&#160;</td>
-          <td class="paramname"><em>obj</em></td><td>)</td>
+          <td class="paramname"><em>resource</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -227,7 +227,7 @@ Functions</h2></td></tr>
 <p>Free the specified resource to allow it to be reused. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">obj</td><td>The resource object to free</td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">resource</td><td>The resource object to free</td></tr>
   </table>
   </dd>
 </dl>
@@ -235,8 +235,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ga16c02006114bccbf64acbdfd5f2066c2" name="ga16c02006114bccbf64acbdfd5f2066c2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga16c02006114bccbf64acbdfd5f2066c2">&#9670;&nbsp;</a></span>cyhal_hwmgr_allocate()</h2>
+<a id="ga6738f65367aa97400100bf43c48452fb" name="ga6738f65367aa97400100bf43c48452fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga6738f65367aa97400100bf43c48452fb">&#9670;&nbsp;</a></span>cyhal_hwmgr_allocate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -251,7 +251,7 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="group__group__hal__impl__hw__types.html#structcyhal__resource__inst__t">cyhal_resource_inst_t</a> *&#160;</td>
-          <td class="paramname"><em>obj</em>&#160;</td>
+          <td class="paramname"><em>resource</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -262,11 +262,11 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Allocates a free block of the specified type if available This function is used when the exact block number and channel number of the resource is not known. </p>
-<p >This function loops through all available resource of the specified type and assigns the resource if available. This function internally calls <a class="el" href="group__group__hal__hwmgr.html#ga33e7c9bb9beaedeb87825dadf604a0b9">cyhal_hwmgr_reserve</a> function and hence, it should not be called again.</p>
+<p >This function loops through all available resource of the specified type and assigns the resource if available. This function internally calls <a class="el" href="group__group__hal__hwmgr.html#ga6b85e9db035df46699ceb7b0b216d331">cyhal_hwmgr_reserve</a> function and hence, it should not be called again.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">type</td><td>The type of resource to allocate. </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">obj</td><td>The resource object. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">resource</td><td>The resource object. </td></tr>
   </table>
   </dd>
 </dl>

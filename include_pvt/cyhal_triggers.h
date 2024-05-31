@@ -49,7 +49,7 @@ extern "C" {
 
 typedef enum
 {
-    // TODO: Required for compilation only. Review when working on TCPWM triggers.
+    // Required for compilation only. Not available for this device.
     // Adding in ZERO_LEVEL and ZERO_EDGE for testing purposes
     CYHAL_TRIGGER_CPUSS_ZERO = 0, //!< cpuss.zero
     CYHAL_TRIGGER_CPUSS_ZERO_LEVEL = 1, //!< cpuss.zero_level
@@ -60,7 +60,7 @@ typedef enum
     _CYHAL_TRIGGER_TCPWM0_TR_OUT10 = 0, //!< tcpwm[0].tr_out0[0]
 
     // Keep these for DMA HAL
-    CYHAL_TRIGGER_DMAC_PTU_TO_MEM = BTSS_DMAC_CONTROL_LINE_SRC_HCI_UART, //!< DMAC trigger - PTU as DMA source
+    CYHAL_TRIGGER_DMAC_PTU_TO_MEM = BTSS_DMAC_CONTROL_LINE_NONE, //!< DMAC trigger - PTU as DMA source
     CYHAL_TRIGGER_DMAC_MXTDM0_TO_MEM = BTSS_DMAC_CONTROL_LINE_SRC_MXTDM0, //!< DMAC trigger - MXTDM0 as DMA source
     CYHAL_TRIGGER_DMAC_MXTDM1_TO_MEM = BTSS_DMAC_CONTROL_LINE_SRC_MXTDM1, //!< DMAC trigger - MXTDM1 as DMA source
     CYHAL_TRIGGER_DMAC_SCB1_RX_TO_MEM = BTSS_DMAC_CONTROL_LINE_SRC_SCB1, //!< DMAC trigger - SCB1 as DMA source
@@ -85,7 +85,7 @@ typedef cyhal_trigger_source_t cyhal_source_t;
 
 typedef enum
 {
-    // TODO: Required for compilation only. Review when working on TCPWM triggers.
+    // Required for compilation only. Not available for this device.
     CYHAL_TRIGGER_TCPWM0_TR_ALL_CNT_IN0 = 0, //!< TCPWM0 trigger multiplexer - tcpwm[0].tr_all_cnt_in[0]
     CYHAL_TRIGGER_TCPWM0_TR_ALL_CNT_IN1 = 1, //!< TCPWM0 trigger multiplexer - tcpwm[0].tr_all_cnt_in[1]
     CYHAL_TRIGGER_TCPWM0_TR_ALL_CNT_IN2 = 2, //!< TCPWM0 trigger multiplexer - tcpwm[0].tr_all_cnt_in[2]

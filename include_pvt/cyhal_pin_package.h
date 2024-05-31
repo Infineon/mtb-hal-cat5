@@ -91,7 +91,14 @@ typedef enum
     TDM2_WS  = 41u, //!< TDM2 WS
     BT_GPIO_LAST, //!< End of reconfigurable pins
 
-    DIRECT_BASE = 50 //!< Start of direct connection pins
+    DIRECT_BASE = 50, //!< Start of direct connection pins
+    MIC_P = 50,
+    SDIO_DATA_0 = 51,
+    SDIO_DATA_1 = 52,
+    SDIO_DATA_2 = 53,
+    SDIO_DATA_3 = 54,
+    SDIO_CLK = 55,
+    SDIO_CMD = 56
 } cyhal_gpio_t;
 
 /** Pin mux connections */
@@ -112,40 +119,58 @@ typedef struct
 
 /** \cond INTERNAL */
 
-// TODO: These drive modes need to be verified
-#define CYHAL_PIN_MAP_DRIVE_MODE_SCB_I2C_SCL        (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_PULL_UP_ENABLE_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK | BTSS_PAD_CONFIG_OUTPUT_ENABLE_MASK)
-#define CYHAL_PIN_MAP_DRIVE_MODE_SCB_I2C_SDA        (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_PULL_UP_ENABLE_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK | BTSS_PAD_CONFIG_OUTPUT_ENABLE_MASK)
+// Output enable is directly driven by the connected hardware so we don't set it here
+#define CYHAL_PIN_MAP_DRIVE_MODE_SCB_I2C_SCL        (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_PULL_UP_ENABLE_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK )
+#define CYHAL_PIN_MAP_DRIVE_MODE_SCB_I2C_SDA        (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_PULL_UP_ENABLE_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK )
 
-#define CYHAL_PIN_MAP_DRIVE_MODE_SCB_SPI_M_CLK      (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK | BTSS_PAD_CONFIG_OUTPUT_ENABLE_MASK)
+#define CYHAL_PIN_MAP_DRIVE_MODE_SCB_SPI_M_CLK      (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK )
 #define CYHAL_PIN_MAP_DRIVE_MODE_SCB_SPI_M_MISO     (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK)
-#define CYHAL_PIN_MAP_DRIVE_MODE_SCB_SPI_M_MOSI     (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK | BTSS_PAD_CONFIG_OUTPUT_ENABLE_MASK)
+#define CYHAL_PIN_MAP_DRIVE_MODE_SCB_SPI_M_MOSI     (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK )
 #define CYHAL_PIN_MAP_DRIVE_MODE_SCB_SPI_S_CLK      (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK)
-#define CYHAL_PIN_MAP_DRIVE_MODE_SCB_SPI_S_MISO     (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK | BTSS_PAD_CONFIG_OUTPUT_ENABLE_MASK)
+#define CYHAL_PIN_MAP_DRIVE_MODE_SCB_SPI_S_MISO     (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK )
 #define CYHAL_PIN_MAP_DRIVE_MODE_SCB_SPI_S_MOSI     (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK)
-#define CYHAL_PIN_MAP_DRIVE_MODE_SCB_SPI_S_SELECT0  (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK | BTSS_PAD_CONFIG_OUTPUT_ENABLE_MASK)
-#define CYHAL_PIN_MAP_DRIVE_MODE_SCB_SPI_S_SELECT1  (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK | BTSS_PAD_CONFIG_OUTPUT_ENABLE_MASK)
-#define CYHAL_PIN_MAP_DRIVE_MODE_SCB_SPI_S_SELECT2  (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK | BTSS_PAD_CONFIG_OUTPUT_ENABLE_MASK)
-#define CYHAL_PIN_MAP_DRIVE_MODE_SCB_SPI_S_SELECT3  (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK | BTSS_PAD_CONFIG_OUTPUT_ENABLE_MASK)
+#define CYHAL_PIN_MAP_DRIVE_MODE_SCB_SPI_S_SELECT0  (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK )
+#define CYHAL_PIN_MAP_DRIVE_MODE_SCB_SPI_S_SELECT1  (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK )
+#define CYHAL_PIN_MAP_DRIVE_MODE_SCB_SPI_S_SELECT2  (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK )
+#define CYHAL_PIN_MAP_DRIVE_MODE_SCB_SPI_S_SELECT3  (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK )
 
 #define CYHAL_PIN_MAP_DRIVE_MODE_SCB_UART_CTS       (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK)
-#define CYHAL_PIN_MAP_DRIVE_MODE_SCB_UART_RTS       (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK | BTSS_PAD_CONFIG_OUTPUT_ENABLE_MASK)
+#define CYHAL_PIN_MAP_DRIVE_MODE_SCB_UART_RTS       (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK )
 #define CYHAL_PIN_MAP_DRIVE_MODE_SCB_UART_RX        (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK)
-#define CYHAL_PIN_MAP_DRIVE_MODE_SCB_UART_TX        (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK | BTSS_PAD_CONFIG_OUTPUT_ENABLE_MASK)
+#define CYHAL_PIN_MAP_DRIVE_MODE_SCB_UART_TX        (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK )
 
 #define CYHAL_PIN_MAP_DRIVE_MODE_TCPWM_TR_IN        (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK)
-#define CYHAL_PIN_MAP_DRIVE_MODE_TCPWM_LINE         (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_OUTPUT_ENABLE_MASK)
-#define CYHAL_PIN_MAP_DRIVE_MODE_TCPWM_LINE_COMPL   (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_OUTPUT_ENABLE_MASK)
+#define CYHAL_PIN_MAP_DRIVE_MODE_TCPWM_LINE         (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK )
+#define CYHAL_PIN_MAP_DRIVE_MODE_TCPWM_LINE_COMPL   (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK )
 
-#define CYHAL_PIN_MAP_DRIVE_MODE_TDM_TDM_TX_MCK     (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK | BTSS_PAD_CONFIG_OUTPUT_ENABLE_MASK)
-#define CYHAL_PIN_MAP_DRIVE_MODE_TDM_TDM_TX_SCK     (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK | BTSS_PAD_CONFIG_OUTPUT_ENABLE_MASK)
-#define CYHAL_PIN_MAP_DRIVE_MODE_TDM_TDM_TX_FSYNC   (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK | BTSS_PAD_CONFIG_OUTPUT_ENABLE_MASK)
-#define CYHAL_PIN_MAP_DRIVE_MODE_TDM_TDM_TX_SD      (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK | BTSS_PAD_CONFIG_OUTPUT_ENABLE_MASK)
+#define CYHAL_PIN_MAP_DRIVE_MODE_TDM_TDM_TX_MCK     (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK )
+#define CYHAL_PIN_MAP_DRIVE_MODE_TDM_TDM_TX_SCK     (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK )
+#define CYHAL_PIN_MAP_DRIVE_MODE_TDM_TDM_TX_FSYNC   (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK )
+#define CYHAL_PIN_MAP_DRIVE_MODE_TDM_TDM_TX_SD      (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK )
 #define CYHAL_PIN_MAP_DRIVE_MODE_TDM_TDM_RX_MCK     (CYHAL_PIN_MAP_DRIVE_MODE_TDM_TDM_TX_MCK)
 #define CYHAL_PIN_MAP_DRIVE_MODE_TDM_TDM_RX_SCK     (CYHAL_PIN_MAP_DRIVE_MODE_TDM_TDM_TX_SCK)
 #define CYHAL_PIN_MAP_DRIVE_MODE_TDM_TDM_RX_FSYNC   (CYHAL_PIN_MAP_DRIVE_MODE_TDM_TDM_TX_FSYNC)
 #define CYHAL_PIN_MAP_DRIVE_MODE_TDM_TDM_RX_SD      (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK)
 #define CYHAL_PIN_MAP_DRIVE_MODE_TDM_SLAVE          (BTSS_PAD_CONFIG_DRIVE_SEL_16MA_MASK | BTSS_PAD_CONFIG_HYSTERESIS_ENABLE_MASK)
 
+#define CYHAL_PIN_MAP_DRIVE_MODE_SDIO_CLK           (0)
+#define CYHAL_PIN_MAP_DRIVE_MODE_SDIO_CMD           (0)
+#define CYHAL_PIN_MAP_DRIVE_MODE_SDIO_DATA_0        (0)
+#define CYHAL_PIN_MAP_DRIVE_MODE_SDIO_DATA_1        (0)
+#define CYHAL_PIN_MAP_DRIVE_MODE_SDIO_DATA_2        (0)
+#define CYHAL_PIN_MAP_DRIVE_MODE_SDIO_DATA_3        (0)
+
+#define CYHAL_PIN_MAP_DRIVE_MODE_PDM_PCM_CLK        (0)
+#define CYHAL_PIN_MAP_DRIVE_MODE_PDM_PCM_DATA       (0)
+
+#define CYHAL_PIN_MAP_DRIVE_MODE_ADCMIC_GPIO_ADC_IN (0)
+#define CYHAL_PIN_MAP_DRIVE_MODE_LPCOMP_INP_COMP    (0)
+#define CYHAL_PIN_MAP_DRIVE_MODE_LPCOMP_INN_COMP    (0)
+
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_adcmic_gpio_adc_in[8];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_inp_comp[4];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_inn_comp[4];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_mic_p[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_dmic_ck[2];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_dmic_dq[2];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_sw_gpio[49];
@@ -166,6 +191,12 @@ extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_uart_cts[7];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_uart_rts[7];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_uart_rx[7];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_uart_tx[7];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_sdio_clk[1];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_sdio_cmd[1];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_sdio_data_0[1];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_sdio_data_1[1];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_sdio_data_2[1];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_sdio_data_3[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_tr_all_1[3];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_tr_all_2[3];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_tr_all_3[3];
@@ -179,11 +210,16 @@ extern const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_out_11[3];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_out_12[3];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_out_21[3];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_out_22[3];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_out_23[2];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_out_24[2];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_out_25[2];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_out_26[2];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_out_27[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_comp_out_11[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_comp_out_12[2];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_comp_out_21[2];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_comp_out_22[1];
-extern const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_line[12];
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_line[21];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_line_compl[6];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_tdm_tdm_rx_fsync[3];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_tdm_tdm_rx_mck[2];

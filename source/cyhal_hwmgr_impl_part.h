@@ -38,12 +38,15 @@
 #define CY_BLOCK_COUNT_DMA          (1)
 #define CY_CHANNEL_COUNT_DMA        (8)
 #define CY_BLOCK_COUNT_GPIO         (2)
-#define CY_CHANNEL_COUNT_GPIO       (49 + 4) // 49 allocatable, 4 dedicated SDIO?
+#define CY_CHANNEL_COUNT_GPIO       (42 + 7) // 42 allocatable, 6 SDIO, 1 ADC
+#define CY_BLOCK_COUNT_LPCOMP       (1)
+#define CY_CHANNEL_COUNT_LPCOMP     (2)
 #define CY_BLOCK_COUNT_PDMPCM       (1)
 #define CY_BLOCK_COUNT_RTC          (1)
 #define CY_BLOCK_COUNT_SCB          (3)
-#define CY_BLOCK_COUNT_TCPWM        (1)
-#define CY_CHANNEL_COUNT_TCPWM      (9) // Grp0 Ch2, Grp1 Ch7
+#define CY_BLOCK_COUNT_SDIO         (1)
+#define CY_BLOCK_COUNT_TCPWM        (2)
+#define CY_CHANNEL_COUNT_TCPWM      (2 + 7) // Grp0 Ch2, Grp1 Ch7
 #define CY_BLOCK_COUNT_TDM          (1)
 #define CY_CHANNEL_COUNT_TDM        (2)
 #define CY_BLOCK_COUNT_T2TIMER      (2)
@@ -69,13 +72,17 @@
 #define CY_SIZE_DMA        CY_CHANNEL_COUNT_DMA
 #define CY_OFFSET_GPIO     (CY_OFFSET_DMA + CY_SIZE_DMA)
 #define CY_SIZE_GPIO       CY_CHANNEL_COUNT_GPIO
-#define CY_OFFSET_PDMPCM   (CY_OFFSET_GPIO + CY_SIZE_GPIO)
+#define CY_OFFSET_LPCOMP   (CY_OFFSET_GPIO + CY_SIZE_GPIO)
+#define CY_SIZE_LPCOMP     CY_CHANNEL_COUNT_LPCOMP
+#define CY_OFFSET_PDMPCM   (CY_OFFSET_LPCOMP + CY_SIZE_LPCOMP)
 #define CY_SIZE_PDMPCM     CY_BLOCK_COUNT_PDMPCM
 #define CY_OFFSET_RTC      (CY_OFFSET_PDMPCM + CY_SIZE_PDMPCM)
 #define CY_SIZE_RTC        CY_BLOCK_COUNT_RTC
 #define CY_OFFSET_SCB      (CY_OFFSET_RTC + CY_SIZE_RTC)
 #define CY_SIZE_SCB        CY_BLOCK_COUNT_SCB
-#define CY_OFFSET_TCPWM    (CY_OFFSET_SCB + CY_SIZE_SCB)
+#define CY_OFFSET_SDIO     (CY_OFFSET_SCB + CY_SIZE_SCB)
+#define CY_SIZE_SDIO       CY_BLOCK_COUNT_SDIO
+#define CY_OFFSET_TCPWM    (CY_OFFSET_SDIO + CY_SIZE_SDIO)
 #define CY_SIZE_TCPWM      CY_CHANNEL_COUNT_TCPWM
 #define CY_OFFSET_TDM      (CY_OFFSET_TCPWM + CY_SIZE_TCPWM)
 #define CY_SIZE_TDM        CY_CHANNEL_COUNT_TDM
@@ -90,25 +97,29 @@
 
 typedef uint8_t _cyhal_hwmgr_offset_t;
 
-static const _cyhal_hwmgr_offset_t cyhal_block_offsets_dma[2] =
+static const _cyhal_hwmgr_offset_t cyhal_block_offsets_dma[CY_BLOCK_COUNT_DMA] =
 {
-    0, 8 // TBD
+    0
 };
 
-static const _cyhal_hwmgr_offset_t cyhal_block_offsets_gpio[3] =
+static const _cyhal_hwmgr_offset_t cyhal_block_offsets_gpio[CY_BLOCK_COUNT_GPIO] =
 {
-    0, 49, 53 // TBD
+    0, 42
 };
 
-static const _cyhal_hwmgr_offset_t cyhal_block_offsets_tcpwm[2] =
+static const _cyhal_hwmgr_offset_t cyhal_block_offsets_lpcomp[CY_BLOCK_COUNT_LPCOMP] =
 {
-    2, 9,
+    0
 };
 
-static const _cyhal_hwmgr_offset_t cyhal_block_offsets_tdm[2] =
+static const _cyhal_hwmgr_offset_t cyhal_block_offsets_tcpwm[CY_BLOCK_COUNT_TCPWM] =
 {
-    0,
-    2
+    0, 2
+};
+
+static const _cyhal_hwmgr_offset_t cyhal_block_offsets_tdm[CY_BLOCK_COUNT_TDM] =
+{
+    0
 };
 
 static uint8_t cyhal_used[(CY_TOTAL_ALLOCATABLE_ITEMS + 7) / 8] = {0};
@@ -120,9 +131,11 @@ static const uint8_t cyhal_resource_offsets[] =
     CY_OFFSET_CLOCK,
     CY_OFFSET_DMA,
     CY_OFFSET_GPIO,
+    CY_OFFSET_LPCOMP,
     CY_OFFSET_PDMPCM,
     CY_OFFSET_RTC,
     CY_OFFSET_SCB,
+    CY_OFFSET_SDIO,
     CY_OFFSET_TCPWM,
     CY_OFFSET_TDM,
     CY_OFFSET_T2TIMER
@@ -133,6 +146,7 @@ static const uint8_t cyhal_resource_offsets[] =
 static const uint32_t cyhal_has_channels =
     (1 << CYHAL_RSC_DMA)   |
     (1 << CYHAL_RSC_GPIO)  |
+    (1 << CYHAL_RSC_LPCOMP)|
     (1 << CYHAL_RSC_TCPWM) |
     (1 << CYHAL_RSC_TDM);
 
@@ -158,6 +172,8 @@ static inline const _cyhal_hwmgr_offset_t* _cyhal_get_block_offsets(cyhal_resour
             return cyhal_block_offsets_dma;
         case CYHAL_RSC_GPIO:
             return cyhal_block_offsets_gpio;
+        case CYHAL_RSC_LPCOMP:
+            return cyhal_block_offsets_lpcomp;
         case CYHAL_RSC_TCPWM:
             return cyhal_block_offsets_tcpwm;
         case CYHAL_RSC_TDM:
@@ -177,6 +193,8 @@ static inline uint8_t _cyhal_get_block_offset_length(cyhal_resource_t type)
             return sizeof(cyhal_block_offsets_dma)/sizeof(cyhal_block_offsets_dma[0]);
         case CYHAL_RSC_GPIO:
             return sizeof(cyhal_block_offsets_gpio)/sizeof(cyhal_block_offsets_gpio[0]);
+        case CYHAL_RSC_LPCOMP:
+            return sizeof(cyhal_block_offsets_lpcomp)/sizeof(cyhal_block_offsets_lpcomp[0]);
         case CYHAL_RSC_TCPWM:
             return sizeof(cyhal_block_offsets_tcpwm)/sizeof(cyhal_block_offsets_tcpwm[0]);
         case CYHAL_RSC_TDM:

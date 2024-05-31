@@ -125,13 +125,13 @@ typedef enum
 typedef enum
 {
     /** Each EZI2C slave status is encoded in a separate bit, therefore multiple bits may be set to indicate the current status */
-    CYHAL_EZI2C_STATUS_OK     = 0x1UL,   /**< Operation completed successfully */
-    CYHAL_EZI2C_STATUS_READ1  = 0x2UL,  /**< The Read transfer intended for the primary slave address is complete */
-    CYHAL_EZI2C_STATUS_WRITE1 = 0x4UL,  /**< The Write transfer intended for the primary slave address is complete */
-    CYHAL_EZI2C_STATUS_READ2  = 0x8UL,  /**< The Read transfer intended for the secondary slave address is complete */
-    CYHAL_EZI2C_STATUS_WRITE2 = 0x10UL,  /**< The Write transfer intended for the secondary slave address is complete */
-    CYHAL_EZI2C_STATUS_BUSY   = 0x20UL,  /**< A transfer intended for the primary address or secondary address is in progress */
-    CYHAL_EZI2C_STATUS_ERR    = 0x40UL   /**< An error occurred during a transfer intended for the primary or secondary slave address */
+    CYHAL_EZI2C_STATUS_OK     = 0x0UL,   /**< Operation completed successfully */
+    CYHAL_EZI2C_STATUS_READ1  = 0x1UL,  /**< The Read transfer intended for the primary slave address is complete */
+    CYHAL_EZI2C_STATUS_WRITE1 = 0x2UL,  /**< The Write transfer intended for the primary slave address is complete */
+    CYHAL_EZI2C_STATUS_READ2  = 0x4UL,  /**< The Read transfer intended for the secondary slave address is complete */
+    CYHAL_EZI2C_STATUS_WRITE2 = 0x8UL,  /**< The Write transfer intended for the secondary slave address is complete */
+    CYHAL_EZI2C_STATUS_BUSY   = 0x10UL,  /**< A transfer intended for the primary address or secondary address is in progress */
+    CYHAL_EZI2C_STATUS_ERR    = 0x20UL   /**< An error occurred during a transfer intended for the primary or secondary slave address */
 
 } cyhal_ezi2c_status_t;
 

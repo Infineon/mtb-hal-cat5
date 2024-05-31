@@ -17,6 +17,7 @@ var group__group__hal__results =
     [ "QSPI HAL Results", "group__group__hal__results__qspi.html", "group__group__hal__results__qspi" ],
     [ "Quadrature Decoder HAL Results", "group__group__hal__results__quaddec.html", "group__group__hal__results__quaddec" ],
     [ "RTC HAL Results", "group__group__hal__results__rtc.html", "group__group__hal__results__rtc" ],
+    [ "SDIO HAL Results", "group__group__hal__results__sdio.html", "group__group__hal__results__sdio" ],
     [ "SPI HAL Results", "group__group__hal__results__spi.html", "group__group__hal__results__spi" ],
     [ "SYSPM HAL Results", "group__group__hal__results__syspm.html", "group__group__hal__results__syspm" ],
     [ "SYSTEM HAL Results", "group__group__hal__results__system.html", "group__group__hal__results__system" ],
@@ -24,6 +25,19 @@ var group__group__hal__results =
     [ "Timer HAL Results", "group__group__hal__results__timer.html", "group__group__hal__results__timer" ],
     [ "UART HAL Results", "group__group__hal__results__uart.html", "group__group__hal__results__uart" ],
     [ "WDT HAL Results", "group__group__hal__results__wdt.html", "group__group__hal__results__wdt" ],
+    [ "CYHAL_I3C_RSLT_ERR_INVALID_PIN", "group__group__hal__results.html#ga2ef8893c936ec9fb95f5837b72737980", null ],
+    [ "CYHAL_I3C_RSLT_ERR_CAN_NOT_REACH_DR", "group__group__hal__results.html#ga8aa20e36f3e7a697b3f2f3494788754f", null ],
+    [ "CYHAL_I3C_RSLT_ERR_INVALID_ADDRESS_SIZE", "group__group__hal__results.html#ga974cbda9432769133f8ede7c44a930b4", null ],
+    [ "CYHAL_I3C_RSLT_ERR_TX_RX_BUFFERS_ARE_EMPTY", "group__group__hal__results.html#ga45f786216b46a00fc27820ffecf0d990", null ],
+    [ "CYHAL_I3C_RSLT_ERR_PREVIOUS_ASYNC_PENDING", "group__group__hal__results.html#gafde9de3d00e54c9c9043e584a49d2f67", null ],
+    [ "CYHAL_I3C_RSLT_ERR_PM_CALLBACK", "group__group__hal__results.html#ga06ff38f39fde4dc4d215a059771be24d", null ],
+    [ "CYHAL_I3C_RSLT_ERR_OPERATION_TIMEOUT", "group__group__hal__results.html#ga963086cd0ccd733bc43a614509c5f0e6", null ],
+    [ "CYHAL_I3C_RSLT_ERR_BAD_ARGUMENT", "group__group__hal__results.html#ga115fe14442e18185785b59e09f738139", null ],
+    [ "CYHAL_I3C_RSLT_ERR_UNSUPPORTED", "group__group__hal__results.html#ga5387790fabda360d1f9a75368ee01ef4", null ],
+    [ "CYHAL_I3C_RSLT_ERR_NO_ACK", "group__group__hal__results.html#ga6eecda8ecbf6cf700be8654776e6c138", null ],
+    [ "CYHAL_I3C_RSLT_ERR_CMD_ERROR", "group__group__hal__results.html#ga2a4ba0659f58ca0cabaed951251385c4", null ],
+    [ "CYHAL_I3C_RSLT_ERR_BUFFERS_NULL_PTR", "group__group__hal__results.html#ga8ef8a8f3080d177fdcc9ebc817785e6a", null ],
+    [ "CYHAL_I3C_RSLT_WARN_DEVICE_BUSY", "group__group__hal__results.html#gae77a7e863b8af5f2114e71c6d1fee9e3", null ],
     [ "cyhal_rslt_module_chip", "group__group__hal__results.html#ga84f32ecb6376e2088d4f048e35f52005", [
       [ "CYHAL_RSLT_MODULE_ADC", "group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a5d2be4eb2e87e5d4f89f4b01cc69abc1", null ],
       [ "CYHAL_RSLT_MODULE_CLOCK", "group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a5664ced7d9350688ae8eccad08477747", null ],
@@ -35,6 +49,7 @@ var group__group__hal__results =
       [ "CYHAL_RSLT_MODULE_GPIO", "group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a8a22f6926766c2e3e69868ec51c2572b", null ],
       [ "CYHAL_RSLT_MODULE_I2C", "group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a48c873ac3890a78ae0379e725396c607", null ],
       [ "CYHAL_RSLT_MODULE_I2S", "group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a8f3c272518c2a32f2455e34137a5180d", null ],
+      [ "CYHAL_RSLT_MODULE_I3C", "group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a12b4e2ebe92e933271f5ad4d0547fa92", null ],
       [ "CYHAL_RSLT_MODULE_IPC", "group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a7228239f5834ed4df9600859c3588a3d", null ],
       [ "CYHAL_RSLT_MODULE_INTERCONNECT", "group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005ab9373b6613ccb00bd4dedab0ae06d11c", null ],
       [ "CYHAL_RSLT_MODULE_HWMGR", "group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005aa31caff90dfe21b862ea4c4d034208b6", null ],
@@ -60,6 +75,8 @@ var group__group__hal__results =
       [ "CYHAL_RSLT_MODULE_WDT", "group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a012172915d19c167e1db5ff7e188adba", null ],
       [ "CYHAL_RSLT_MODULE_IMPL_TCPWM", "group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005af99e4705ecb46e6ebf1ce9e9fb73c171", null ],
       [ "CYHAL_RSLT_MODULE_IMPL_SCB", "group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005aa7ba6553c921351f322f391838049f91", null ],
-      [ "CYHAL_RSLT_MODULE_T2TIMER", "group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005abb3e7eab4c1403e33f9d069725a14787", null ]
+      [ "CYHAL_RSLT_MODULE_T2TIMER", "group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005abb3e7eab4c1403e33f9d069725a14787", null ],
+      [ "CYHAL_RSLT_MODULE_ETHERNET", "group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a71dcff74719c74dc169094df0ca5f322", null ],
+      [ "CYHAL_RSLT_MODULE_OTP", "group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a82e9bedf130a012018f6663811a8c18e", null ]
     ] ]
 ];

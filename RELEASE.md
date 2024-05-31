@@ -1,26 +1,20 @@
-# CAT5 (CYW55500) Hardware Abstraction Layer (HAL) Release Notes
-The CAT5 Hardware Abstraction Layer (HAL) provides an implementation of the Hardware Abstraction Layer for the CYW55500 chip families. This API provides convenience methods for initializing and manipulating different hardware peripherals. Depending on the specific chip being used, not all features may be supported.
-
-### What's Included?
-This release of the CAT5 HAL includes support for the following drivers:
-* GPIO
-* Hardware Manager
-* SPI
-* UART
+# CAT5 (CYW55500/CYW55900) Hardware Abstraction Layer (HAL) Release Notes
+The CAT5 Hardware Abstraction Layer (HAL) provides an implementation of the Hardware Abstraction Layer for the CYW55500/CYW55900 chip families. This API provides convenience methods for initializing and manipulating different hardware peripherals. Depending on the specific chip being used, not all features may be supported.
 
 ### What Changed?
-#### v0.5.0
-* Initial pre-production release supporting GCC_ARM
+#### v1.0.0
+* Initial release
 
 ### Supported Software and Tools
 This version of the CAT5 Hardware Abstraction Layer was validated for compatibility with the following Software and Tools:
 
 | Software and Tools                        | Version |
 | :---                                      | :----:  |
-| ModusToolbox™ Software Environment        | 3.0.0   |
-| GCC Compiler                              | 10.3.1  |
+| ModusToolbox™ Software Environment        | 3.1.0   |
+| GCC Compiler                              | 11.3.1  |
+| ARM Compiler                              | 6.16    |
 
-Minimum required ModusToolbox™ Software Environment: v3.0.0
+Minimum required ModusToolbox™ Software Environment: v3.1.0
 
 ### More information
 Use the following links for more information, as needed:

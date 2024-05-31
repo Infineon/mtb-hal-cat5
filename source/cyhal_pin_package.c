@@ -27,7 +27,42 @@
 #include "cyhal_pin_package.h"
 
 
-/////////////////////////////////////////////// DMIC ////////////////////////////////////////////////
+/////////////////////////////////////////////// ADC ////////////////////////////////////////////////
+
+/* Connections for: dc conversion */
+const cyhal_resource_pin_mapping_t cyhal_pin_map_adcmic_gpio_adc_in[8] = {
+    {0, 0, LHL_GPIO_2, FUNC_NONE},
+    {0, 1, LHL_GPIO_3, FUNC_NONE},
+    {0, 2, LHL_GPIO_4, FUNC_NONE},
+    {0, 3, LHL_GPIO_5, FUNC_NONE},
+    {0, 4, LHL_GPIO_6, FUNC_NONE},
+    {0, 6, LHL_GPIO_8, FUNC_NONE},
+    {0, 7, LHL_GPIO_9, FUNC_NONE},
+};
+
+/////////////////////////////////////////////// Comp ////////////////////////////////////////////////
+
+/* Connections for: Vp dc mode */
+const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_inp_comp[4] = {
+    {0, 1, LHL_GPIO_4, FUNC_NONE},
+    {0, 1, LHL_GPIO_5, FUNC_NONE},
+    {0, 0, LHL_GPIO_8, FUNC_NONE},
+    {0, 0, LHL_GPIO_9, FUNC_NONE}
+};
+
+/* Connections for: Vm dc mode */
+const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_inn_comp[4] = {
+    {0, 1, LHL_GPIO_2, FUNC_NONE},
+    {0, 1, LHL_GPIO_3, FUNC_NONE},
+    {0, 0, LHL_GPIO_6, FUNC_NONE}
+};
+
+///////////////////////////////////////// DMIC/AMIC -> PDM-PCM ///////////////////////////////////////
+/* Connections for: (ADC) mic_p */
+const cyhal_resource_pin_mapping_t cyhal_pin_map_mic_p[1] = {
+    {0, 0, MIC_P, FUNC_NONE}
+};
+
 /* Connections for: dmic_ck */
 const cyhal_resource_pin_mapping_t cyhal_pin_map_dmic_ck[2] = {
     {0, 0, DMIC_CK, FUNC_DMIC_CK},
@@ -78,7 +113,6 @@ const cyhal_resource_pin_mapping_t cyhal_pin_map_sw_gpio[49] = {
     {0, LHL_GPIO_4, LHL_GPIO_4, FUNC_B_GPIO_2},
     {0, LHL_GPIO_5, LHL_GPIO_5, FUNC_B_GPIO_3},
     {0, LHL_GPIO_6, LHL_GPIO_6, FUNC_B_GPIO_4},
-    {0, LHL_GPIO_7, LHL_GPIO_7, FUNC_B_GPIO_5},
     {0, LHL_GPIO_8, LHL_GPIO_8, FUNC_B_GPIO_6},
     {0, LHL_GPIO_9, LHL_GPIO_9, FUNC_B_GPIO_7},
     {0, TDM1_DI, TDM1_DI, FUNC_A_GPIO_5},
@@ -117,7 +151,6 @@ const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_i2c_scl[8] = {
 const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_i2c_sda[8] = {
     {0, 0, BT_GPIO_13, FUNC_SCB0_SDA},
     {0, 0, BT_GPIO_4, FUNC_SCB0_SDA},
-    {0, 0, LHL_GPIO_7, FUNC_SCB0_SDA},
     {1, 0, TDM2_SCK, FUNC_SCB1_SDA},
     {1, 0, BT_GPIO_2, FUNC_SCB1_SDA},
     {1, 0, BT_GPIO_17, FUNC_SCB1_SDA},
@@ -130,7 +163,6 @@ const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_i2c_sda[8] = {
 const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_s_clk[6] = {
     {0, 0, BT_UART_RTS_N, FUNC_SCB0_SPI_CLK},
     {0, 0, BT_GPIO_9, FUNC_SCB0_SPI_CLK},
-    {0, 0, LHL_GPIO_7, FUNC_SCB0_SPI_CLK},
     {1, 0, BT_GPIO_17, FUNC_SCB1_SPI_CLK},
     {1, 0, LHL_GPIO_6, FUNC_SCB1_SPI_CLK},
     {2, 0, DMIC_CK, FUNC_SCB2_SPI_CLK}
@@ -138,7 +170,6 @@ const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_s_clk[6] = {
 const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_m_clk[6] = {
     {0, 0, BT_UART_RTS_N, FUNC_SCB0_SPI_CLK},
     {0, 0, BT_GPIO_9, FUNC_SCB0_SPI_CLK},
-    {0, 0, LHL_GPIO_7, FUNC_SCB0_SPI_CLK},
     {1, 0, BT_GPIO_17, FUNC_SCB1_SPI_CLK},
     {1, 0, LHL_GPIO_6, FUNC_SCB1_SPI_CLK},
     {2, 0, DMIC_CK, FUNC_SCB2_SPI_CLK}
@@ -195,7 +226,6 @@ const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_s_select0[7] = {
     {0, 0, LHL_GPIO_6, FUNC_SCB0_SPI_SELECT0},
     {1, 0, TDM2_WS, FUNC_SCB1_SPI_SELECT0},
     {1, 0, BT_GPIO_16, FUNC_SCB1_SPI_SELECT0},
-    {1, 0, LHL_GPIO_7, FUNC_SCB1_SPI_SELECT0},
     {2, 0, DMIC_DQ, FUNC_SCB2_SPI_SEL0}
 };
 const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_spi_s_select1[5] = {
@@ -241,8 +271,7 @@ const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_uart_rts[7] = {
     {1, 0, BT_GPIO_11, FUNC_SCB1_UART_RTS},
     {1, 0, BT_GPIO_5, FUNC_SCB1_UART_RTS},
     {1, 0, LHL_GPIO_5, FUNC_SCB1_UART_RTS},
-    {2, 0, BT_GPIO_15, FUNC_SCB2_UART_RTS},
-    {2, 0, LHL_GPIO_7, FUNC_SCB2_UART_RTS}
+    {2, 0, BT_GPIO_15, FUNC_SCB2_UART_RTS}
 };
 
 /* Connections for: uart_rx */
@@ -265,6 +294,37 @@ const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_uart_tx[7] = {
     {1, 0, LHL_GPIO_2, FUNC_SCB1_UART_TXD},
     {2, 0, BT_GPIO_13, FUNC_SCB2_UART_TXD},
     {2, 0, LHL_GPIO_9, FUNC_SCB2_UART_TXD}
+};
+
+///////////////////////////////////////////// SDIO ////////////////////////////////////////////////
+/* Connections for: sdio_clk */
+const cyhal_resource_pin_mapping_t cyhal_pin_map_sdio_clk[1] = {
+    {0, 0, SDIO_CLK, FUNC_NONE}
+};
+
+/* Connections for: sdio_cmd */
+const cyhal_resource_pin_mapping_t cyhal_pin_map_sdio_cmd[1] = {
+    {0, 0, SDIO_CMD, FUNC_NONE}
+};
+
+/* Connections for: sdio_data_0 */
+const cyhal_resource_pin_mapping_t cyhal_pin_map_sdio_data_0[1] = {
+    {0, 0, SDIO_DATA_0, FUNC_NONE}
+};
+
+/* Connections for: sdio_data_1 */
+const cyhal_resource_pin_mapping_t cyhal_pin_map_sdio_data_1[1] = {
+    {0, 0, SDIO_DATA_1, FUNC_NONE}
+};
+
+/* Connections for: sdio_data_2 */
+const cyhal_resource_pin_mapping_t cyhal_pin_map_sdio_data_2[1] = {
+    {0, 0, SDIO_DATA_2, FUNC_NONE}
+};
+
+/* Connections for: sdio_data_3 */
+const cyhal_resource_pin_mapping_t cyhal_pin_map_sdio_data_3[1] = {
+    {0, 0, SDIO_DATA_3, FUNC_NONE}
 };
 
 ///////////////////////////////////////////// TCPWM ////////////////////////////////////////////////
@@ -329,7 +389,7 @@ const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_tr_all_cnt_in[16] = {
     {0, 2, LHL_GPIO_5, FUNC_TCPWM_TR_ALL_3},
     {0, 3, BT_GPIO_10, FUNC_TCPWM_TR_ALL_4},
     {0, 3, BT_GPIO_15, FUNC_TCPWM_TR_ALL_4},
-    {0, 3, BT_GPIO_4, FUNC_TCPWM_TR_ALL_4},
+    {0, 3, LHL_GPIO_4, FUNC_TCPWM_TR_ALL_4},
     {0, 4, BT_GPIO_0, FUNC_TCPWM_TR_ALL_5},
     {0, 5, BT_HOST_WAKE, FUNC_TCPWM_TR_ALL_6},
     {0, 6, BT_GPIO_2, FUNC_TCPWM_TR_ALL_7},
@@ -352,17 +412,46 @@ const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_out_12[3] = {
 
 /* Connections for: tcpwm_out_21 */
 const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_out_21[3] = {
-    {0, 2, TDM2_DI, FUNC_TCPWM_OUT_21},
-    {0, 2, BT_GPIO_15, FUNC_TCPWM_OUT_21},
-    {0, 2, BT_GPIO_6, FUNC_TCPWM_OUT_21}
+    {1, 0, TDM2_DI, FUNC_TCPWM_OUT_21},
+    {1, 0, BT_GPIO_15, FUNC_TCPWM_OUT_21},
+    {1, 0, BT_GPIO_6, FUNC_TCPWM_OUT_21}
 };
 
 /* Connections for: tcpwm_out_22 */
 const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_out_22[3] = {
-    {0, 3, TDM2_DO, FUNC_TCPWM_OUT_22},
-    {0, 3, BT_GPIO_14, FUNC_TCPWM_OUT_22},
-    {0, 3, BT_GPIO_7, FUNC_TCPWM_OUT_22}
+    {1, 1, TDM2_DO, FUNC_TCPWM_OUT_22},
+    {1, 1, BT_GPIO_14, FUNC_TCPWM_OUT_22},
+    {1, 1, BT_GPIO_7, FUNC_TCPWM_OUT_22}
 };
+
+/* Connections for: tcpwm_out_23 */
+const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_out_23[2] = {
+    {1, 2, TDM1_WS, FUNC_TCPWM_OUT_23},
+    {1, 2, LHL_GPIO_6, FUNC_TCPWM_OUT_23}
+};
+
+/* Connections for: tcpwm_out_24 */
+const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_out_24[2] = {
+    {1, 3, TDM1_SCK, FUNC_TCPWM_OUT_24},
+};
+
+/* Connections for: tcpwm_out_25 */
+const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_out_25[2] = {
+    {1, 4, TDM1_MCK, FUNC_TCPWM_OUT_25},
+    {1, 4, LHL_GPIO_8, FUNC_TCPWM_OUT_25}
+};
+
+/* Connections for: tcpwm_out_26 */
+const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_out_26[2] = {
+    {1, 5, TDM1_DI, FUNC_TCPWM_OUT_26},
+    {1, 5, LHL_GPIO_9, FUNC_TCPWM_OUT_26}
+};
+
+/* Connections for: tcpwm_out_27 */
+const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_out_27[1] = {
+    {1, 6, TDM1_DO, FUNC_TCPWM_OUT_27}
+};
+
 
 /* Connections for: tcpwm_comp_out_11 */
 const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_comp_out_11[1] = {
@@ -372,45 +461,49 @@ const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_comp_out_11[1] = {
 /* Connections for: tcpwm_comp_out_12 */
 const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_comp_out_12[2] = {
     {0, 1, BT_GPIO_16, FUNC_TCPWM_COMP_OUT_12},
-    {0, 1, LHL_GPIO_7, FUNC_TCPWM_COMP_OUT_12}
 };
 
 /* Connections for: tcpwm_comp_out_21 */
 const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_comp_out_21[2] = {
-    {0, 2, BT_GPIO_17, FUNC_TCPWM_COMP_OUT_21},
-    {0, 2, LHL_GPIO_8, FUNC_TCPWM_COMP_OUT_21}
+    {1, 0, BT_GPIO_17, FUNC_TCPWM_COMP_OUT_21},
+    {1, 0, LHL_GPIO_8, FUNC_TCPWM_COMP_OUT_21}
 };
 
 /* Connections for: tcpwm_comp_out_22 */
 const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_comp_out_22[1] = {
-    {0, 3, LHL_GPIO_9, FUNC_TCPWM_COMP_OUT_22}
+    {1, 1, LHL_GPIO_9, FUNC_TCPWM_COMP_OUT_22}
 };
 
-// TODO: Need to figure out how the above signals map to tcpwm_line and line_compl
 // The indexes appear to be count group number followed by the counter number. 
 // E.g. CNT_GRP0 and CNT0 = "11". CNT_GRP1 and CNT0 = "21".
-// CAT5 has more counters in the second group and hence will need more signals.
-const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_line[12] = {
+const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_line[21] = {
     {0, 0, TDM2_SCK,   FUNC_TCPWM_OUT_11},
     {0, 0, BT_GPIO_4,  FUNC_TCPWM_OUT_11},
     {0, 0, BT_GPIO_17, FUNC_TCPWM_OUT_11},
     {0, 1, TDM2_WS,    FUNC_TCPWM_OUT_12},
     {0, 1, BT_GPIO_5,  FUNC_TCPWM_OUT_12},
     {0, 1, BT_GPIO_16, FUNC_TCPWM_OUT_12},
-    {0, 2, TDM2_WS,    FUNC_TCPWM_OUT_21},
-    {0, 2, BT_GPIO_15, FUNC_TCPWM_OUT_21},
-    {0, 2, BT_GPIO_6,  FUNC_TCPWM_OUT_21},
-    {0, 3, TDM2_DO,    FUNC_TCPWM_OUT_22},
-    {0, 3, BT_GPIO_14, FUNC_TCPWM_OUT_22},
-    {0, 3, BT_GPIO_7,  FUNC_TCPWM_OUT_22}
+    {1, 0, TDM2_WS,    FUNC_TCPWM_OUT_21},
+    {1, 0, BT_GPIO_15, FUNC_TCPWM_OUT_21},
+    {1, 0, BT_GPIO_6,  FUNC_TCPWM_OUT_21},
+    {1, 1, TDM2_DO,    FUNC_TCPWM_OUT_22},
+    {1, 1, BT_GPIO_14, FUNC_TCPWM_OUT_22},
+    {1, 1, BT_GPIO_7,  FUNC_TCPWM_OUT_22},
+    {1, 2, TDM1_WS,    FUNC_TCPWM_OUT_23},
+    {1, 2, LHL_GPIO_6, FUNC_TCPWM_OUT_23},
+    {1, 3, TDM1_SCK,   FUNC_TCPWM_OUT_24},
+    {1, 4, TDM1_MCK,   FUNC_TCPWM_OUT_25},
+    {1, 4, LHL_GPIO_8, FUNC_TCPWM_OUT_25},
+    {1, 5, TDM1_DI,    FUNC_TCPWM_OUT_26},
+    {1, 5, LHL_GPIO_9, FUNC_TCPWM_OUT_26},
+    {1, 6, TDM1_DO,    FUNC_TCPWM_OUT_27}
 };
 const cyhal_resource_pin_mapping_t cyhal_pin_map_tcpwm_line_compl[6] = {
     {0, 0, LHL_GPIO_6, FUNC_TCPWM_COMP_OUT_11},
     {0, 1, BT_GPIO_16, FUNC_TCPWM_COMP_OUT_12},
-    {0, 1, LHL_GPIO_7, FUNC_TCPWM_COMP_OUT_12},
-    {0, 2, BT_GPIO_17, FUNC_TCPWM_COMP_OUT_21},
-    {0, 2, LHL_GPIO_8, FUNC_TCPWM_COMP_OUT_21},
-    {0, 3, LHL_GPIO_9, FUNC_TCPWM_COMP_OUT_22}
+    {1, 0, BT_GPIO_17, FUNC_TCPWM_COMP_OUT_21},
+    {1, 0, LHL_GPIO_8, FUNC_TCPWM_COMP_OUT_21},
+    {1, 1, LHL_GPIO_9, FUNC_TCPWM_COMP_OUT_22}
 };
 
 /////////////////////////////////////////////// TDM ///////////////////////////////////////////////

@@ -31,8 +31,9 @@
 
 #include "cyhal_system.h"
 #include "btss_system.h"
+#include "wiced_memory.h"
+#include "tx_api.h"
 
-#define cyhal_system_delay_us(x)                Cy_SysLib_DelayUs(x)
 #define cyhal_system_critical_section_enter()   Cy_SysLib_EnterCriticalSection()
 #define cyhal_system_critical_section_exit(x)   Cy_SysLib_ExitCriticalSection(x)
 
@@ -72,3 +73,31 @@ static inline void __disable_irq(void)
     btss_system_intDisable(BTSS_SYSTEM_INTERRUPT_MXTDM0);
     btss_system_intDisable(BTSS_SYSTEM_INTERRUPT_MXTDM1);
 };
+
+
+//--------------------------------------------------------------------------------------------------
+// _cyhal_system_interrupt_control
+//--------------------------------------------------------------------------------------------------
+static inline UINT _cyhal_system_interrupt_control(UINT new_posture)
+{
+    static UINT32 int_val = 0;
+
+    if (new_posture == TX_INT_DISABLE)
+    {
+        int_val = cyhal_system_critical_section_enter();
+    }
+    else
+    {
+        cyhal_system_critical_section_exit(int_val);
+    }
+
+    return int_val;
+}
+
+/* Interrupt control is not provided by default so define it here */
+#define _tx_thread_interrupt_control(A)  _cyhal_system_interrupt_control(A)
+
+/* Cannot be called in ISR context on this device */
+#define __get_IPSR()    0
+#define __BKPT          (void)
+

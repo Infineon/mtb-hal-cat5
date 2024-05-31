@@ -51,6 +51,7 @@ Some HAL driver's may have slightly different behavior when run in an RTOS envir
 
 When using HAL in an RTOS environment with the `RTOS_AWARE` component enabled, initialization of the HAL drivers must be done after the RTOS has been initialized in order to ensure that the RTOS modules such as semaphores used by the HAL drivers are initialized properly. A temporary exception to this is the SDIO HAL driver that is initialized as a part of cybsp_init() and will be addressed in future releases.
 
+It is not safe to invoke more than one operation on the same HAL driver instance at a given time. If multiple threads can potentially interact with a HAL driver instance, it is the callers responsibility to implement mutual exclusion measures (e.g. RTOS mutex, RTOS semaphore) to ensure that only one thread at a time interacts with a given instance.
 
 ## More information
 * [API Reference Guide](https://infineon.github.io/mtb-hal-cat5/html/modules.html)

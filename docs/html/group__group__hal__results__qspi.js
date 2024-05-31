@@ -12,5 +12,6 @@ var group__group__hal__results__qspi =
     [ "CYHAL_QSPI_RSLT_ERR_INSTRUCTION", "group__group__hal__results__qspi.html#gaa494ba652ae042cd8f7e9e9b6ff74d4c", null ],
     [ "CYHAL_QSPI_RSLT_ERR_DUMMY_CYCLES", "group__group__hal__results__qspi.html#gaac04207b76aa0669b3f9118896d45608", null ],
     [ "CYHAL_QSPI_RSLT_ERR_CLOCK", "group__group__hal__results__qspi.html#gada7a1b7b410d3818d3a659e1f42a94e0", null ],
-    [ "CYHAL_QSPI_RSLT_ERR_UNSUPPORTED", "group__group__hal__results__qspi.html#ga25fac114ffd37b5c54270665b205173b", null ]
+    [ "CYHAL_QSPI_RSLT_ERR_UNSUPPORTED", "group__group__hal__results__qspi.html#ga25fac114ffd37b5c54270665b205173b", null ],
+    [ "CYHAL_QSPI_RSLT_ERR_BAD_ARGUMENT", "group__group__hal__results__qspi.html#gab14799218dcd48e73dd6d3966dfa2e4d", null ]
 ];

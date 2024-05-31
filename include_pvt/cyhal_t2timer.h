@@ -69,7 +69,6 @@ extern "C" {
 *       Data Structures
 *******************************************************************************/
 
-// TODO: what is mode versus counter_mode?
 /** @brief Describes the current configuration of a T2Timer timer. Used to interface between
  *  Timer configuration function and T2Timer.
  */

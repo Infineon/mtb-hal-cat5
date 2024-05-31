@@ -46,10 +46,8 @@ static _cyhal_utils_clock_cfg_t _cyhal_clock_data[7] = {0};
 
 uint32_t _cyhal_utils_get_peripheral_clock_frequency(const cyhal_resource_inst_t *clocked_item)
 {
-    if (clocked_item->type == CYHAL_RSC_SCB)
-        return SCB_IP_SYS_CLK_MAX_FREQUENCY;
-    else if (clocked_item->type == CYHAL_RSC_TCPWM)
-        return TCPWM_IP_SYS_CLK_MAX_FREQUENCY;
+    if ((clocked_item->type == CYHAL_RSC_SCB) || (clocked_item->type == CYHAL_RSC_TCPWM))
+        return btss_system_getRpuBaseClock();
     else
         return 0UL;
 }
@@ -107,7 +105,7 @@ cy_rslt_t _cyhal_utils_peri_pclk_set_divider(en_clk_dst_t clk_dest, const cyhal_
             case 8UL:
             case 10UL:
             case 12UL:
-                div_enum = (TCPWM_TPORT_CLK_DIV_SEL_t)((div/2) + 1u);
+                div_enum = (TCPWM_TPORT_CLK_DIV_SEL_t)((actual_div/2) + 1u);
                 break;
             case 16UL:
                 div_enum = TCPWM_TPORT_CLK_DIV_16;

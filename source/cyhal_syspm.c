@@ -27,7 +27,6 @@
 * limitations under the License.
 *******************************************************************************/
 
-// TODO: This is a stub based on cat4 implementation.
 
 #include <limits.h>
 #include <math.h>
@@ -35,9 +34,11 @@
 #include "cyhal_timer.h"
 #include "cyhal_syspm.h"
 #include "cyhal_system.h"
+#include "cyhal_gpio.h"
 #include "cyhal_clock_impl.h"
 #include "cy_utils.h"
 #include "wiced_sleep.h"
+#include "cyhal_syspm_impl.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -48,15 +49,6 @@ extern "C" {
 *       Internal - Helper functions
 *******************************************************************************/
 
-/* Hz to KHz */
-#define _CYHAL_HZ_TO_KHZ_CONVERSION_FACTOR (1000)
-
-/* Set in timer driver */
-cyhal_timer_t*    _cyhal_timer_copy;
-
-static bool _cyhal_disable_systick_before_sleep_deepsleep = false;
-
-
 #define _CYHAL_SYSPM_CB_ALL ((cyhal_syspm_callback_state_t)(CYHAL_SYSPM_CB_CPU_SLEEP \
                                                         | CYHAL_SYSPM_CB_CPU_DEEPSLEEP \
                                                         | CYHAL_SYSPM_CB_SYSTEM_HIBERNATE \
@@ -66,6 +58,46 @@ static bool _cyhal_disable_systick_before_sleep_deepsleep = false;
 static uint16_t _cyhal_deep_sleep_lock = 0;
 static uint32_t _cyhal_syspm_supply_voltages[((size_t)CYHAL_VOLTAGE_SUPPLY_MAX) + 1] = { 0 };
 
+/* Connections for: wakeup source GPIOs */
+const _cyhal_wakeup_src_pin_mapping_t _cyhal_gpio_map_wakeup_src[36] = {
+    {BTSS_SYSTEM_PMU_WAKE_SRC_BT_GPIO_0, BT_GPIO_0},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_BT_GPIO_2, BT_GPIO_2},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_BT_GPIO_3, BT_GPIO_3},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_BT_GPIO_4, BT_GPIO_4},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_BT_GPIO_5, BT_GPIO_5},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_BT_GPIO_6, BT_GPIO_6},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_BT_GPIO_7, BT_GPIO_7},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_BT_GPIO_8, BT_GPIO_8},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_BT_GPIO_9, BT_GPIO_9},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_BT_GPIO_10, BT_GPIO_10},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_BT_GPIO_11, BT_GPIO_11},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_BT_GPIO_16, BT_GPIO_16},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_BT_GPIO_17, BT_GPIO_17},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_BT_HOST_WAKE, BT_HOST_WAKE},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_BT_UART_CTS_N, BT_UART_CTS_N},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_BT_UART_RTS_N, BT_UART_RTS_N},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_BT_UART_RXD, BT_UART_RXD},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_DMIC_CK, DMIC_CK},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_DMIC_DQ, DMIC_DQ},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_TDM1_DI, TDM1_DI},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_TDM1_DO, TDM1_DO},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_TDM1_MCK, TDM1_MCK},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_TDM1_SCK, TDM1_SCK},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_TDM1_WS, TDM1_WS},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_TDM2_CLK, TDM2_SCK},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_TDM2_IN, TDM2_DI},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_TDM2_MCK, TDM2_MCK},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_TDM2_OUT, TDM2_DO},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_TDM2_SYNC, TDM2_WS},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_LHL_GPIO_2, LHL_GPIO_2},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_LHL_GPIO_3, LHL_GPIO_3},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_LHL_GPIO_4, LHL_GPIO_4},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_LHL_GPIO_5, LHL_GPIO_5},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_LHL_GPIO_6, LHL_GPIO_6},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_LHL_GPIO_8, LHL_GPIO_8},
+    {BTSS_SYSTEM_PMU_WAKE_SRC_LHL_GPIO_9, LHL_GPIO_9}
+};
+
 /* The first entry in the callback chain is always reserved for the user set
  * cyhal_syspm_register_callback callback. This may be set to a sentinel value
  * indicating it is the end of the list. All subsequent slots are where
@@ -74,16 +106,14 @@ static uint32_t _cyhal_syspm_supply_voltages[((size_t)CYHAL_VOLTAGE_SUPPLY_MAX) 
 static cyhal_syspm_callback_data_t* _cyhal_syspm_callback_ptr = CYHAL_SYSPM_END_OF_LIST;
 static cyhal_syspm_callback_data_t* _cyhal_syspm_peripheral_callback_ptr = CYHAL_SYSPM_END_OF_LIST;
 
-/* General syspm callback */
-
 static cyhal_syspm_callback_data_t* _cyhal_syspm_call_all_pm_callbacks(
     cyhal_syspm_callback_data_t* entry, bool* allow, cyhal_syspm_callback_state_t state, cyhal_syspm_callback_mode_t mode)
 {
-    while(entry != CYHAL_SYSPM_END_OF_LIST)
+     while(entry != CYHAL_SYSPM_END_OF_LIST)
     {
-        if (entry->callback != NULL &&
-            (entry->states & state) == state &&
-            (entry->ignore_modes & mode) != mode)
+        if ((entry->callback != NULL &&
+             (entry->states & state) == state &&
+             (entry->ignore_modes & mode) != mode))
         {
             *allow = entry->callback(state, mode, entry->args) || mode != CYHAL_SYSPM_CHECK_READY;
             if (!(*allow))
@@ -101,9 +131,9 @@ static void _cyhal_syspm_backtrack_all_pm_callbacks(cyhal_syspm_callback_data_t*
 {
     while(start != end)
     {
-        if (start->callback != NULL &&
-            (start->states & state) == state &&
-            (start->ignore_modes & CYHAL_SYSPM_CHECK_FAIL) != CYHAL_SYSPM_CHECK_FAIL)
+        if (((start->callback) != NULL &&
+             (start->states & state) == state &&
+             (start->ignore_modes & CYHAL_SYSPM_CHECK_FAIL) != CYHAL_SYSPM_CHECK_FAIL))
         {
             start->callback(state, CYHAL_SYSPM_CHECK_FAIL, start->args);
         }
@@ -113,7 +143,8 @@ static void _cyhal_syspm_backtrack_all_pm_callbacks(cyhal_syspm_callback_data_t*
 
 static cy_rslt_t _cyhal_syspm_common_cb(cyhal_syspm_callback_state_t state, cyhal_syspm_callback_mode_t mode)
 {
-    if ((state == CYHAL_SYSPM_CB_CPU_DEEPSLEEP) && (mode == CYHAL_SYSPM_CHECK_READY) && (_cyhal_deep_sleep_lock != 0))
+    if ((state == (state & (CYHAL_SYSPM_CB_CPU_DEEPSLEEP | CYHAL_SYSPM_CB_SYSTEM_HIBERNATE)))
+            && (mode == CYHAL_SYSPM_CHECK_READY) && (_cyhal_deep_sleep_lock != 0))
     {
         return CYHAL_SYSPM_RSLT_ERR_PM_PENDING;
     }
@@ -142,34 +173,6 @@ static cy_rslt_t _cyhal_syspm_common_cb(cyhal_syspm_callback_state_t state, cyha
         {
             _cyhal_syspm_backtrack_all_pm_callbacks(second, second_current, state);
             _cyhal_syspm_backtrack_all_pm_callbacks(first, first_current, state);
-        }
-
-        if (allow
-            && (state == CYHAL_SYSPM_CB_CPU_DEEPSLEEP)
-            && (_cyhal_timer_copy != NULL))
-        {
-            static bool timerOn = false;
-
-            if (mode == CYHAL_SYSPM_BEFORE_TRANSITION)
-            {
-                if ((_cyhal_timer_copy->running) && _cyhal_disable_systick_before_sleep_deepsleep)
-                {
-                    timerOn = true;
-                    allow = (cyhal_timer_stop(_cyhal_timer_copy) == CY_RSLT_SUCCESS);
-                }
-                else
-                {
-                    timerOn = false;
-                }
-            }
-            else if (mode == CYHAL_SYSPM_AFTER_TRANSITION)
-            {
-                if (timerOn)
-                {
-                    allow = (cyhal_timer_start(_cyhal_timer_copy) == CY_RSLT_SUCCESS);
-                    timerOn = false;
-                }
-            }
         }
 
         return allow ? CY_RSLT_SUCCESS : CYHAL_SYSPM_RSLT_ERR_PM_PENDING;
@@ -217,115 +220,119 @@ void _cyhal_syspm_unregister_peripheral_callback(cyhal_syspm_callback_data_t *ca
     _cyhal_syspm_remove_callback_from_list(&_cyhal_syspm_peripheral_callback_ptr, callback_data);
 }
 
-cy_rslt_t _cyhal_syspm_tickless_sleep_deepsleep(cyhal_lptimer_t *obj, uint32_t desired_ms, uint32_t *actual_ms, bool deep_sleep)
-{
-    CY_UNUSED_PARAMETER(obj);
-    CY_UNUSED_PARAMETER(desired_ms);
-    CY_UNUSED_PARAMETER(actual_ms);
-    CY_UNUSED_PARAMETER(deep_sleep);
-    // Temporarily commented out function, needs to be reevaluated for CAT5 since lptimer is not supported
-    // CY_ASSERT(obj != NULL);
-    // uint32_t initial_ticks;
-    // uint32_t sleep_ticks;
-    // cyhal_lptimer_info_t timer_info;
-
-    // *actual_ms = 0;
-    // cy_rslt_t result = CY_RSLT_SUCCESS;
-
-    // if(desired_ms > 0)
-    // {
-    //     cyhal_lptimer_get_info(obj, &timer_info);
-
-    //     sleep_ticks = desired_ms * (timer_info.frequency_hz / _CYHAL_HZ_TO_KHZ_CONVERSION_FACTOR);
-    //     initial_ticks = cyhal_lptimer_read(obj);
-
-    //     result = cyhal_lptimer_set_delay(obj, sleep_ticks);
-    //     if(result == CY_RSLT_SUCCESS)
-    //     {
-    //         /* Disabling and enabling the system timer is handled in _cyhal_syspm_common_cb in order
-    //          * to prevent loosing kernel ticks when sleep/deep-sleep is rejected causing the time spent
-    //          * in the callback handlers to check if the system can make the sleep/deep-sleep transition
-    //          * to be not accounted for.
-    //          */
-    //         _cyhal_disable_systick_before_sleep_deepsleep = true;
-    //         cyhal_lptimer_enable_event(obj, CYHAL_LPTIMER_COMPARE_MATCH, CYHAL_ISR_PRIORITY_DEFAULT, true);
-
-    //         result = deep_sleep ? cyhal_syspm_deepsleep() : cyhal_syspm_sleep();
-    //         if(result == CY_RSLT_SUCCESS)
-    //         {
-    //             uint32_t final_ticks = cyhal_lptimer_read(obj);
-    //             uint32_t ticks = (final_ticks < initial_ticks)
-    //                             ? (timer_info.max_counter_value - initial_ticks) + final_ticks
-    //                             : final_ticks - initial_ticks;
-    //             *actual_ms = ticks / (timer_info.frequency_hz / _CYHAL_HZ_TO_KHZ_CONVERSION_FACTOR);
-    //         }
-
-    //         cyhal_lptimer_enable_event(obj, CYHAL_LPTIMER_COMPARE_MATCH, CYHAL_ISR_PRIORITY_DEFAULT, false);
-    //         _cyhal_disable_systick_before_sleep_deepsleep = false;
-    //     }
-    // }
-
-    // return result;
-
-    return CY_RSLT_SUCCESS;
-}
-
-
 /*******************************************************************************
 *       Internal
 *******************************************************************************/
 
-/* 
-    The ROM controls when to enter sleep. The application can let it
-    know when to sleep only when asked through a callback.
-
-    Shutdown sleep is mapped to deep-sleep. Regular sleep is sleep.
-    When in shutdown mode, most of the hardware is turned off. Only
-    retention registers and data in retention RAM are available.
-*/
-
-// Retention data (limited to 256 bytes)
-uint8_t retention_data[256] __attribute__ ((section(".data_in_retention_ram")));
-
-// May need to use wiced_rtos semaphore instead
-volatile bool _cyhal_syspm_sleep_flag = false;
-volatile bool _cyhal_syspm_deepsleep_flag = false;
-
-uint32_t _cyhal_syspm_wiced_callback(wiced_sleep_poll_type_t type)
+cyhal_syspm_callback_state_t _cyhal_syspm_convert_pdltohal_pm_state(BTSS_SYSTEM_PMU_SLEEP_MODE_t sleep_state)
 {
-    if (type == WICED_SLEEP_POLL_TIME_TO_SLEEP)
+    cyhal_syspm_callback_state_t state = CYHAL_SYSPM_CB_CPU_DEEPSLEEP;
+    switch (sleep_state)
     {
-        // Return the time in microseconds allowed to sleep
-        // If shutdown sleep, need to use WICED_SLEEP_MAX_TIME_TO_SLEEP
-        return WICED_SLEEP_MAX_TIME_TO_SLEEP;
+        case BTSS_SYSTEM_PMU_SLEEP_PDS:
+            state = CYHAL_SYSPM_CB_CPU_DEEPSLEEP;
+            break;
+#if defined(CYHAL_SYSPM_EPDS_ENABLED) && (CYHAL_SYSPM_EPDS_ENABLED == 1)
+        case BTSS_SYSTEM_PMU_SLEEP_EPDS:
+            state = CYHAL_SYSPM_CB_SYSTEM_HIBERNATE;
+            break;
+#endif
+        default:
+            break;
     }
-    else if (type == WICED_SLEEP_POLL_SLEEP_PERMISSION)
+
+    return state;
+}
+
+cyhal_syspm_callback_mode_t _cyhal_syspm_convert_pdltohal_pm_mode(BTSS_SYSTEM_PMU_SLEEP_MODE_t sleep_state, bool *proceed)
+{
+    cyhal_syspm_callback_mode_t callback_mode = CYHAL_SYSPM_CHECK_READY;
+
+    switch (sleep_state)
     {
-        if (_cyhal_syspm_sleep_flag)
+        case BTSS_SYSTEM_PMU_SLEEP_PDS:
+            callback_mode = CYHAL_SYSPM_CHECK_READY;
+            *proceed = true;
+            break;
+#if defined(CYHAL_SYSPM_EPDS_ENABLED) && (CYHAL_SYSPM_EPDS_ENABLED == 1)
+        case BTSS_SYSTEM_PMU_SLEEP_EPDS:
+            callback_mode = CYHAL_SYSPM_CHECK_READY;
+            *proceed = true;
+            break;
+#endif
+        case BTSS_SYSTEM_PMU_SLEEP_NOT_ALLOWED:
+            /* This state is mapped to the CHECK FAIL */
+            callback_mode = CYHAL_SYSPM_CHECK_FAIL;
+            *proceed = true;
+            break;
+        default:
+            /* The states here are not handled since no sleep is actualy reached in these states */
+            *proceed = false;
+            break;
+    }
+
+    return callback_mode;
+}
+
+BTSS_SYSTEM_PMU_SLEEP_MODE_t _cyhal_syspm_pre_sleep_cback(BTSS_SYSTEM_PMU_SLEEP_MODE_t sleep_state , uint32_t sleep_time_in_lpo_cycles)
+{
+    CY_UNUSED_PARAMETER(sleep_time_in_lpo_cycles);
+    bool proceed = true;
+
+    /* Retrieve the Sleep Mode */
+    cyhal_syspm_callback_mode_t callback_mode = _cyhal_syspm_convert_pdltohal_pm_mode(sleep_state, &proceed);
+
+    /* Proceed only if the state is the expected one */
+    if (proceed)
+    {
+        /* Retrieve the Sleep State */
+        cyhal_syspm_callback_state_t callback_state = _cyhal_syspm_convert_pdltohal_pm_state(sleep_state);
+
+        cy_rslt_t result = _cyhal_syspm_common_cb(callback_state, callback_mode);
+
+        /* The expected mode to trigger BEFORE transition is CHECK READY */
+        if((CY_RSLT_SUCCESS == result) && (CYHAL_SYSPM_CHECK_READY == callback_mode))
         {
-            // It's possible that this can be set in multiple threads.
-            // In such a situation, opt for regular sleep.
-            _cyhal_syspm_deepsleep_flag = false;
-            _cyhal_syspm_sleep_flag = false;
-            return WICED_SLEEP_ALLOWED_WITHOUT_SHUTDOWN;
+            result = _cyhal_syspm_common_cb(callback_state, CYHAL_SYSPM_BEFORE_TRANSITION);
         }
 
-        if (_cyhal_syspm_deepsleep_flag)
-        {
-            _cyhal_syspm_deepsleep_flag = false;
-            return WICED_SLEEP_ALLOWED_WITH_SHUTDOWN;
-        }
-
-        return WICED_SLEEP_NOT_ALLOWED;
+        //Return the appropriate sleep state in case the sleep is allowed or sleep not allowed
+        sleep_state = (result == CY_RSLT_SUCCESS) ? sleep_state:BTSS_SYSTEM_PMU_SLEEP_NOT_ALLOWED;
     }
-    else
+
+    return sleep_state;
+}
+
+void _cyhal_syspm_post_sleep_cback (BTSS_SYSTEM_PMU_SLEEP_MODE_t sleep_state)
+{
+    //Invoke the exit sleep cback
+    _cyhal_syspm_common_cb( _cyhal_syspm_convert_pdltohal_pm_state(sleep_state), CYHAL_SYSPM_AFTER_TRANSITION);
+
+}
+
+cy_rslt_t _cyhal_syspm_set_wakeup_source(cyhal_gpio_t pin, bool polarity, bool enable)
+{
+    bool pdl_status = false;
+    for (uint8_t pin_idx = 0; pin_idx < (sizeof(_cyhal_gpio_map_wakeup_src)/sizeof(_cyhal_gpio_map_wakeup_src[0])); pin_idx++)
     {
-        // This should never happen.
-        CY_ASSERT(0);
-        return 0;
+        if(_cyhal_gpio_map_wakeup_src[pin_idx].pin == pin)
+        {
+            if (enable)
+            {
+                pdl_status = btss_system_sleepEnableWakeSource(_cyhal_gpio_map_wakeup_src[pin_idx].wakeup_src,
+                            (BTSS_SYSTEM_SLEEP_ACTIVE_CONFIG_t) polarity);
+            }
+            else
+            {
+                pdl_status = btss_system_sleepDisableWakeSource(_cyhal_gpio_map_wakeup_src[pin_idx].wakeup_src);
+            }
+            //terminate the loop
+            break;
+        }
     }
-};
 
+    return (pdl_status) ? CY_RSLT_SUCCESS : CYHAL_SYSPM_RSLT_BAD_ARGUMENT;
+}
 
 /*******************************************************************************
 *       HAL Implementation
@@ -333,30 +340,49 @@ uint32_t _cyhal_syspm_wiced_callback(wiced_sleep_poll_type_t type)
 
 cy_rslt_t cyhal_syspm_init(void)
 {
-    // Temporarily commented out since wiced_sleep_configure symbol is not exposed
-    // wiced_sleep_config_t p_sleep_config = 
-    // {
-    //     .sleep_mode = WICED_SLEEP_MODE_NO_TRANSPORT,
-    //     .host_wake_mode = WICED_SLEEP_WAKE_ACTIVE_LOW, /* Not used since sleep_mode is "no transport" */
-    //     .device_wake_mode = WICED_SLEEP_WAKE_ACTIVE_LOW, /* Not used since sleep_mode is "no transport" */
-    //     .device_wake_source = WICED_SLEEP_WAKE_SOURCE_MASK,
-    //     .device_wake_gpio_num = 0, /* Not used since sleep_mode is "no transport" */
-    //     .sleep_permit_handler = _cyhal_syspm_wiced_callback
-    // };
-    // 
-    // wiced_result_t status = wiced_sleep_configure(&p_sleep_config);
+    cy_rslt_t status = CY_RSLT_SUCCESS;
+    bool pdl_status = FALSE;
 
-    wiced_result_t status = WICED_SUCCESS;
+    BTSS_SYSTEM_SLEEP_PARAMS_t _syspm_params_default = {
+        .sleep_config = _CYHAL_SYSPM_SLEEP_MODE,
+        .device_wake_mode = (BTSS_SYSTEM_SLEEP_ACTIVE_CONFIG_t)TRUE,
+        .host_wake_mode = (BTSS_SYSTEM_SLEEP_ACTIVE_CONFIG_t)TRUE,
+    };
 
-    if (status == WICED_SUCCESS)
+    if (CY_RSLT_SUCCESS == status)
     {
-        // TODO: Might need thread_ap_RegisterMPAFprePostSleepHandler();
-        return CY_RSLT_SUCCESS;
+        /* Initialize callbacks */
+        pdl_status = btss_system_sleepInit((BTSS_SYSTEM_PRE_SLEEP_CB_t)_cyhal_syspm_pre_sleep_cback,
+                (BTSS_SYSTEM_POST_SLEEP_CB_t)_cyhal_syspm_post_sleep_cback);
+
+        status = (pdl_status) ? CY_RSLT_SUCCESS : CYHAL_SYSPM_RSLT_CB_REGISTER_ERROR;
     }
-    else
+
+    if (CY_RSLT_SUCCESS == status)
     {
-        return CYHAL_SYSPM_RSLT_INIT_ERROR;
+#if defined(COMPONENT_55500A1)
+        // CYW55500A1 requires sleep mode to be locked at startup
+        cyhal_syspm_lock_deepsleep();
+#else
+        /* Set default sleep mode as PDS allowed  */
+        pdl_status = btss_system_sleepAllowMode(BTSS_SYSTEM_PMU_SLEEP_PDS);
+        status = (pdl_status) ? CY_RSLT_SUCCESS : CYHAL_SYSPM_RSLT_INIT_ERROR;
+#endif
     }
+
+    if (CY_RSLT_SUCCESS == status)
+    {
+        /* Setup PMU with sleep mode and wake-up polarity */
+        pdl_status = btss_system_sleepEnable(&_syspm_params_default);
+        status = (pdl_status) ? CY_RSLT_SUCCESS : CYHAL_SYSPM_RSLT_INIT_ERROR;
+    }
+
+     return status;
+}
+
+cy_rslt_t cyhal_syspm_deepsleep(void)
+{
+    return CYHAL_SYSPM_RSLT_ERR_NOT_SUPPORTED;
 }
 
 cy_rslt_t cyhal_syspm_hibernate(cyhal_syspm_hibernate_source_t wakeup_source)
@@ -395,38 +421,7 @@ void cyhal_syspm_unregister_callback(cyhal_syspm_callback_data_t *callback_data)
 
 cy_rslt_t cyhal_syspm_sleep(void)
 {
-    cy_rslt_t result = _cyhal_syspm_common_cb(CYHAL_SYSPM_CB_CPU_SLEEP, CYHAL_SYSPM_CHECK_READY);
-    if (result == CY_RSLT_SUCCESS)
-    {
-        result = _cyhal_syspm_common_cb(CYHAL_SYSPM_CB_CPU_SLEEP, CYHAL_SYSPM_BEFORE_TRANSITION);
-        if (result == CY_RSLT_SUCCESS)
-        {
-            // Spin until either an interrupt or sleep routine has been executed.
-            _cyhal_syspm_sleep_flag = true;
-            while (_cyhal_syspm_sleep_flag){};
-            result = _cyhal_syspm_common_cb(CYHAL_SYSPM_CB_CPU_SLEEP, CYHAL_SYSPM_AFTER_TRANSITION);
-        }
-    }
-
-    return result;
-}
-
-cy_rslt_t cyhal_syspm_deepsleep(void)
-{
-    cy_rslt_t result = _cyhal_syspm_common_cb(CYHAL_SYSPM_CB_CPU_DEEPSLEEP, CYHAL_SYSPM_CHECK_READY);
-    if (result == CY_RSLT_SUCCESS)
-    {
-        result = _cyhal_syspm_common_cb(CYHAL_SYSPM_CB_CPU_DEEPSLEEP, CYHAL_SYSPM_BEFORE_TRANSITION);
-        if (result == CY_RSLT_SUCCESS)
-        {
-            // Spin until either an interrupt or deepsleep routine has been executed.
-            _cyhal_syspm_deepsleep_flag = true;
-            while (_cyhal_syspm_deepsleep_flag){};
-            result = _cyhal_syspm_common_cb(CYHAL_SYSPM_CB_CPU_DEEPSLEEP, CYHAL_SYSPM_AFTER_TRANSITION);
-        }
-    }
-
-    return result;
+    return CYHAL_SYSPM_RSLT_ERR_NOT_SUPPORTED;
 }
 
 void cyhal_syspm_lock_deepsleep(void)
@@ -436,6 +431,8 @@ void cyhal_syspm_lock_deepsleep(void)
     if (_cyhal_deep_sleep_lock < USHRT_MAX)
     {
         _cyhal_deep_sleep_lock++;
+        /* Set sleep mode as not Allowed  */
+        (void)btss_system_sleepAllowMode(BTSS_SYSTEM_PMU_SLEEP_NOT_ALLOWED);
     }
     cyhal_system_critical_section_exit(intr_status);
 }
@@ -448,17 +445,38 @@ void cyhal_syspm_unlock_deepsleep(void)
     {
         _cyhal_deep_sleep_lock--;
     }
+    if (_cyhal_deep_sleep_lock == 0)
+    {
+#if defined(CYHAL_SYSPM_EPDS_ENABLED) && (CYHAL_SYSPM_EPDS_ENABLED == 1)
+        /* Set sleep mode as Allowed Hibernate */
+        (void)btss_system_sleepAllowMode(BTSS_SYSTEM_PMU_SLEEP_EPDS);
+#else
+        /* Set sleep mode as Allowed Deepsleep */
+        (void)btss_system_sleepAllowMode(BTSS_SYSTEM_PMU_SLEEP_PDS);
+#endif
+    }
     cyhal_system_critical_section_exit(intr_status);
 }
 
 cy_rslt_t cyhal_syspm_tickless_deepsleep(cyhal_lptimer_t *obj, uint32_t desired_ms, uint32_t *actual_ms)
 {
-    return _cyhal_syspm_tickless_sleep_deepsleep(obj, desired_ms, actual_ms, true);
+    CY_UNUSED_PARAMETER(obj);
+    CY_UNUSED_PARAMETER(desired_ms);
+    CY_UNUSED_PARAMETER(actual_ms);
+    return CYHAL_SYSPM_RSLT_ERR_NOT_SUPPORTED;
 }
 
 cy_rslt_t cyhal_syspm_tickless_sleep(cyhal_lptimer_t *obj, uint32_t desired_ms, uint32_t *actual_ms)
 {
-    return _cyhal_syspm_tickless_sleep_deepsleep(obj, desired_ms, actual_ms, false);
+    CY_UNUSED_PARAMETER(obj);
+    CY_UNUSED_PARAMETER(desired_ms);
+    CY_UNUSED_PARAMETER(actual_ms);
+    return CYHAL_SYSPM_RSLT_ERR_NOT_SUPPORTED;
+}
+
+cyhal_syspm_system_deep_sleep_mode_t cyhal_syspm_get_deepsleep_mode (void)
+{
+    return CYHAL_SYSPM_SYSTEM_DEEPSLEEP;
 }
 
 void cyhal_syspm_set_supply_voltage(cyhal_syspm_voltage_supply_t supply, uint32_t mvolts)

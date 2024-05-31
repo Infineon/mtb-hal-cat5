@@ -166,16 +166,19 @@ static void _cyhal_i2c_irq_handler(void)
 static void _cyhal_i2c0_irq_handler(void)
 {
     _cyhal_i2c_irq_handler(scb_0_interrupt_IRQn);
+    Cy_SCB_EnableInterrupt(SCB0);
 }
 
 static void _cyhal_i2c1_irq_handler(void)
 {
     _cyhal_i2c_irq_handler(scb_1_interrupt_IRQn);
+    Cy_SCB_EnableInterrupt(SCB1);
 }
 
 static void _cyhal_i2c2_irq_handler(void)
 {
     _cyhal_i2c_irq_handler(scb_2_interrupt_IRQn);
+    Cy_SCB_EnableInterrupt(SCB2);
 }
 
 static CY_SCB_IRQ_THREAD_CB_t _cyhal_irq_cb[3] = {_cyhal_i2c0_irq_handler, _cyhal_i2c1_irq_handler, _cyhal_i2c2_irq_handler};
@@ -242,6 +245,7 @@ static bool _cyhal_i2c_pm_callback_instance(void *obj_ptr, cyhal_syspm_callback_
     return allow;
 }
 
+
 static cy_rslt_t _cyhal_i2c_init_resources(cyhal_i2c_t *obj, cyhal_gpio_t sda, cyhal_gpio_t scl, const cyhal_clock_t *clk)
 {
     /* Explicitly marked not allocated resources as invalid to prevent freeing them. */
@@ -288,7 +292,9 @@ static cy_rslt_t _cyhal_i2c_init_resources(cyhal_i2c_t *obj, cyhal_gpio_t sda, c
         return CYHAL_I2C_RSLT_ERR_INVALID_PIN;
     }
 
-    cy_rslt_t result = cyhal_hwmgr_reserve(&i2c_rsc);
+
+    cyhal_resource_inst_t rsc_to_reserve = { CYHAL_RSC_SCB, _cyhal_scb_get_block_index(found_block_idx), 0 };
+    cy_rslt_t result = cyhal_hwmgr_reserve(&rsc_to_reserve);
 
     if (result == CY_RSLT_SUCCESS)
     {
@@ -354,7 +360,7 @@ static cy_rslt_t _cyhal_i2c_init_hw(cyhal_i2c_t *obj, const cy_stc_scb_i2c_confi
     {
         _cyhal_scb_update_instance_data(obj->resource.block_num, (void*)obj, &_cyhal_i2c_pm_callback_instance);
         /* Enable I2C to operate */
-#if defined(COMPONENT_CAT1A) || defined(COMPONENT_CAT1B) || defined(COMPONENT_CAT1C) || defined(COMPONENT_CAT1D)
+#if defined(COMPONENT_CAT1A) || defined(COMPONENT_CAT1B) || defined(COMPONENT_CAT1C) || defined(COMPONENT_CAT1D) || defined(COMPONENT_CAT5)
         Cy_SCB_I2C_Enable(obj->base);
 #elif defined(COMPONENT_CAT2)
         Cy_SCB_I2C_Enable(obj->base, &(obj->context));
@@ -480,7 +486,8 @@ void cyhal_i2c_free(cyhal_i2c_t *obj)
 
         if (!obj->dc_configured)
         {
-            cyhal_hwmgr_free(&(obj->resource));
+            cyhal_resource_inst_t rsc_to_free = { CYHAL_RSC_SCB, _cyhal_scb_get_block_index(obj->resource.block_num), obj->resource.channel_num };
+            cyhal_hwmgr_free(&(rsc_to_free));
         }
 
         obj->resource.type = CYHAL_RSC_INVALID;
@@ -551,7 +558,7 @@ cy_rslt_t cyhal_i2c_configure_adv(cyhal_i2c_t *obj, const cyhal_i2c_adv_cfg_t *c
             return CYHAL_I2C_RSLT_ERR_CAN_NOT_REACH_DR;
         }
 
-    #if defined(COMPONENT_CAT1A) || defined(COMPONENT_CAT1B) || defined(COMPONENT_CAT1C) || defined(COMPONENT_CAT1D)
+    #if defined(COMPONENT_CAT1A) || defined(COMPONENT_CAT1B) || defined(COMPONENT_CAT1C) || defined(COMPONENT_CAT1D) || defined(COMPONENT_CAT5)
         (void) Cy_SCB_I2C_Enable(obj->base);
     #elif defined(COMPONENT_CAT2)
         (void) Cy_SCB_I2C_Enable(obj->base, &(obj->context));

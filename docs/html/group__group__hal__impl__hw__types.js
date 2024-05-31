@@ -8,6 +8,10 @@ var group__group__hal__impl__hw__types =
     ] ],
     [ "cyhal_event_callback_data_t", "group__group__hal__impl__hw__types.html#structcyhal__event__callback__data__t", null ],
     [ "_cyhal_buffer_info_t", "group__group__hal__impl__hw__types.html#struct__cyhal__buffer__info__t", null ],
+    [ "cyhal_sdio_buffer_t", "group__group__hal__impl__hw__types.html#structcyhal__sdio__buffer__t", [
+      [ "rx_header", "group__group__hal__impl__hw__types.html#a243bbe70b74af8f35d61b6059596957c", null ],
+      [ "payload", "group__group__hal__impl__hw__types.html#a0d084aa9bbb9fc31269b56a1e4855706", null ]
+    ] ],
     [ "cyhal_tcpwm_t", "group__group__hal__impl__hw__types.html#structcyhal__tcpwm__t", null ],
     [ "cyhal_dma_t", "group__group__hal__impl__hw__types.html#structcyhal__dma__t", null ],
     [ "cyhal_dma_configurator_t", "group__group__hal__impl__hw__types.html#structcyhal__dma__configurator__t", null ],
@@ -38,9 +42,7 @@ var group__group__hal__impl__hw__types =
     [ "cyhal_ezi2c_t", "group__group__hal__impl__hw__types.html#structcyhal__ezi2c__t", null ],
     [ "cyhal_ezi2c_configurator_t", "group__group__hal__impl__hw__types.html#structcyhal__ezi2c__configurator__t", null ],
     [ "cyhal_lptimer_t", "group__group__hal__impl__hw__types.html#structcyhal__lptimer__t", null ],
-    [ "cyhal_pdm_pcm_t", "group__group__hal__impl__hw__types.html#structcyhal__pdm__pcm__t", [
-      [ "irq_cause", "group__group__hal__impl__hw__types.html#a459a288e12f28d84eba07b731557f6c7", null ]
-    ] ],
+    [ "cyhal_pdm_pcm_t", "group__group__hal__impl__hw__types.html#structcyhal__pdm__pcm__t", null ],
     [ "cyhal_pdm_pcm_configurator_t", "group__group__hal__impl__hw__types.html#structcyhal__pdm__pcm__configurator__t", null ],
     [ "cyhal_pwm_t", "group__group__hal__impl__hw__types.html#structcyhal__pwm__t", null ],
     [ "cyhal_pwm_configurator_t", "group__group__hal__impl__hw__types.html#structcyhal__pwm__configurator__t", null ],
@@ -50,6 +52,8 @@ var group__group__hal__impl__hw__types =
     [ "cyhal_quaddec_configurator_t", "group__group__hal__impl__hw__types.html#structcyhal__quaddec__configurator__t", null ],
     [ "cyhal_rtc_t", "group__group__hal__impl__hw__types.html#structcyhal__rtc__t", null ],
     [ "cyhal_rtc_configurator_t", "group__group__hal__impl__hw__types.html#structcyhal__rtc__configurator__t", null ],
+    [ "cyhal_sdio_t", "group__group__hal__impl__hw__types.html#structcyhal__sdio__t", null ],
+    [ "cyhal_sdio_configurator_t", "group__group__hal__impl__hw__types.html#structcyhal__sdio__configurator__t", null ],
     [ "cyhal_spi_t", "group__group__hal__impl__hw__types.html#structcyhal__spi__t", null ],
     [ "cyhal_spi_configurator_t", "group__group__hal__impl__hw__types.html#structcyhal__spi__configurator__t", null ],
     [ "cyhal_t2timer_t", "group__group__hal__impl__hw__types.html#structcyhal__t2timer__t", null ],
@@ -74,9 +78,11 @@ var group__group__hal__impl__hw__types =
       [ "CYHAL_RSC_CLOCK", "group__group__hal__impl__hw__types.html#gga63b023ea7b5e73db59ddc0423c77975ba87c497b200dfbc0c5daf9617a89f4aa7", null ],
       [ "CYHAL_RSC_DMA", "group__group__hal__impl__hw__types.html#gga63b023ea7b5e73db59ddc0423c77975badd087e136a6661d42919ab8c145a395f", null ],
       [ "CYHAL_RSC_GPIO", "group__group__hal__impl__hw__types.html#gga63b023ea7b5e73db59ddc0423c77975ba5f4259788e0fc887772496df602d7549", null ],
-      [ "CYHAL_RSC_PDM", "group__group__hal__impl__hw__types.html#gga63b023ea7b5e73db59ddc0423c77975ba9123cdde61ea752aa7c362b3f9ca2814", null ],
+      [ "CYHAL_RSC_LPCOMP", "group__group__hal__impl__hw__types.html#gga63b023ea7b5e73db59ddc0423c77975ba66b3400d94288b89d49def6194537bbe", null ],
+      [ "CYHAL_RSC_PDMPCM", "group__group__hal__impl__hw__types.html#gga63b023ea7b5e73db59ddc0423c77975baa81c8326253424f51c6951a37637ccab", null ],
       [ "CYHAL_RSC_RTC", "group__group__hal__impl__hw__types.html#gga63b023ea7b5e73db59ddc0423c77975ba65ea21d45fd38e900113b40eb3849236", null ],
       [ "CYHAL_RSC_SCB", "group__group__hal__impl__hw__types.html#gga63b023ea7b5e73db59ddc0423c77975bac1349fcb893be326bcd28ed254bd7a80", null ],
+      [ "CYHAL_RSC_SDIO", "group__group__hal__impl__hw__types.html#gga63b023ea7b5e73db59ddc0423c77975ba75cc6f0b9d71432afb76ce8022dac301", null ],
       [ "CYHAL_RSC_TCPWM", "group__group__hal__impl__hw__types.html#gga63b023ea7b5e73db59ddc0423c77975baa445456a2983f23d4be55613f2d09eb6", null ],
       [ "CYHAL_RSC_TDM", "group__group__hal__impl__hw__types.html#gga63b023ea7b5e73db59ddc0423c77975ba4f5bf99fff8a2e7d669855fd7a86a4ed", null ],
       [ "CYHAL_RSC_T2TIMER", "group__group__hal__impl__hw__types.html#gga63b023ea7b5e73db59ddc0423c77975ba49df168e79a520fa20f02ffab9e72b28", null ],
