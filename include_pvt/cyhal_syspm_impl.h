@@ -81,7 +81,8 @@ typedef struct
 
 void _cyhal_syspm_register_peripheral_callback(cyhal_syspm_callback_data_t *callback_data);
 void _cyhal_syspm_unregister_peripheral_callback(cyhal_syspm_callback_data_t *callback_data);
-cy_rslt_t _cyhal_syspm_set_wakeup_source(cyhal_gpio_t pin, bool polarity, bool enable);
+cy_rslt_t _cyhal_syspm_set_gpio_wakeup_source(cyhal_gpio_t pin, bool polarity, bool enable);
+cy_rslt_t _cyhal_syspm_set_lpcomp_wakeup_source(cy_en_adccomp_lpcomp_id_t comp_ch, bool enable);
 /** \endcond */
 
 #if defined(__cplusplus)

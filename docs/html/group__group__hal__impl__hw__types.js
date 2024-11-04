@@ -10,7 +10,8 @@ var group__group__hal__impl__hw__types =
     [ "_cyhal_buffer_info_t", "group__group__hal__impl__hw__types.html#struct__cyhal__buffer__info__t", null ],
     [ "cyhal_sdio_buffer_t", "group__group__hal__impl__hw__types.html#structcyhal__sdio__buffer__t", [
       [ "rx_header", "group__group__hal__impl__hw__types.html#a243bbe70b74af8f35d61b6059596957c", null ],
-      [ "payload", "group__group__hal__impl__hw__types.html#a0d084aa9bbb9fc31269b56a1e4855706", null ]
+      [ "rx_payload", "group__group__hal__impl__hw__types.html#a9a622c86397186441745f45d06a15acc", null ],
+      [ "tx_payload", "group__group__hal__impl__hw__types.html#af325073a78b17a540706ea430ffaef8b", null ]
     ] ],
     [ "cyhal_tcpwm_t", "group__group__hal__impl__hw__types.html#structcyhal__tcpwm__t", null ],
     [ "cyhal_dma_t", "group__group__hal__impl__hw__types.html#structcyhal__dma__t", null ],

@@ -2,6 +2,11 @@
 The CAT5 Hardware Abstraction Layer (HAL) provides an implementation of the Hardware Abstraction Layer for the CYW55500/CYW55900 chip families. This API provides convenience methods for initializing and manipulating different hardware peripherals. Depending on the specific chip being used, not all features may be supported.
 
 ### What Changed?
+#### v1.1.0
+* Fixed documentation
+* Added KSO bit sleep support for SDIO
+* Enabled Low Power Mode in CYW55500 devices
+* Enabled Low Power Comparator (LPCOMP) wake-up handling
 #### v1.0.0
 * Initial release
 
@@ -10,11 +15,11 @@ This version of the CAT5 Hardware Abstraction Layer was validated for compatibil
 
 | Software and Tools                        | Version |
 | :---                                      | :----:  |
-| ModusToolbox™ Software Environment        | 3.1.0   |
+| ModusToolbox™ Software Environment        | 3.2.0   |
 | GCC Compiler                              | 11.3.1  |
 | ARM Compiler                              | 6.16    |
 
-Minimum required ModusToolbox™ Software Environment: v3.1.0
+Minimum required ModusToolbox™ Software Environment: v3.2.0
 
 ### More information
 Use the following links for more information, as needed:

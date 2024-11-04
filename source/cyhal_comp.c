@@ -30,6 +30,7 @@
 #include "cyhal_comp.h"
 #include "cyhal_hwmgr.h"
 #include "cyhal_system.h"
+#include "cyhal_syspm.h"
 #include "cyhal_analog_common.h"
 #include <string.h>
 
@@ -96,6 +97,31 @@ void _cyhal_comp_process_event(uint32_t intr)
             callback(obj->callback_data.callback_arg, CYHAL_COMP_RISING_EDGE);
         }
     }
+}
+
+static bool _cyhal_comp_pm_callback(cyhal_syspm_callback_state_t state, cyhal_syspm_callback_mode_t mode, void* callback_arg)
+{
+    CY_UNUSED_PARAMETER(state);
+    CY_UNUSED_PARAMETER(callback_arg);
+
+    switch(mode)
+    {
+        case CYHAL_SYSPM_BEFORE_TRANSITION:
+#if defined (CYW55900)
+            // Enable the LHL wake up since the COMP wake up is mapped on this
+            ctss_system_sleepEnableWakeSource(CTSS_SYSTEM_PMU_WAKE_SRC_LHL_IO);
+#endif //defined (CYW55900)
+            return true;
+        case CYHAL_SYSPM_AFTER_TRANSITION:
+#if defined (CYW55900)
+            // Disable the LHL wake up since the COMP wake up is mapped on this
+            ctss_system_sleepDisableWakeSource(CTSS_SYSTEM_PMU_WAKE_SRC_LHL_IO);
+#endif //defined (CYW55900)
+            return true;
+        default:
+            return true;
+    }
+
 }
 
 
@@ -280,6 +306,16 @@ cy_rslt_t cyhal_comp_init(cyhal_comp_t *obj, cyhal_gpio_t vin_p, cyhal_gpio_t vi
         result = _cyhal_comp_init_hw(obj, &comp_lp_config);
     }
 
+
+    obj->pm_callback.states = (cyhal_syspm_callback_state_t)(CYHAL_SYSPM_CB_CPU_SLEEP | CYHAL_SYSPM_CB_CPU_DEEPSLEEP | CYHAL_SYSPM_CB_SYSTEM_HIBERNATE);
+    obj->pm_callback.callback = &_cyhal_comp_pm_callback;
+    obj->pm_callback.next = NULL;
+    obj->pm_callback.args = NULL;
+    obj->pm_callback.ignore_modes = (cyhal_syspm_callback_mode_t)(0);
+#if (CYHAL_DRIVER_AVAILABLE_SYSPM)
+    _cyhal_syspm_register_peripheral_callback(&(obj->pm_callback));
+#endif /*  (CYHAL_DRIVER_AVAILABLE_SYSPM) */
+
     /* Free the resource in case of failure */
     if (result != CY_RSLT_SUCCESS)
     {
@@ -338,6 +374,10 @@ void cyhal_comp_free(cyhal_comp_t *obj)
 
     _cyhal_utils_release_if_used(&(obj->pin_vin_p));
     _cyhal_utils_release_if_used(&(obj->pin_vin_m));
+#if (CYHAL_DRIVER_AVAILABLE_SYSPM)
+    _cyhal_syspm_unregister_peripheral_callback(&(obj->pm_callback));
+#endif /*  (CYHAL_DRIVER_AVAILABLE_SYSPM) */
+
 }
 
 cy_rslt_t cyhal_comp_set_power(cyhal_comp_t *obj, cyhal_power_level_t power)
@@ -404,6 +444,9 @@ void cyhal_comp_enable_event(cyhal_comp_t *obj, cyhal_comp_event_t event, uint8_
     CY_UNUSED_PARAMETER(intr_priority);
     cy_en_adccomp_lpcomp_id_t comp_ch = _CYHAL_COMP_GET_CHANNEL(obj->resource.channel_num);
     uint32_t comp_intr = _CYHAL_COMP_GET_INTR(comp_ch);
+#if (CYHAL_DRIVER_AVAILABLE_SYSPM == 1)
+    (void)_cyhal_syspm_set_lpcomp_wakeup_source(comp_ch, enable);
+#endif
 
     if(enable)
     {

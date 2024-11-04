@@ -350,7 +350,7 @@ void cyhal_gpio_enable_event(cyhal_gpio_t pin, cyhal_gpio_event_t event, uint8_t
         btss_gpio_configInterrupt(btss_pin, trigger);
         btss_gpio_enableInterrupt(btss_pin, enable);
 #if (CYHAL_DRIVER_AVAILABLE_SYSPM == 1)
-        (void)_cyhal_syspm_set_wakeup_source(pin, ((event == CYHAL_GPIO_IRQ_RISE)? true : false), enable);
+        (void)_cyhal_syspm_set_gpio_wakeup_source(pin, ((event == CYHAL_GPIO_IRQ_RISE)? true : false), enable);
 #endif
     }
     else

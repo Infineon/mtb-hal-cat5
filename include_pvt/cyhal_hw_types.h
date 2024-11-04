@@ -166,7 +166,8 @@ typedef struct {
 typedef struct
 {
     uint8_t *rx_header;            //!< Represents the header of a received data packet
-    uint8_t *payload;               //!< Represents the payload of a received data packet
+    uint8_t *rx_payload;           //!< Represents the payload of a received data packet
+    uint8_t *tx_payload;           //!< Represents the payload of a transmitted data packet
 } cyhal_sdio_buffer_t;
 #endif
 
@@ -420,6 +421,7 @@ typedef struct {
     int16_t                             mode;
     cyhal_event_callback_data_t         callback_data;
     uint32_t                            user_enabled_events;
+    cyhal_syspm_callback_data_t         pm_callback;
 } cyhal_comp_t;
 
 /**

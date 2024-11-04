@@ -604,11 +604,10 @@ void cyhal_dma_enable_event(cyhal_dma_t *obj, cyhal_dma_event_t event, uint8_t i
     {
         cfg_reg.bitfields.tcIntMask = 1;
     }
-    //if ((event & err_mask) != 0UL)
-    // Potential ROM bug: errIntMask must always be 1 for transfers and interrupts to work
-    // When resolved, set this to only be 1 if the above commented out conditional is true
-    CY_UNUSED_PARAMETER(err_mask);
-    cfg_reg.bitfields.errIntMask = 1;
+    if ((event & err_mask) != 0UL)
+    {
+        cfg_reg.bitfields.errIntMask = 1;
+    }
 
     ctrl_reg.bitfields.intEnable = enable ? 1 : 0;
 

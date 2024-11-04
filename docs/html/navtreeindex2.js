@@ -15,8 +15,8 @@ var NAVTREEINDEX2 =
 "group__group__hal__impl__availability.html#gaa097ddb6e6636ab99420a10fd4d7f755":[1,3,2,1],
 "group__group__hal__impl__availability.html#gaa2d11bfc0756f86ab20e67b63440723a":[1,3,2,9],
 "group__group__hal__impl__availability.html#gaaa024446105f87484845a4037f81d7da":[1,3,2,28],
-"group__group__hal__impl__availability.html#gab2f352b52c9ab8d8bf868c217611f89f":[1,1,0],
 "group__group__hal__impl__availability.html#gab2f352b52c9ab8d8bf868c217611f89f":[1,3,2,42],
+"group__group__hal__impl__availability.html#gab2f352b52c9ab8d8bf868c217611f89f":[1,1,0],
 "group__group__hal__impl__availability.html#gab3a98cf6a3644b2069a9439764f4f021":[1,3,2,25],
 "group__group__hal__impl__availability.html#gab3ad3078832e573d10343b49bb98c504":[1,3,2,24],
 "group__group__hal__impl__availability.html#gab6ff6036bf3f1646f562f687d3341eaf":[1,3,2,6],
@@ -77,11 +77,12 @@ var NAVTREEINDEX2 =
 "group__group__hal__impl__dma.html#gae0f2109d4a20ba3ffa9ac7a416936a87":[1,3,1,20],
 "group__group__hal__impl__dma.html#gaf6b9f62f7ba9750ffa6cf7d466889cbf":[1,3,1,5],
 "group__group__hal__impl__hw__types.html":[1,3,3],
-"group__group__hal__impl__hw__types.html#a0d084aa9bbb9fc31269b56a1e4855706":[1,3,3,4,1],
 "group__group__hal__impl__hw__types.html#a243bbe70b74af8f35d61b6059596957c":[1,3,3,4,0],
 "group__group__hal__impl__hw__types.html#a4488a199114a86e5a72184c7a0a16c06":[1,3,3,1,2],
 "group__group__hal__impl__hw__types.html#a91895766b5f5efe1dfffac2d7537e73a":[1,3,3,1,1],
+"group__group__hal__impl__hw__types.html#a9a622c86397186441745f45d06a15acc":[1,3,3,4,1],
 "group__group__hal__impl__hw__types.html#ad111187a65d182386ea96858369b83d4":[1,3,3,1,0],
+"group__group__hal__impl__hw__types.html#af325073a78b17a540706ea430ffaef8b":[1,3,3,4,2],
 "group__group__hal__impl__hw__types.html#ga0feb1843e60080c101c7a35fe884fe73":[1,3,3,50],
 "group__group__hal__impl__hw__types.html#ga1968e793be1599de10dec9e2d48f66d6":[1,3,3,53],
 "group__group__hal__impl__hw__types.html#ga4748ddbae8e13f9fe60b189349e3cdbd":[1,3,3,51],
@@ -248,6 +249,5 @@ var NAVTREEINDEX2 =
 "group__group__hal__ipc.html#gae2d8d3b44af0d4f2ed88614de5362bb4":[1,2,12,8],
 "group__group__hal__ipc.html#gaeb3c9ad4caa2220aad9cdcea180b247c":[1,2,12,11],
 "group__group__hal__ipc.html#gafc143166a726ce930ed50e31bbb5cccc":[1,2,12,2],
-"group__group__hal__ipc.html#gafc5f675378d6ed1ff7b2194defea4744":[1,2,12,4],
-"group__group__hal__ipc.html#gafdb349be3166a4468214a10f8c031e83":[1,2,12,10]
+"group__group__hal__ipc.html#gafc5f675378d6ed1ff7b2194defea4744":[1,2,12,4]
 };

@@ -1,5 +1,6 @@
 var NAVTREEINDEX8 =
 {
+"group__group__hal__tolerance.html#gaef8a71ce6c678434294b31c467ff0bad":[1,2,1,1,0],
 "group__group__hal__tolerance.html#gaef8a71ce6c678434294b31c467ff0bad":[1,0,1,2,1,0],
 "group__group__hal__types.html":[1,0],
 "group__group__hal__types__implementation.html":[1,0,3],

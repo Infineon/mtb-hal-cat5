@@ -194,7 +194,7 @@ extern "C" {
 #define SDIO_F2_FRAME_MAX_PAYLOAD                       (SDIO_F2_FRAME_MAX_LENGTH - sizeof(sdiod_f2_frame_hdr_t))
 /** DMA Buffer size for SDIO */
 #define SDIO_F2_DMA_BUFFER_SIZE                            \
-    (sizeof(sdiod_dma_descs_buf_t) + sizeof(sdiod_f2_rx_frame_hdr_t) + SDIO_F2_FRAME_MAX_PAYLOAD)
+    (sizeof(sdiod_dma_descs_buf_t) + sizeof(sdiod_f2_rx_frame_hdr_t) + (2 * SDIO_F2_FRAME_MAX_PAYLOAD))
 #endif
 /*******************************************************************************
 *       Common Enumerations

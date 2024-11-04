@@ -120,18 +120,35 @@ static bool _cyhal_sdio_syspm_callback(cyhal_syspm_callback_state_t state, cyhal
         {
             case CYHAL_SYSPM_CHECK_READY:
             {
-                sdio->pm_transition_pending = !cyhal_sdio_is_busy(sdio);
+                if(!(cyhal_sdio_is_busy(sdio)))
+                {
+                    /* if device is not busy the sleepCSR is checked to decide if sleep is allowed */
+                    sdio->pm_transition_pending = (SDIOD_STATUS_SUCCESS == sdiod_IsSleepAllowed()) ? true : false;
+                }
+                else
+                {
+                    sdio->pm_transition_pending = false;
+                }
                 allow = sdio->pm_transition_pending;
                 break;
             }
 
             case CYHAL_SYSPM_BEFORE_TRANSITION:
+            {
+                (void)sdiod_preSleep();
+                break;
+            }
+
             case CYHAL_SYSPM_AFTER_DS_WFI_TRANSITION:
             {
                 break;
             }
 
             case CYHAL_SYSPM_AFTER_TRANSITION:
+            {
+                (void)sdiod_postSleep();
+                break;
+            }
             case CYHAL_SYSPM_CHECK_FAIL:
             {
                 sdio->pm_transition_pending = false;
@@ -331,7 +348,8 @@ cy_rslt_t cyhal_sdio_configure(cyhal_sdio_t *obj, const cyhal_sdio_cfg_t *config
                 thread_ap_sec_hw_openDeviceAccess(SEC_HW_DEVICE_SDIO, (uint8_t*)_cyhal_sdio_dma_desc, SDIO_F2_DMA_BUFFER_SIZE, 0);
 
                 obj->buffer.rx_header = (uint8_t*)_cyhal_sdio_dma_desc + sizeof(sdiod_dma_descs_buf_t);
-                obj->buffer.payload = obj->buffer.rx_header + sizeof(sdiod_f2_rx_frame_hdr_t);
+                obj->buffer.rx_payload = obj->buffer.rx_header + sizeof(sdiod_f2_rx_frame_hdr_t);
+                obj->buffer.tx_payload = obj->buffer.rx_payload + SDIO_F2_FRAME_MAX_PAYLOAD;
             }
             obj->hw_inited = (result == CY_RSLT_SUCCESS);
         }

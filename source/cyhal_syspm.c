@@ -39,6 +39,9 @@
 #include "cy_utils.h"
 #include "wiced_sleep.h"
 #include "cyhal_syspm_impl.h"
+// This is included to allow the user to control the idle task behavior via the configurator
+// Power->MCU-> Idle Power Mode Config.
+#include "cybsp.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -310,7 +313,7 @@ void _cyhal_syspm_post_sleep_cback (BTSS_SYSTEM_PMU_SLEEP_MODE_t sleep_state)
 
 }
 
-cy_rslt_t _cyhal_syspm_set_wakeup_source(cyhal_gpio_t pin, bool polarity, bool enable)
+cy_rslt_t _cyhal_syspm_set_gpio_wakeup_source(cyhal_gpio_t pin, bool polarity, bool enable)
 {
     bool pdl_status = false;
     for (uint8_t pin_idx = 0; pin_idx < (sizeof(_cyhal_gpio_map_wakeup_src)/sizeof(_cyhal_gpio_map_wakeup_src[0])); pin_idx++)
@@ -332,6 +335,20 @@ cy_rslt_t _cyhal_syspm_set_wakeup_source(cyhal_gpio_t pin, bool polarity, bool e
     }
 
     return (pdl_status) ? CY_RSLT_SUCCESS : CYHAL_SYSPM_RSLT_BAD_ARGUMENT;
+}
+
+cy_rslt_t _cyhal_syspm_set_lpcomp_wakeup_source(cy_en_adccomp_lpcomp_id_t comp_ch, bool enable)
+{
+    if (enable)
+    {
+        Cy_ADCCOMP_LPCOMP_EnableWakeConfig(comp_ch);
+    }
+    else
+    {
+        Cy_ADCCOMP_LPCOMP_DisableWakeConfig(comp_ch);
+    }
+
+    return CY_RSLT_SUCCESS;
 }
 
 /*******************************************************************************
@@ -360,14 +377,14 @@ cy_rslt_t cyhal_syspm_init(void)
 
     if (CY_RSLT_SUCCESS == status)
     {
-#if defined(COMPONENT_55500A1)
-        // CYW55500A1 requires sleep mode to be locked at startup
-        cyhal_syspm_lock_deepsleep();
+        /* Set sleep mode */
+#if defined(CY_CFG_PMU_SLEEP_MODE)
+        pdl_status = btss_system_sleepAllowMode(CY_CFG_PMU_SLEEP_MODE);
 #else
-        /* Set default sleep mode as PDS allowed  */
+        /* Set sleep mode to PDS if not configured */
         pdl_status = btss_system_sleepAllowMode(BTSS_SYSTEM_PMU_SLEEP_PDS);
+#endif // defined(CY_CFG_PMU_SLEEP_MODE)
         status = (pdl_status) ? CY_RSLT_SUCCESS : CYHAL_SYSPM_RSLT_INIT_ERROR;
-#endif
     }
 
     if (CY_RSLT_SUCCESS == status)
@@ -451,8 +468,13 @@ void cyhal_syspm_unlock_deepsleep(void)
         /* Set sleep mode as Allowed Hibernate */
         (void)btss_system_sleepAllowMode(BTSS_SYSTEM_PMU_SLEEP_EPDS);
 #else
-        /* Set sleep mode as Allowed Deepsleep */
+        /* Set sleep mode */
+#if defined(CY_CFG_PMU_SLEEP_MODE)
+        (void)btss_system_sleepAllowMode(CY_CFG_PMU_SLEEP_MODE);
+#else
+        /* Set sleep mode to PDS if not configured */
         (void)btss_system_sleepAllowMode(BTSS_SYSTEM_PMU_SLEEP_PDS);
+#endif // defined(CY_CFG_PMU_SLEEP_MODE)
 #endif
     }
     cyhal_system_critical_section_exit(intr_status);
