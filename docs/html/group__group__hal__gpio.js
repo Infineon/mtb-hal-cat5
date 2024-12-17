@@ -13,7 +13,9 @@ var group__group__hal__gpio =
       [ "CYHAL_GPIO_IRQ_NONE", "group__group__hal__gpio.html#ggaa18cb21d1ea9d64311a7c8ddc6a27656aa7946bc42b986d4739a0917d156daa96", null ],
       [ "CYHAL_GPIO_IRQ_RISE", "group__group__hal__gpio.html#ggaa18cb21d1ea9d64311a7c8ddc6a27656a4e34bdb4db6023a4c502c29e2b435096", null ],
       [ "CYHAL_GPIO_IRQ_FALL", "group__group__hal__gpio.html#ggaa18cb21d1ea9d64311a7c8ddc6a27656a25be17b1b49dff67ca628b9fe6ae38f7", null ],
-      [ "CYHAL_GPIO_IRQ_BOTH", "group__group__hal__gpio.html#ggaa18cb21d1ea9d64311a7c8ddc6a27656a966472a025b6099a9c758c22975ab8d7", null ]
+      [ "CYHAL_GPIO_IRQ_BOTH", "group__group__hal__gpio.html#ggaa18cb21d1ea9d64311a7c8ddc6a27656a966472a025b6099a9c758c22975ab8d7", null ],
+      [ "CYHAL_GPIO_IRQ_HIGH", "group__group__hal__gpio.html#ggaa18cb21d1ea9d64311a7c8ddc6a27656a446fe90f1ba4455b54c1a33c013140e5", null ],
+      [ "CYHAL_GPIO_IRQ_LOW", "group__group__hal__gpio.html#ggaa18cb21d1ea9d64311a7c8ddc6a27656a24569aceae88654f650fa97593bfd0de", null ]
     ] ],
     [ "cyhal_gpio_direction_t", "group__group__hal__gpio.html#ga54f023b4b455556095b64f4f5d7e3446", [
       [ "CYHAL_GPIO_DIR_INPUT", "group__group__hal__gpio.html#gga54f023b4b455556095b64f4f5d7e3446a0b8ce046272e1971aea1248bd86f2698", null ],

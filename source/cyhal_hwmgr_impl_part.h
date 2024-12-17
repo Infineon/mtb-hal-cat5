@@ -38,7 +38,11 @@
 #define CY_BLOCK_COUNT_DMA          (1)
 #define CY_CHANNEL_COUNT_DMA        (8)
 #define CY_BLOCK_COUNT_GPIO         (2)
+#if defined (CYW55900)
+#define CY_CHANNEL_COUNT_GPIO       (65 + 1) // 65 allocatable, 1 ADC
+#else
 #define CY_CHANNEL_COUNT_GPIO       (42 + 7) // 42 allocatable, 6 SDIO, 1 ADC
+#endif // defined (CYW55900)
 #define CY_BLOCK_COUNT_LPCOMP       (1)
 #define CY_CHANNEL_COUNT_LPCOMP     (2)
 #define CY_BLOCK_COUNT_PDMPCM       (1)
@@ -104,7 +108,12 @@ static const _cyhal_hwmgr_offset_t cyhal_block_offsets_dma[CY_BLOCK_COUNT_DMA] =
 
 static const _cyhal_hwmgr_offset_t cyhal_block_offsets_gpio[CY_BLOCK_COUNT_GPIO] =
 {
-    0, 42
+    0,
+#if defined (CYW55900)
+    65
+#else
+    42
+#endif // defined (CYW55900)
 };
 
 static const _cyhal_hwmgr_offset_t cyhal_block_offsets_lpcomp[CY_BLOCK_COUNT_LPCOMP] =

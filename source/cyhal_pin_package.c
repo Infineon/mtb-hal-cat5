@@ -76,9 +76,13 @@ const cyhal_resource_pin_mapping_t cyhal_pin_map_dmic_dq[2] = {
 };
 
 /////////////////////////////////////////////// GPIO ////////////////////////////////////////////////
-/* Connections for: sw_gpio */
-const cyhal_resource_pin_mapping_t cyhal_pin_map_sw_gpio[49] = {
-    {0, BT_GPIO_0, BT_GPIO_0, FUNC_GPIO_0},
+/* Connections for: sw_gpio clustered */
+#if defined (CYW55900)
+const cyhal_resource_pin_mapping_t cyhal_pin_map_sw_gpio[3][65] = {
+#else
+const cyhal_resource_pin_mapping_t cyhal_pin_map_sw_gpio[1][49] = {
+#endif // defined (CYW55900)
+   {{0, BT_GPIO_0, BT_GPIO_0, FUNC_GPIO_0},
     {0, BT_GPIO_2, BT_GPIO_2, FUNC_GPIO_2},
     {0, BT_GPIO_3, BT_GPIO_3, FUNC_GPIO_3},
     {0, BT_GPIO_4, BT_GPIO_4, FUNC_GPIO_4},
@@ -125,7 +129,27 @@ const cyhal_resource_pin_mapping_t cyhal_pin_map_sw_gpio[49] = {
     {0, TDM2_MCK, TDM2_MCK, FUNC_A_GPIO_1}, // shared
     {0, TDM2_MCK, TDM2_MCK, FUNC_A_GPIO_7}, // shared
     {0, TDM2_DO, TDM2_DO, FUNC_GPIO_7},
-    {0, TDM2_WS, TDM2_WS, FUNC_A_GPIO_7}
+    {0, TDM2_WS, TDM2_WS, FUNC_A_GPIO_7}}
+#if defined (CYW55900)
+   ,
+   {{0, LHL_GPIO_0, LHL_GPIO_0, FUNC_LHL_IO_0},
+    {0, LHL_GPIO_1, LHL_GPIO_1, FUNC_LHL_IO_1},
+    {0, LHL_GPIO_10, LHL_GPIO_10, FUNC_LHL_IO_10}}
+   ,
+    {{0, WL_GPIO_0, WL_GPIO_0, FUNC_WL_GPIO_0_GPIO},
+    {0, WL_GPIO_2, WL_GPIO_2, FUNC_WL_GPIO_2_GPIO},
+    {0, WL_GPIO_3, WL_GPIO_3, FUNC_WL_GPIO_3_GPIO},
+    {0, WL_GPIO_4, WL_GPIO_4, FUNC_WL_GPIO_4_GPIO},
+    {0, WL_GPIO_5, WL_GPIO_5, FUNC_WL_GPIO_5_GPIO},
+    {0, WL_GPIO_6, WL_GPIO_6, FUNC_WL_GPIO_6_GPIO},
+    {0, SDIO_CMD, SDIO_CMD, FUNC_SDIO_CMD_GPIO},
+    {0, SDIO_DATA_0, SDIO_DATA_0, FUNC_SDIO_DATA_0_GPIO},
+    {0, SDIO_DATA_1, SDIO_DATA_1, FUNC_SDIO_DATA_1_GPIO},
+    {0, SDIO_DATA_2, SDIO_DATA_2, FUNC_SDIO_DATA_2_GPIO},
+    {0, SDIO_DATA_3, SDIO_DATA_3, FUNC_SDIO_DATA_3_GPIO},
+    {0, RFSW_CTRL_6, RFSW_CTRL_6, FUNC_RFSW_CTRL_6_GPIO},
+    {0, RFSW_CTRL_7, RFSW_CTRL_7, FUNC_RFSW_CTRL_7_GPIO}}
+#endif // defined (CYW55900)
 };
 
 /////////////////////////////////////////////// PCM ////////////////////////////////////////////////

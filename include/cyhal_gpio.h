@@ -130,6 +130,10 @@ typedef enum
     CYHAL_GPIO_IRQ_RISE = 1 << 0,                                       /**< Interrupt on rising edge */
     CYHAL_GPIO_IRQ_FALL = 1 << 1,                                       /**< Interrupt on falling edge */
     CYHAL_GPIO_IRQ_BOTH = (CYHAL_GPIO_IRQ_RISE | CYHAL_GPIO_IRQ_FALL),  /**< Interrupt on both rising and falling edges */
+#if defined (CYW55900)
+    CYHAL_GPIO_IRQ_HIGH = 1 << 2,                                       /**< Interrupt on high level */
+    CYHAL_GPIO_IRQ_LOW  = 1 << 3,                                       /**< Interrupt on low level */
+#endif // defined (CYW55900)
 } cyhal_gpio_event_t;
 
 /** Pin direction */
@@ -207,9 +211,9 @@ void cyhal_gpio_free(cyhal_gpio_t pin);
 /** Configure the GPIO pin <br>
  * See \ref subsection_gpio_snippet_3.
  *
- * @param[in] pin          The GPIO pin
- * @param[in] direction    The pin direction
- * @param[in] drive_mode   The pin drive mode
+ * @param[in] pin           The GPIO pin
+ * @param[in] direction     The pin direction
+ * @param[in] drive_mode    The pin drive mode
  *
  * @return The status of the configure request
  */

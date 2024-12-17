@@ -298,7 +298,7 @@ static cy_rslt_t _cyhal_qspi_check_pin_and_reserve(const cyhal_resource_pin_mapp
     #if (_CYHAL_QSPI_OWNS_GPIO_CTL)
         result = _cyhal_qspi_connect_pin(mapping, drive_mode);
     #else
-        result = cyhal_connect_pin(mapping, drive_mode);
+        result = cyhal_connect_pin(mapping, (uint32_t)drive_mode);
     #endif /* (_CYHAL_QSPI_OWNS_GPIO_CTL) */
 #endif
     return result;

@@ -29,6 +29,8 @@
 
 #pragma once
 
+#include "cyhal.h"
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
@@ -73,7 +75,7 @@ typedef struct
 {
     BTSS_SYSTEM_SLEEP_PMU_WAKE_SRC_t    wakeup_src;     //!< Wake-up source associated to the pin
     cyhal_gpio_t                        pin;            //!< The GPIO pin
-} _cyhal_wakeup_src_pin_mapping_t;
+} _cyhal_wakeup_src_btss_pin_mapping_t;
 
 /*******************************************************************************
 *       Functions
@@ -81,7 +83,7 @@ typedef struct
 
 void _cyhal_syspm_register_peripheral_callback(cyhal_syspm_callback_data_t *callback_data);
 void _cyhal_syspm_unregister_peripheral_callback(cyhal_syspm_callback_data_t *callback_data);
-cy_rslt_t _cyhal_syspm_set_gpio_wakeup_source(cyhal_gpio_t pin, bool polarity, bool enable);
+cy_rslt_t _cyhal_syspm_set_gpio_wakeup_source(cyhal_gpio_t pin, cyhal_gpio_event_t event, bool enable);
 cy_rslt_t _cyhal_syspm_set_lpcomp_wakeup_source(cy_en_adccomp_lpcomp_id_t comp_ch, bool enable);
 /** \endcond */
 

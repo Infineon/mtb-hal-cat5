@@ -98,10 +98,10 @@ extern "C" {
  * @param[in] drive_mode      The drive mode to use for the pin
  * @return The status of the connect request
  */
-cy_rslt_t cyhal_connect_pin(const cyhal_resource_pin_mapping_t *pin_connection, uint8_t drive_mode);
+cy_rslt_t cyhal_connect_pin(const cyhal_resource_pin_mapping_t *pin_connection, uint32_t drive_mode);
 
 /** Disconnect a peripheral from a pin. This will also reset the pin's drive mode to High-Z.
- * @param[in] pin The pin to be disconnected
+ * @param[in] pin  The pin to be disconnected
  * @return The status of the disconnect request
  */
 cy_rslt_t cyhal_disconnect_pin(cyhal_gpio_t pin);

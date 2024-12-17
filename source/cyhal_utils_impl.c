@@ -189,7 +189,7 @@ cy_rslt_t _cyhal_utils_reserve_and_connect(const cyhal_resource_pin_mapping_t *m
     cy_rslt_t status = cyhal_hwmgr_reserve(&pinRsc);
     if (CY_RSLT_SUCCESS == status)
     {
-        status = cyhal_connect_pin(mapping, drive_mode);
+        status = cyhal_connect_pin(mapping, (uint32_t)drive_mode);
         if (CY_RSLT_SUCCESS != status)
         {
             cyhal_hwmgr_free(&pinRsc);

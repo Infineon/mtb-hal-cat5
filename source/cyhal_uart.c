@@ -1141,7 +1141,7 @@ cy_rslt_t cyhal_uart_enable_flow_control(cyhal_uart_t *obj, bool enable_cts, boo
             }
             else
             {
-                result = cyhal_connect_pin(cts_map, (uint8_t)CYHAL_PIN_MAP_DRIVE_MODE_SCB_UART_CTS);
+                result = cyhal_connect_pin(cts_map, (uint32_t)CYHAL_PIN_MAP_DRIVE_MODE_SCB_UART_CTS);
             }
             if (CY_RSLT_SUCCESS == result)
             {
@@ -1178,7 +1178,7 @@ cy_rslt_t cyhal_uart_enable_flow_control(cyhal_uart_t *obj, bool enable_cts, boo
             }
             else
             {
-                result = cyhal_connect_pin(rts_map, (uint8_t)CYHAL_PIN_MAP_DRIVE_MODE_SCB_UART_RTS);
+                result = cyhal_connect_pin(rts_map, (uint32_t)CYHAL_PIN_MAP_DRIVE_MODE_SCB_UART_RTS);
             }
             obj->rts_enabled = (CY_RSLT_SUCCESS == result);
         }

@@ -40,12 +40,20 @@
 extern "C" {
 #endif /* __cplusplus */
 
+/** Definitions for all of the pins clusters */
+typedef enum
+{
+    CYHAL_GPIO_CLUSTER_BTSS = 0, //!< BTSS cluster
+    CYHAL_GPIO_CLUSTER_CTSS = 1, //!< CTSS cluster
+    CYHAL_GPIO_CLUSTER_WLSS = 2  //!< WLSS cluster
+} cyhal_gpio_cluster_t;
+
 /** Definitions for all of the pins that are bonded out on in the package */
 typedef enum
 {
     NC = 0xFF, //!< No Connect/Invalid Pin
     HSIOM_SEL_GPIO =  NC, //!< BWC with PSoC for LPM transitions
-
+    /* BTSS GPIOs */
     BT_GPIO_BASE = 0u, //!< Start of reconfigurable pins
     BT_GPIO_0  = 0u, //!< BT General Purpose I/O 0
     BT_GPIO_2  = 1u, //!< BT General Purpose I/O 2
@@ -90,7 +98,37 @@ typedef enum
     TDM2_DO  = 40u, //!< TDM1 Data Output
     TDM2_WS  = 41u, //!< TDM2 WS
     BT_GPIO_LAST, //!< End of reconfigurable pins
-
+#if defined (CYW55900)
+    /* CTSS GPIOs */
+    LHL_GPIO_0  = BT_GPIO_LAST, //!< LHL General Purpose I/O 0
+    LHL_GPIO_1  = 43u, //!< LHL General Purpose I/O 1
+    LHL_GPIO_10  = 44u, //!< LHL General Purpose I/O 1
+    CTSS_GPIO_LAST, //!< End of reconfigurable pins
+    /* WLSS GPIOs */
+    WL_GPIO_0 = CTSS_GPIO_LAST, //!< WLAN General Purpose I/O 0
+    WL_GPIO_2 = 46, //!< WLAN General Purpose I/O 0
+    WL_GPIO_3 = 47, //!< WLAN General Purpose I/O 0
+    WL_GPIO_4 = 48, //!< WLAN General Purpose I/O 0
+    WL_GPIO_5 = 49, //!< WLAN General Purpose I/O 0
+    WL_GPIO_6 = 50, //!< WLAN General Purpose I/O 0
+    SDIO_CLK = 51, //!< SDIO Clock I/O
+    SDIO_CMD = 52, //!< SDIO Command I/O
+    SDIO_DATA_0 = 53, //!< SDIO Data 0 I/O
+    SDIO_DATA_1 = 54, //!< SDIO Data 1 I/O
+    SDIO_DATA_2 = 55, //!< SDIO Data 2 I/O
+    SDIO_DATA_3 = 56, //!< SDIO Data 3 I/O
+    RFSW_CTRL_0 = 57,
+    RFSW_CTRL_1 = 58,
+    RFSW_CTRL_2 = 59,
+    RFSW_CTRL_3 = 60,
+    RFSW_CTRL_4 = 61,
+    RFSW_CTRL_5 = 62,
+    RFSW_CTRL_6 = 63,
+    RFSW_CTRL_7 = 64,
+    WLSS_GPIO_LAST,
+    DIRECT_BASE = WLSS_GPIO_LAST, //!< Start of direct connection pins
+    MIC_P = WLSS_GPIO_LAST //!< External Microphone
+#else
     DIRECT_BASE = 50, //!< Start of direct connection pins
     MIC_P = 50,
     SDIO_DATA_0 = 51,
@@ -99,10 +137,12 @@ typedef enum
     SDIO_DATA_3 = 54,
     SDIO_CLK = 55,
     SDIO_CMD = 56
+#endif // defined (CYW55900)
 } cyhal_gpio_t;
 
 /** Pin mux connections */
-typedef BTSS_PINMUX_FUNC_LIST_t cyhal_pinmux_t;
+/** Type is void to include BTSS, CTSS and WLSS data types */
+typedef uint8_t cyhal_pinmux_t;
 
 /** Map for compatibility with PSoC drivers */
 typedef cyhal_pinmux_t en_hsiom_sel_t;
@@ -173,7 +213,11 @@ extern const cyhal_resource_pin_mapping_t cyhal_pin_map_lpcomp_inn_comp[4];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_mic_p[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_dmic_ck[2];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_dmic_dq[2];
-extern const cyhal_resource_pin_mapping_t cyhal_pin_map_sw_gpio[49];
+#if defined (CYW55900)
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_sw_gpio[3][65];
+#else
+extern const cyhal_resource_pin_mapping_t cyhal_pin_map_sw_gpio[1][49];
+#endif // defined (CYW55900)
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_pcm_in[1];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_i2c_scl[8];
 extern const cyhal_resource_pin_mapping_t cyhal_pin_map_scb_i2c_sda[8];

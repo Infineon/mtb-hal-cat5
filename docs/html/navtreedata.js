@@ -45,13 +45,14 @@ var NAVTREEINDEX =
 [
 "group__group__hal.html",
 "group__group__hal__gpio.html#adf08cc4c443eb36d53cc943ddd1447a4",
-"group__group__hal__impl__availability.html#ga5a2601a3ad02e25fcca8f9c4ff5179c9",
-"group__group__hal__ipc.html#gafdb349be3166a4468214a10f8c031e83",
-"group__group__hal__results.html#gga84f32ecb6376e2088d4f048e35f52005a48c873ac3890a78ae0379e725396c607",
-"group__group__hal__results__i2s.html#gaa4210798171fa0699b5c7a57618810ea",
-"group__group__hal__results__syspm.html#ga1da0dd0a239743cd61288baf0fd2528d",
-"group__group__hal__syspm.html#ga3568214a6038240239f99768fe6707d6",
-"group__group__hal__tolerance.html#gaef8a71ce6c678434294b31c467ff0bad"
+"group__group__hal__impl__availability.html#ga34d490d013103cd54a492df567f16ad7",
+"group__group__hal__ipc.html#a46f91555597b6fc3c302d73c197275fe",
+"group__group__hal__results.html#ga974cbda9432769133f8ede7c44a930b4",
+"group__group__hal__results__i2c.html#gaada2d114bcc08622172e7cfdbd1454a5",
+"group__group__hal__results__spi.html#ga9be0aaa5888dea007b9080f8e6508761",
+"group__group__hal__syspm.html#a0a5827d8c4bb7f81086fdfc02a2e5067",
+"group__group__hal__timer.html#gga39a171d6680fe30685a6e27a333db8e9a3b6afa3bcff5af8b040f479eda3aaf35",
+"index.html#autotoc_md5"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

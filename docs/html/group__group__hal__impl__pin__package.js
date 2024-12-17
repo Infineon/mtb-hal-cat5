@@ -6,8 +6,13 @@ var group__group__hal__impl__pin__package =
       [ "pin", "group__group__hal__impl__pin__package.html#a61f6033fdaae54a06ac8e63656b2a37a", null ],
       [ "functionality", "group__group__hal__impl__pin__package.html#a3ca56a30f007a998614d18160f2d01d2", null ]
     ] ],
-    [ "cyhal_pinmux_t", "group__group__hal__impl__pin__package.html#gaffcf328b48424a0d3757867ac439775d", null ],
+    [ "cyhal_pinmux_t", "group__group__hal__impl__pin__package.html#gab3d551eccf36469f1e5087435e536506", null ],
     [ "en_hsiom_sel_t", "group__group__hal__impl__pin__package.html#ga1d46b85bc0d7b31b99a029a5f6566b3e", null ],
+    [ "cyhal_gpio_cluster_t", "group__group__hal__impl__pin__package.html#ga9cb90d30bccb74abe1088d98fd6c6f3a", [
+      [ "CYHAL_GPIO_CLUSTER_BTSS", "group__group__hal__impl__pin__package.html#gga9cb90d30bccb74abe1088d98fd6c6f3aa26053a79924d0395c5f3586532856db7", null ],
+      [ "CYHAL_GPIO_CLUSTER_CTSS", "group__group__hal__impl__pin__package.html#gga9cb90d30bccb74abe1088d98fd6c6f3aaaa495f7864d68f4e87dc6f9dc5417b0c", null ],
+      [ "CYHAL_GPIO_CLUSTER_WLSS", "group__group__hal__impl__pin__package.html#gga9cb90d30bccb74abe1088d98fd6c6f3aa536bf1b9f13e705544396cd99977e055", null ]
+    ] ],
     [ "cyhal_gpio_t", "group__group__hal__impl__pin__package.html#gadbe9168dec346c75fc33b7fedb4d57aa", [
       [ "NC", "group__group__hal__impl__pin__package.html#ggadbe9168dec346c75fc33b7fedb4d57aaa3dbd1016ea99d087d747530418b89a01", null ],
       [ "HSIOM_SEL_GPIO", "group__group__hal__impl__pin__package.html#ggadbe9168dec346c75fc33b7fedb4d57aaa0ce6289da2464b412933a84aaecfef54", null ],
@@ -55,6 +60,23 @@ var group__group__hal__impl__pin__package =
       [ "TDM2_DO", "group__group__hal__impl__pin__package.html#ggadbe9168dec346c75fc33b7fedb4d57aaa74b8a63da463634d89eb311400891139", null ],
       [ "TDM2_WS", "group__group__hal__impl__pin__package.html#ggadbe9168dec346c75fc33b7fedb4d57aaaf64380e7e19e571c924fc31ee2819682", null ],
       [ "BT_GPIO_LAST", "group__group__hal__impl__pin__package.html#ggadbe9168dec346c75fc33b7fedb4d57aaa4499a70d470aa48f7ff719e0db2d601b", null ],
-      [ "DIRECT_BASE", "group__group__hal__impl__pin__package.html#ggadbe9168dec346c75fc33b7fedb4d57aaa16a609471c5a8a5d14734e02bb1e734a", null ]
+      [ "LHL_GPIO_0", "group__group__hal__impl__pin__package.html#ggadbe9168dec346c75fc33b7fedb4d57aaa29782e406d172dd722b701052345eef6", null ],
+      [ "LHL_GPIO_1", "group__group__hal__impl__pin__package.html#ggadbe9168dec346c75fc33b7fedb4d57aaa54097384da0f096f47919d401135a29c", null ],
+      [ "LHL_GPIO_10", "group__group__hal__impl__pin__package.html#ggadbe9168dec346c75fc33b7fedb4d57aaaefad112d731509ce555745f3253addc2", null ],
+      [ "CTSS_GPIO_LAST", "group__group__hal__impl__pin__package.html#ggadbe9168dec346c75fc33b7fedb4d57aaa6e0d082d48f0dc55aefa3c9e84a1e3d8", null ],
+      [ "WL_GPIO_0", "group__group__hal__impl__pin__package.html#ggadbe9168dec346c75fc33b7fedb4d57aaa5fff60fe2cc466b75a9c7a4dc022d72c", null ],
+      [ "WL_GPIO_2", "group__group__hal__impl__pin__package.html#ggadbe9168dec346c75fc33b7fedb4d57aaa4b5a278ae5f45524ae8f54195512f778", null ],
+      [ "WL_GPIO_3", "group__group__hal__impl__pin__package.html#ggadbe9168dec346c75fc33b7fedb4d57aaacb296e9252feda41998b2440206e1676", null ],
+      [ "WL_GPIO_4", "group__group__hal__impl__pin__package.html#ggadbe9168dec346c75fc33b7fedb4d57aaae63be51a6b5f20dcd3751eb730bdf500", null ],
+      [ "WL_GPIO_5", "group__group__hal__impl__pin__package.html#ggadbe9168dec346c75fc33b7fedb4d57aaa66e03d0cb5a42c1b2cd68c59cec3b4be", null ],
+      [ "WL_GPIO_6", "group__group__hal__impl__pin__package.html#ggadbe9168dec346c75fc33b7fedb4d57aaaf0cc73964f187d8cbac3726eac325e74", null ],
+      [ "SDIO_CLK", "group__group__hal__impl__pin__package.html#ggadbe9168dec346c75fc33b7fedb4d57aaa78832adf3657180d9b268e6579e569ca", null ],
+      [ "SDIO_CMD", "group__group__hal__impl__pin__package.html#ggadbe9168dec346c75fc33b7fedb4d57aaa9893f224adcbad20aa0c0c2f4c49c858", null ],
+      [ "SDIO_DATA_0", "group__group__hal__impl__pin__package.html#ggadbe9168dec346c75fc33b7fedb4d57aaafd198ece7f0ee026757e36a521f39b48", null ],
+      [ "SDIO_DATA_1", "group__group__hal__impl__pin__package.html#ggadbe9168dec346c75fc33b7fedb4d57aaa3fd32a406559e878fcc38f7f9b112815", null ],
+      [ "SDIO_DATA_2", "group__group__hal__impl__pin__package.html#ggadbe9168dec346c75fc33b7fedb4d57aaab73dffe2d1dfa89a025d56c542f95cd2", null ],
+      [ "SDIO_DATA_3", "group__group__hal__impl__pin__package.html#ggadbe9168dec346c75fc33b7fedb4d57aaa928f5c2a47888010763253dde6b72992", null ],
+      [ "DIRECT_BASE", "group__group__hal__impl__pin__package.html#ggadbe9168dec346c75fc33b7fedb4d57aaa16a609471c5a8a5d14734e02bb1e734a", null ],
+      [ "MIC_P", "group__group__hal__impl__pin__package.html#ggadbe9168dec346c75fc33b7fedb4d57aaadff315b35cebaef45d771a016e894469", null ]
     ] ]
 ];

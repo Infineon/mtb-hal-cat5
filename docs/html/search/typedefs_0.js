@@ -33,7 +33,7 @@ var searchData=
   ['cyhal_5fnvm_5ft_30',['cyhal_nvm_t',['../group__group__hal__types__implementation.html#ga01f4f1796d911a3d8750a962467f10c0',1,'cyhal_hw_types_template.h']]],
   ['cyhal_5fopamp_5ft_31',['cyhal_opamp_t',['../group__group__hal__types__implementation.html#gad67e8f567b5d54aa35511a1bddb371d9',1,'cyhal_hw_types_template.h']]],
   ['cyhal_5fpdm_5fpcm_5fevent_5fcallback_5ft_32',['cyhal_pdm_pcm_event_callback_t',['../group__group__hal__pdmpcm.html#gac01795c2aaebf0b8c73bb6d82c4be198',1,'cyhal_pdmpcm.h']]],
-  ['cyhal_5fpinmux_5ft_33',['cyhal_pinmux_t',['../group__group__hal__impl__pin__package.html#gaffcf328b48424a0d3757867ac439775d',1,'cyhal_pin_package.h']]],
+  ['cyhal_5fpinmux_5ft_33',['cyhal_pinmux_t',['../group__group__hal__impl__pin__package.html#gab3d551eccf36469f1e5087435e536506',1,'cyhal_pin_package.h']]],
   ['cyhal_5fpwm_5fevent_5fcallback_5ft_34',['cyhal_pwm_event_callback_t',['../group__group__hal__pwm.html#gaaa08c1a2445ea5243c96ca657b37ec67',1,'cyhal_pwm.h']]],
   ['cyhal_5fpwm_5ft_35',['cyhal_pwm_t',['../group__group__hal__types__implementation.html#gad699a32011e66d85dd608493fff4feca',1,'cyhal_hw_types_template.h']]],
   ['cyhal_5fqspi_5fevent_5fcallback_5ft_36',['cyhal_qspi_event_callback_t',['../group__group__hal__qspi.html#ga42887dff6257345711b353990edb1ab1',1,'cyhal_qspi.h']]],

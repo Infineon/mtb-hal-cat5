@@ -62,7 +62,7 @@ static uint16_t _cyhal_deep_sleep_lock = 0;
 static uint32_t _cyhal_syspm_supply_voltages[((size_t)CYHAL_VOLTAGE_SUPPLY_MAX) + 1] = { 0 };
 
 /* Connections for: wakeup source GPIOs */
-const _cyhal_wakeup_src_pin_mapping_t _cyhal_gpio_map_wakeup_src[36] = {
+const _cyhal_wakeup_src_btss_pin_mapping_t _cyhal_gpio_map_btss_wakeup_src[36] = {
     {BTSS_SYSTEM_PMU_WAKE_SRC_BT_GPIO_0, BT_GPIO_0},
     {BTSS_SYSTEM_PMU_WAKE_SRC_BT_GPIO_2, BT_GPIO_2},
     {BTSS_SYSTEM_PMU_WAKE_SRC_BT_GPIO_3, BT_GPIO_3},
@@ -313,25 +313,77 @@ void _cyhal_syspm_post_sleep_cback (BTSS_SYSTEM_PMU_SLEEP_MODE_t sleep_state)
 
 }
 
-cy_rslt_t _cyhal_syspm_set_gpio_wakeup_source(cyhal_gpio_t pin, bool polarity, bool enable)
+cy_rslt_t _cyhal_syspm_set_gpio_wakeup_source(cyhal_gpio_t pin, cyhal_gpio_event_t event, bool enable)
 {
     bool pdl_status = false;
-    for (uint8_t pin_idx = 0; pin_idx < (sizeof(_cyhal_gpio_map_wakeup_src)/sizeof(_cyhal_gpio_map_wakeup_src[0])); pin_idx++)
+    if (pin < BT_GPIO_LAST)
     {
-        if(_cyhal_gpio_map_wakeup_src[pin_idx].pin == pin)
+        for (uint8_t pin_idx = 0; pin_idx < (sizeof(_cyhal_gpio_map_btss_wakeup_src)/sizeof(_cyhal_gpio_map_btss_wakeup_src[0])); pin_idx++)
         {
-            if (enable)
+            if(_cyhal_gpio_map_btss_wakeup_src[pin_idx].pin == pin)
             {
-                pdl_status = btss_system_sleepEnableWakeSource(_cyhal_gpio_map_wakeup_src[pin_idx].wakeup_src,
-                            (BTSS_SYSTEM_SLEEP_ACTIVE_CONFIG_t) polarity);
+                if (enable)
+                {
+                    pdl_status = btss_system_sleepEnableWakeSource(_cyhal_gpio_map_btss_wakeup_src[pin_idx].wakeup_src,
+                                (BTSS_SYSTEM_SLEEP_ACTIVE_CONFIG_t) (event == CYHAL_GPIO_IRQ_RISE));
+                }
+                else
+                {
+                    pdl_status = btss_system_sleepDisableWakeSource(_cyhal_gpio_map_btss_wakeup_src[pin_idx].wakeup_src);
+                }
+                //terminate the loop
+                break;
             }
-            else
-            {
-                pdl_status = btss_system_sleepDisableWakeSource(_cyhal_gpio_map_wakeup_src[pin_idx].wakeup_src);
-            }
-            //terminate the loop
-            break;
         }
+    }
+#if defined (CYW55900)
+    else if (pin < CTSS_GPIO_LAST)
+    {
+        if (enable)
+        {
+            pdl_status = ctss_system_sleepEnableWakeSource(CTSS_SYSTEM_PMU_WAKE_SRC_LHL_IO);
+        }
+        else
+        {
+            pdl_status = ctss_system_sleepDisableWakeSource(CTSS_SYSTEM_PMU_WAKE_SRC_LHL_IO);
+        }
+    }
+    else if (pin < WLSS_GPIO_LAST)
+    {
+        WLSS_IO_WAKE_TRIGGER_TYPE_t wlss_wakeup_src = WLSS_IO_WAKE_TRIGGER_EDGE_NONE;
+        switch (event)
+        {
+            case CYHAL_GPIO_IRQ_RISE:
+                wlss_wakeup_src = WLSS_IO_WAKE_TRIGGER_EDGE_RISING;
+                break;
+            case CYHAL_GPIO_IRQ_FALL:
+                wlss_wakeup_src = WLSS_IO_WAKE_TRIGGER_EDGE_FALLING;
+                break;
+            case CYHAL_GPIO_IRQ_BOTH:
+                wlss_wakeup_src = WLSS_IO_WAKE_TRIGGER_EDGE_BOTH;
+                break;
+            case CYHAL_GPIO_IRQ_NONE:
+            default:
+                break;
+        }
+
+        wlss_io_configWake(_CYHAL_GPIO_GET_WLSS_MAP(pin), wlss_wakeup_src);
+
+        if(enable)
+        {
+            pdl_status = wlss_system_sleepEnableWakeSource(WLSS_SYSTEM_PMU_WAKE_SRC_GCI2BT);
+        }
+        else
+        {
+            pdl_status = wlss_system_sleepDisableWakeSource(WLSS_SYSTEM_PMU_WAKE_SRC_GCI2BT);
+        }
+        /* Enable/Disable GCI wake-up*/
+        wlss_io_enableWake(_CYHAL_GPIO_GET_WLSS_MAP(pin), enable);
+    }
+#endif // defined (CYW55900)
+    else
+    {
+        return CYHAL_SYSPM_RSLT_BAD_ARGUMENT;
     }
 
     return (pdl_status) ? CY_RSLT_SUCCESS : CYHAL_SYSPM_RSLT_BAD_ARGUMENT;
