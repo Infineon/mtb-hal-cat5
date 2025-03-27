@@ -110,7 +110,7 @@ static const _cyhal_hwmgr_offset_t cyhal_block_offsets_gpio[CY_BLOCK_COUNT_GPIO]
 {
     0,
 #if defined (CYW55900)
-    65
+    74
 #else
     42
 #endif // defined (CYW55900)

@@ -2,6 +2,9 @@
 The CAT5 Hardware Abstraction Layer (HAL) provides an implementation of the Hardware Abstraction Layer for the CYW55500/CYW55900 chip families. This API provides convenience methods for initializing and manipulating different hardware peripherals. Depending on the specific chip being used, not all features may be supported.
 
 ### What Changed?
+#### v2.0.0
+* Extended CTSS GPIO support for CYW55900
+* Added Level triggered wakeup support
 #### v1.2.0
 * Added CTSS and WLSS GPIO support for CYW55900
 #### v1.1.0

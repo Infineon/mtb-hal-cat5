@@ -350,7 +350,7 @@ cy_rslt_t _cyhal_syspm_set_gpio_wakeup_source(cyhal_gpio_t pin, cyhal_gpio_event
     }
     else if (pin < WLSS_GPIO_LAST)
     {
-        WLSS_IO_WAKE_TRIGGER_TYPE_t wlss_wakeup_src = WLSS_IO_WAKE_TRIGGER_EDGE_NONE;
+        WLSS_IO_WAKE_TRIGGER_TYPE_t wlss_wakeup_src = (WLSS_IO_WAKE_TRIGGER_TYPE_t)0;
         switch (event)
         {
             case CYHAL_GPIO_IRQ_RISE:
@@ -362,6 +362,12 @@ cy_rslt_t _cyhal_syspm_set_gpio_wakeup_source(cyhal_gpio_t pin, cyhal_gpio_event
             case CYHAL_GPIO_IRQ_BOTH:
                 wlss_wakeup_src = WLSS_IO_WAKE_TRIGGER_EDGE_BOTH;
                 break;
+            case CYHAL_GPIO_IRQ_LOW:
+                wlss_wakeup_src = WLSS_IO_WAKE_TRIGGER_LEVEL_LOW;
+                break;
+            case CYHAL_GPIO_IRQ_HIGH:
+                wlss_wakeup_src = WLSS_IO_WAKE_TRIGGER_LEVEL_HIGH;
+                break;
             case CYHAL_GPIO_IRQ_NONE:
             default:
                 break;
@@ -371,11 +377,11 @@ cy_rslt_t _cyhal_syspm_set_gpio_wakeup_source(cyhal_gpio_t pin, cyhal_gpio_event
 
         if(enable)
         {
-            pdl_status = wlss_system_sleepEnableWakeSource(WLSS_SYSTEM_PMU_WAKE_SRC_GCI2BT);
+            pdl_status = wlss_system_sleepEnableWakeSource(WLSS_SYSTEM_PMU_WAKE_SRC_WLIO);
         }
         else
         {
-            pdl_status = wlss_system_sleepDisableWakeSource(WLSS_SYSTEM_PMU_WAKE_SRC_GCI2BT);
+            pdl_status = wlss_system_sleepDisableWakeSource(WLSS_SYSTEM_PMU_WAKE_SRC_WLIO);
         }
         /* Enable/Disable GCI wake-up*/
         wlss_io_enableWake(_CYHAL_GPIO_GET_WLSS_MAP(pin), enable);

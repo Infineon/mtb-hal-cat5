@@ -60,15 +60,50 @@ extern "C"
 {
 #endif
 
-#define _CYHAL_COMP_GPIO_0      LHL_GPIO_2
-#define _CYHAL_COMP_GPIO_1      LHL_GPIO_3
-#define _CYHAL_COMP_GPIO_2      LHL_GPIO_4
-#define _CYHAL_COMP_GPIO_3      LHL_GPIO_5
-#define _CYHAL_COMP_GPIO_4      LHL_GPIO_6
-#define _CYHAL_COMP_GPIO_5      LHL_GPIO_7
-#define _CYHAL_COMP_GPIO_6      LHL_GPIO_8
-#define _CYHAL_COMP_GPIO_7      LHL_GPIO_9
-#define _CYHAL_COMP_GPIO_MIC    MIC_P
+/* Connection type definition */
+/** Represents an association between a pin and the specific comparator pin */
+typedef struct
+{
+    cyhal_gpio_t                            pin;       //!< The GPIO pin
+    cy_en_adccomp_lpcomp_positive_channel_t comp_pin;  //!< The Comparator positive GPIO pin
+} _cyhal_adccomp_inp_mapping_t;
+
+typedef struct
+{
+    cyhal_gpio_t                            pin;       //!< The GPIO pin
+    cy_en_adccomp_lpcomp_negative_channel_t comp_pin;  //!< The Comparator negative GPIO pin
+} _cyhal_adccomp_inn_mapping_t;
+
+/* Connections for: Vp dc mode */
+const _cyhal_adccomp_inp_mapping_t _cyhal_pin_map_lpcomp_inp[5] = {
+#if defined (CYW55900)
+    {LHL_GPIO_4, CY_ADCCOMP_LPCOMP_2_IN_P_LHL_GPIO_4},
+    {LHL_GPIO_5, CY_ADCCOMP_LPCOMP_2_IN_P_LHL_GPIO_5},
+    {LHL_GPIO_8, CY_ADCCOMP_LPCOMP_1_IN_P_LHL_GPIO_8},
+    {LHL_GPIO_9, CY_ADCCOMP_LPCOMP_1_IN_P_LHL_GPIO_9},
+    {MIC_P, CY_ADCCOMP_LPCOMP_IN_P_MIC}
+#else
+    {LHL_GPIO_4, CY_ADCCOMP_LPCOMP_IN_P_GPIO26},
+    {LHL_GPIO_5, CY_ADCCOMP_LPCOMP_IN_P_GPIO37},
+    {LHL_GPIO_8, CY_ADCCOMP_LPCOMP_IN_P_GPIO26},
+    {LHL_GPIO_9, CY_ADCCOMP_LPCOMP_IN_P_GPIO37},
+    {MIC_P, CY_ADCCOMP_LPCOMP_IN_P_MIC}
+#endif //defined (CYW55900)
+};
+/* Connections for: Vn dc mode */
+const _cyhal_adccomp_inn_mapping_t _cyhal_pin_map_lpcomp_inn[4] = {
+#if defined (CYW55900)
+    {LHL_GPIO_2, CY_ADCCOMP_LPCOMP_2_IN_N_LHL_GPIO_2},
+    {LHL_GPIO_3, CY_ADCCOMP_LPCOMP_2_IN_N_LHL_GPIO_3},
+    {LHL_GPIO_6, CY_ADCCOMP_LPCOMP_1_IN_N_LHL_GPIO_6},
+    {LHL_GPIO_7, CY_ADCCOMP_LPCOMP_1_IN_N_LHL_GPIO_7}
+#else
+    {LHL_GPIO_2, CY_ADCCOMP_LPCOMP_IN_N_GPIO04},
+    {LHL_GPIO_3, CY_ADCCOMP_LPCOMP_IN_N_GPIO15},
+    {LHL_GPIO_6, CY_ADCCOMP_LPCOMP_IN_N_GPIO04},
+    {LHL_GPIO_7, CY_ADCCOMP_LPCOMP_IN_N_GPIO15}
+#endif // defined (CYW55900)
+};
 
 #define _CYHAL_COMP_IP_BLOCKS   (CY_IP_MXS40ADCMIC_INSTANCES)
 #define _CYHAL_COMP_PER_LP      (CY_IP_MXLPCOMP_INSTANCES)
@@ -160,6 +195,7 @@ cy_rslt_t cyhal_comp_init(cyhal_comp_t *obj, cyhal_gpio_t vin_p, cyhal_gpio_t vi
 
     /* Initial values */
     cy_rslt_t result = CY_RSLT_SUCCESS;
+    uint8_t arr_size = 0;
     cy_en_adccomp_lpcomp_positive_channel_t inP = CY_ADCCOMP_LPCOMP_IN_P_OPEN;
     cy_en_adccomp_lpcomp_negative_channel_t inN = CY_ADCCOMP_LPCOMP_IN_N_OPEN;
     cy_en_adccomp_lpcomp_mode_t mode = CY_ADCCOMP_LPCOMP_DC;
@@ -221,31 +257,16 @@ cy_rslt_t cyhal_comp_init(cyhal_comp_t *obj, cyhal_gpio_t vin_p, cyhal_gpio_t vi
         result = _cyhal_utils_reserve_and_connect(vin_p_map, CYHAL_PIN_MAP_DRIVE_MODE_LPCOMP_INP_COMP);
         if (CY_RSLT_SUCCESS == result)
         {
-            switch (vin_p)
+            arr_size = sizeof (_cyhal_pin_map_lpcomp_inp)/ sizeof(_cyhal_adccomp_inp_mapping_t);
+            for (uint8_t pinIdx = 0; pinIdx < arr_size; pinIdx++)
             {
-                case _CYHAL_COMP_GPIO_2:
-                case _CYHAL_COMP_GPIO_6:
+                if (_cyhal_pin_map_lpcomp_inp[pinIdx].pin == vin_p)
                 {
-                    inP = CY_ADCCOMP_LPCOMP_IN_P_GPIO26;
-                    break;
-                }
-                case _CYHAL_COMP_GPIO_3:
-                case _CYHAL_COMP_GPIO_7:
-                {
-                    inP = CY_ADCCOMP_LPCOMP_IN_P_GPIO37;
-                    break;
-                }
-                case _CYHAL_COMP_GPIO_MIC:
-                {
-                    inP = CY_ADCCOMP_LPCOMP_IN_P_MIC;
-                    break;
-                }
-                default:
-                {
-                    inP = CY_ADCCOMP_LPCOMP_IN_P_OPEN;
+                    inP = _cyhal_pin_map_lpcomp_inp[pinIdx].comp_pin;
                     break;
                 }
             }
+
             obj->pin_vin_p = vin_p;
             obj->inP = inP;
         }
@@ -258,27 +279,16 @@ cy_rslt_t cyhal_comp_init(cyhal_comp_t *obj, cyhal_gpio_t vin_p, cyhal_gpio_t vi
             result = _cyhal_utils_reserve_and_connect(vin_m_map, CYHAL_PIN_MAP_DRIVE_MODE_LPCOMP_INN_COMP);
             if (result == CY_RSLT_SUCCESS)
             {
-                switch (vin_m)
+                arr_size = sizeof (_cyhal_pin_map_lpcomp_inn)/ sizeof(_cyhal_adccomp_inn_mapping_t);
+                for (uint8_t pinIdx = 0; pinIdx < arr_size; pinIdx++)
                 {
-                    case _CYHAL_COMP_GPIO_0:
-                    case _CYHAL_COMP_GPIO_4:
+                    if (_cyhal_pin_map_lpcomp_inn[pinIdx].pin == vin_m)
                     {
-                        inN = CY_ADCCOMP_LPCOMP_IN_N_GPIO04;
-                        break;
-                    }
-                    case _CYHAL_COMP_GPIO_1:
-                    case _CYHAL_COMP_GPIO_5:
-                    {
-                        inN = CY_ADCCOMP_LPCOMP_IN_N_GPIO15;
-                        break;
-                    }
-                    default:
-                    {
-                        // Expected to be the case for NTD mode
-                        inN = CY_ADCCOMP_LPCOMP_IN_N_OPEN;
+                        inN = _cyhal_pin_map_lpcomp_inn[pinIdx].comp_pin;
                         break;
                     }
                 }
+
                 obj->pin_vin_m = vin_m;
                 obj->inN = inN;
             }

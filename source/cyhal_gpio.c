@@ -197,6 +197,8 @@ CTSS_LHL_IO_t _cyhal_gpio_convert_func_to_ctss(CTSS_PINMUX_FUNC_LIST_t functiona
         ctss_pin = (CTSS_LHL_IO_t)(functionality - FUNC_LHL_IO_0);
     else if (FUNC_LHL_IO_10 == functionality)
         ctss_pin = CTSS_LHL_IO_10;
+    else if ((FUNC_LHL_IO_2_ADC_MUX_SEL <= functionality) && (functionality <= FUNC_LHL_IO_9_ADC_MUX_SEL))
+        ctss_pin = (CTSS_LHL_IO_t)(functionality - FUNC_LHL_IO_2_ADC_MUX_SEL) + 2;
     else
         CY_ASSERT(0); // This should never happen due to previous checks
 

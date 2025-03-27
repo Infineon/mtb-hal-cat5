@@ -104,6 +104,16 @@ static cy_en_adccomp_adc_dc_channel_t _cyhal_adcmic_convert_channel_sel(uint8_t 
 {
     static const cy_en_adccomp_adc_dc_channel_t gpio_channel[] =
     {
+#if defined (CYW55900)
+        CY_ADCCOMP_ADC_IN_LHL_GPIO_2,
+        CY_ADCCOMP_ADC_IN_LHL_GPIO_3,
+        CY_ADCCOMP_ADC_IN_LHL_GPIO_4,
+        CY_ADCCOMP_ADC_IN_LHL_GPIO_5,
+        CY_ADCCOMP_ADC_IN_LHL_GPIO_6,
+        CY_ADCCOMP_ADC_IN_LHL_GPIO_7,
+        CY_ADCCOMP_ADC_IN_LHL_GPIO_8,
+        CY_ADCCOMP_ADC_IN_LHL_GPIO_9,
+#else
         CY_ADCCOMP_ADC_IN_GPIO0,
         CY_ADCCOMP_ADC_IN_GPIO1,
         CY_ADCCOMP_ADC_IN_GPIO2,
@@ -112,6 +122,7 @@ static cy_en_adccomp_adc_dc_channel_t _cyhal_adcmic_convert_channel_sel(uint8_t 
         CY_ADCCOMP_ADC_IN_GPIO5,
         CY_ADCCOMP_ADC_IN_GPIO6,
         CY_ADCCOMP_ADC_IN_GPIO7,
+#endif // defined (CYW55900)
     };
 
     if (bit_index < sizeof(gpio_channel) / sizeof(gpio_channel[0]))

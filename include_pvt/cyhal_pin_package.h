@@ -100,31 +100,40 @@ typedef enum
     BT_GPIO_LAST, //!< End of reconfigurable pins
 #if defined (CYW55900)
     /* CTSS GPIOs */
-    LHL_GPIO_0  = BT_GPIO_LAST, //!< LHL General Purpose I/O 0
-    LHL_GPIO_1  = 43u, //!< LHL General Purpose I/O 1
-    LHL_GPIO_10  = 44u, //!< LHL General Purpose I/O 1
+    LHL_IO_0  = BT_GPIO_LAST, //!< LHL General Purpose I/O 0
+    LHL_IO_1  = 43u, //!< LHL I/O 1
+    LHL_IO_2  = 44u, //!< LHL I/O 2
+    LHL_IO_3  = 45u, //!< LHL I/O 3
+    LHL_IO_4  = 46u, //!< LHL I/O 4
+    LHL_IO_5  = 47u, //!< LHL I/O 5
+    LHL_IO_6  = 48u, //!< LHL I/O 6
+    LHL_IO_7  = 49u, //!< LHL I/O 7
+    LHL_IO_8  = 50u, //!< LHL I/O 8
+    LHL_IO_9  = 51u, //!< LHL I/O 9
+    LHL_IO_10  = 52u, //!< LHL I/O 10
+    LHL_IO_I_MIC  = 53u, //!< LHL Input MIC
     CTSS_GPIO_LAST, //!< End of reconfigurable pins
     /* WLSS GPIOs */
     WL_GPIO_0 = CTSS_GPIO_LAST, //!< WLAN General Purpose I/O 0
-    WL_GPIO_2 = 46, //!< WLAN General Purpose I/O 0
-    WL_GPIO_3 = 47, //!< WLAN General Purpose I/O 0
-    WL_GPIO_4 = 48, //!< WLAN General Purpose I/O 0
-    WL_GPIO_5 = 49, //!< WLAN General Purpose I/O 0
-    WL_GPIO_6 = 50, //!< WLAN General Purpose I/O 0
-    SDIO_CLK = 51, //!< SDIO Clock I/O
-    SDIO_CMD = 52, //!< SDIO Command I/O
-    SDIO_DATA_0 = 53, //!< SDIO Data 0 I/O
-    SDIO_DATA_1 = 54, //!< SDIO Data 1 I/O
-    SDIO_DATA_2 = 55, //!< SDIO Data 2 I/O
-    SDIO_DATA_3 = 56, //!< SDIO Data 3 I/O
-    RFSW_CTRL_0 = 57,
-    RFSW_CTRL_1 = 58,
-    RFSW_CTRL_2 = 59,
-    RFSW_CTRL_3 = 60,
-    RFSW_CTRL_4 = 61,
-    RFSW_CTRL_5 = 62,
-    RFSW_CTRL_6 = 63,
-    RFSW_CTRL_7 = 64,
+    WL_GPIO_2 = 55u, //!< WLAN General Purpose I/O 0
+    WL_GPIO_3 = 56u, //!< WLAN General Purpose I/O 0
+    WL_GPIO_4 = 57u, //!< WLAN General Purpose I/O 0
+    WL_GPIO_5 = 58u, //!< WLAN General Purpose I/O 0
+    WL_GPIO_6 = 59u, //!< WLAN General Purpose I/O 0
+    SDIO_CLK = 60u, //!< SDIO Clock I/O
+    SDIO_CMD = 61u, //!< SDIO Command I/O
+    SDIO_DATA_0 = 62u, //!< SDIO Data 0 I/O
+    SDIO_DATA_1 = 63u, //!< SDIO Data 1 I/O
+    SDIO_DATA_2 = 64u, //!< SDIO Data 2 I/O
+    SDIO_DATA_3 = 65u, //!< SDIO Data 3 I/O
+    RFSW_CTRL_0 = 66u,
+    RFSW_CTRL_1 = 67u,
+    RFSW_CTRL_2 = 68u,
+    RFSW_CTRL_3 = 69u,
+    RFSW_CTRL_4 = 70u,
+    RFSW_CTRL_5 = 71u,
+    RFSW_CTRL_6 = 72u,
+    RFSW_CTRL_7 = 73u,
     WLSS_GPIO_LAST,
     DIRECT_BASE = WLSS_GPIO_LAST, //!< Start of direct connection pins
     MIC_P = WLSS_GPIO_LAST //!< External Microphone
